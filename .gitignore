@@ -1,0 +1,24 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.log
+
+# Documentos acadêmicos (não versionar)
+*.pdf
+docs/academic/*.pdf
+
+# Node (futuro apps/backend)
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+
+# MySQL / dumps locais
+*.sql.gz
+tmp/
