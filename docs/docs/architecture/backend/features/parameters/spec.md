@@ -40,8 +40,8 @@ Tabela `parameters` (ver functional spec):
 
 ## Critérios de aceite
 
-- [ ] Seed global com três presets e default `normal`
-- [ ] Operator altera `teleop.activeProfile` no escopo user
-- [ ] Operator **não** altera `teleop.presets` global
-- [ ] session-config reflete o preset efetivo em `limits.teleop`
-- [ ] Admin altera presets globais e isso afeta novos session-config
+- [x] Seed global com três presets e default `normal`
+- [x] Operator altera `teleop.activeProfile` no escopo user
+- [x] Operator **não** altera `teleop.presets` global
+- [x] session-config reflete o preset efetivo em `limits.teleop`
+- [x] Admin altera presets globais e isso afeta novos session-config

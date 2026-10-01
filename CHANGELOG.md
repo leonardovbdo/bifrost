@@ -7,7 +7,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionament
 
 ### Added
 
-- Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles, grant access, seed operator opcional (`feat/etapa-a-auth-session`, PR #1)
+- Etapa B: parameters (`global`/`user`, merge em session-config) + audit events, allowlist `goal_pose`, purge 90d (`feat/etapa-b-parameters-audit`)
+- Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles (`feat/etapa-a-auth-session`, PR #1)
 
 
 ### Added
