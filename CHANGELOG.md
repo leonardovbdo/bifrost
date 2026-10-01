@@ -7,6 +7,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionament
 
 ### Added
 
+- Etapa C: proxy LLM `POST /api/v1/llm/ask` (Gemini pluggable + stub), audit `llm_ask`, seed viewer, CI Maven `.github/workflows/backend.yml` (`feat/etapa-c-llm-ci`)
 - Etapa B: parameters (`global`/`user`, merge em session-config) + audit events, allowlist `goal_pose`, purge 90d (`feat/etapa-b-parameters-audit`)
 - Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles (`feat/etapa-a-auth-session`, PR #1)
 

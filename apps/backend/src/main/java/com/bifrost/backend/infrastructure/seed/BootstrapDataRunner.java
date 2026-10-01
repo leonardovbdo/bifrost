@@ -70,6 +70,13 @@ public class BootstrapDataRunner implements ApplicationRunner {
         UserRole.OPERATOR,
         profile,
         "operator");
+    ensureUser(
+        properties.viewer().enabled(),
+        properties.viewer().username(),
+        properties.viewer().password(),
+        UserRole.VIEWER,
+        profile,
+        "viewer");
     ensureTeleopParameters();
   }
 

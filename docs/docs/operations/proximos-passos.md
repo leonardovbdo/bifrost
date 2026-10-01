@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-01  
-**Estado:** Etapa B (parameters + audit) na branch `feat/etapa-b-parameters-audit`. Etapa A na PR #1.
+**Estado:** Etapa C (LLM + CI Maven) na branch `feat/etapa-c-llm-ci`. Etapas A/B nas PRs #1/#2.
 
 ---
 
@@ -10,28 +10,30 @@
 | Item | Status |
 |------|--------|
 | Etapa A — auth/session/profiles | DONE (PR #1) |
-| Etapa B — parameters + audit | DONE nesta branch |
-| Etapa C — LLM + CI Maven | **TODO** |
+| Etapa B — parameters + audit | DONE (PR #2 / `feat/etapa-b-parameters-audit`) |
+| Etapa C — LLM + CI Maven | DONE nesta branch |
 | Etapa D — UI / demo NARA | TODO |
 
-Branch atual de trabalho: `feat/etapa-b-parameters-audit`
+Branch atual de trabalho: `feat/etapa-c-llm-ci`
 
 ---
 
 ## Como retomar
 
 ```bash
-git checkout feat/etapa-b-parameters-audit
+git checkout feat/etapa-c-llm-ci
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
+# opcional: BIFROST_LLM_API_KEY=... (sem key usa stub)
 cd apps/backend && ./mvnw spring-boot:run
 ```
 
-Novos endpoints: `/api/v1/parameters`, `/api/v1/audit/events`
+Novos endpoints: `POST /api/v1/llm/ask`  
+CI: `.github/workflows/backend.yml` (`./mvnw verify`)
 
 ---
 
 ## Próxima ação imediata
 
-**Etapa C** — proxy LLM (ADR-011) + workflow GitHub Actions `./mvnw verify`.
+**Etapa D** — UI / demo NARA (session-config → Foxglaze/teleop; assistente via `/llm/ask`).
