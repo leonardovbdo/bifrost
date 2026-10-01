@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-01  
-**Estado:** Etapa C (LLM + CI Maven) na branch `feat/etapa-c-llm-ci`. Etapas A/B nas PRs #1/#2.
+**Estado:** Etapa D (UI / demo NARA) na branch `feat/etapa-d-ui-demo`. Etapas A–C nas PRs #1–#3.
 
 ---
 
@@ -10,30 +10,32 @@
 | Item | Status |
 |------|--------|
 | Etapa A — auth/session/profiles | DONE (PR #1) |
-| Etapa B — parameters + audit | DONE (PR #2 / `feat/etapa-b-parameters-audit`) |
-| Etapa C — LLM + CI Maven | DONE nesta branch |
-| Etapa D — UI / demo NARA | TODO |
+| Etapa B — parameters + audit | DONE (PR #2) |
+| Etapa C — LLM + CI Maven | DONE (PR #3 / `feat/etapa-c-llm-ci`) |
+| Etapa D — UI / demo NARA | DONE nesta branch |
 
-Branch atual de trabalho: `feat/etapa-c-llm-ci`
+Branch atual de trabalho: `feat/etapa-d-ui-demo`
 
 ---
 
 ## Como retomar
 
 ```bash
-git checkout feat/etapa-c-llm-ci
+git checkout feat/etapa-d-ui-demo
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
-# opcional: BIFROST_LLM_API_KEY=... (sem key usa stub)
 cd apps/backend && ./mvnw spring-boot:run
+# outro terminal:
+cd apps/web && npm install && npm run dev
 ```
 
-Novos endpoints: `POST /api/v1/llm/ask`  
-CI: `.github/workflows/backend.yml` (`./mvnw verify`)
+UI: `http://localhost:5173` (proxy `/api` → `:8081`)
+
+Com NARA + bridgelaunch: teleop WASD + câmera via session-config.
 
 ---
 
 ## Próxima ação imediata
 
-**Etapa D** — UI / demo NARA (session-config → Foxglaze/teleop; assistente via `/llm/ask`).
+Polimento / demos / merge das PRs em cadeia (A→B→C→D), ou evoluções UI (mapa, goal_pose auditado).
