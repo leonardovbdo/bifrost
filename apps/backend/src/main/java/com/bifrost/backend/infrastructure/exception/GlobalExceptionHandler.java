@@ -4,6 +4,7 @@ import com.bifrost.backend.domain.exception.AuthenticationFailedException;
 import com.bifrost.backend.domain.exception.ConflictException;
 import com.bifrost.backend.domain.exception.DomainException;
 import com.bifrost.backend.domain.exception.ForbiddenException;
+import com.bifrost.backend.domain.exception.LlmException;
 import com.bifrost.backend.domain.exception.NotFoundException;
 import com.bifrost.backend.domain.exception.ValidationException;
 import com.bifrost.backend.infrastructure.adapter.input.controller.v1.dto.ErrorResponse;
@@ -38,6 +39,13 @@ public class GlobalExceptionHandler {
     }
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(ErrorResponse.of("ACCESS_DENIED", "Access denied"));
+  }
+
+  @ExceptionHandler(LlmException.class)
+  public ResponseEntity<ErrorResponse> llm(LlmException ex) {
+    HttpStatus status =
+        "LLM_NOT_CONFIGURED".equals(ex.code()) ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
+    return ResponseEntity.status(status).body(ErrorResponse.of(ex.code(), ex.getMessage()));
   }
 
   @ExceptionHandler(NotFoundException.class)
