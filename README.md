@@ -15,7 +15,7 @@ Desenvolver e documentar **Bifrost**, uma arquitetura de **backend** (Java + Spr
 
 A comunicação de **baixa latência** com o ROS (teleop, sensores, câmeras) permanece no modelo **híbrido**: o cliente (protótipo de UI do TCC ou outro front) fala com rosbridge / web_video_server; o backend autoriza, configura e audita.
 
-Este repositório é **docs-first** com skeleton em [`apps/backend`](apps/backend/README.md) (Java 21 + Spring Boot). Features de produto seguem as ADRs e packs em `docs/`.
+Este repositório é **docs-first** com implementação em [`apps/backend`](apps/backend/README.md) (Java 21 + Spring Boot) e protótipo de UI em [`apps/web`](apps/web/README.md). Features de produto seguem as ADRs e packs em `docs/`.
 
 ## Stack declarada
 
@@ -24,22 +24,24 @@ Este repositório é **docs-first** com skeleton em [`apps/backend`](apps/backen
 | Backend | Java 21 + Spring Boot (`apps/backend`) |
 | Banco | PostgreSQL 16 (`docker compose`) |
 | Integração ROS | Rosbridge (cliente no browser; governo no backend) |
-| Cliente de testes | Protótipo de UI do próprio TCC (futuro; opcional) |
+| Cliente de testes | Protótipo UI Vite/React (`apps/web`) |
 | Runtime robótico | ROS 2 Jazzy (`noblenara` / `nara-sim`) |
 
-## Quick start (API local)
+## Quick start (API + UI local)
 
 ```bash
 docker compose up -d
 cd apps/backend && ./mvnw spring-boot:run
-# health: http://localhost:8081/actuator/health
+# outro terminal:
+cd apps/web && npm install && npm run dev
+# UI: http://localhost:5173 · health: http://localhost:8081/actuator/health
 ```
 
 ## Documentação
 
 Toda a documentação arquitetural vive em [`docs/`](docs/README.md), organizada em `adrs/`, `architecture/`, `conventions/`, `requirements/`, `operations/` e `diagrams/`.
 
-**Retomar o trabalho:** [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md) — estado atual, ordem de implementação e próxima task (AUTH-01).
+**Retomar o trabalho:** [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md).
 
 Changelog: [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -56,6 +58,6 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 
 | Fase | Situação |
 |------|----------|
-| Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** (2026-09-30) |
-| Skeleton `apps/backend` | **Pronto** (health + Flyway baseline + correlation-id) |
-| Implementação de domínio (auth → profiles → …) | **Próximo** — ver [próximos passos](docs/docs/operations/proximos-passos.md) |
+| Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** |
+| Skeleton + Etapas A–C (API) | **Em PRs** — ver [próximos passos](docs/docs/operations/proximos-passos.md) |
+| Etapa D (UI demo) | **Em andamento** — `apps/web` |

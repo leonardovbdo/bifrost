@@ -25,7 +25,8 @@ O repositório é docs-first e caminha para `apps/backend` Java. É preciso CI �
 
 1. Workflow GitHub Actions na pasta `.github/workflows/`:
    - **docs:** lint Markdown em PRs e pushes para `main`
-   - **backend:** `./mvnw verify` (Testcontainers; ITs com `disabledWithoutDocker`) — ativo em `.github/workflows/backend.yml`
+   - **backend:** `./mvnw verify` (Testcontainers; ITs com `disabledWithoutDocker`) — `.github/workflows/backend.yml`
+   - **web:** `npm ci` + lint + build do protótipo — `.github/workflows/web.yml`
 2. Branch `main`: preferir mudanças via **pull request**; proteção formal (required checks) ativar quando o remote e o fluxo solo/permitirem sem atrito indevido
 3. Sem deploy automático no MVP (sem ambiente cloud obrigatório)
 
