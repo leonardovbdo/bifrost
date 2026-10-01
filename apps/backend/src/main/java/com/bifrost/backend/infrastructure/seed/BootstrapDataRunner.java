@@ -1,13 +1,17 @@
 package com.bifrost.backend.infrastructure.seed;
 
+import com.bifrost.backend.domain.enums.ParameterScope;
 import com.bifrost.backend.domain.enums.ProfileEnvironment;
 import com.bifrost.backend.domain.enums.UserRole;
+import com.bifrost.backend.domain.model.Parameter;
 import com.bifrost.backend.domain.model.RobotProfile;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.port.output.PasswordHasher;
+import com.bifrost.backend.domain.repository.ParameterRepository;
 import com.bifrost.backend.domain.repository.RobotProfileRepository;
 import com.bifrost.backend.domain.repository.UserProfileAccessRepository;
 import com.bifrost.backend.domain.repository.UserRepository;
+import com.bifrost.backend.domain.service.TeleopLimitsMerger;
 import com.bifrost.backend.infrastructure.config.BifrostProperties;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +34,7 @@ public class BootstrapDataRunner implements ApplicationRunner {
   private final RobotProfileRepository profileRepository;
   private final UserRepository userRepository;
   private final UserProfileAccessRepository accessRepository;
+  private final ParameterRepository parameterRepository;
   private final PasswordHasher passwordHasher;
 
   public BootstrapDataRunner(
@@ -37,11 +42,13 @@ public class BootstrapDataRunner implements ApplicationRunner {
       RobotProfileRepository profileRepository,
       UserRepository userRepository,
       UserProfileAccessRepository accessRepository,
+      ParameterRepository parameterRepository,
       PasswordHasher passwordHasher) {
     this.properties = properties;
     this.profileRepository = profileRepository;
     this.userRepository = userRepository;
     this.accessRepository = accessRepository;
+    this.parameterRepository = parameterRepository;
     this.passwordHasher = passwordHasher;
   }
 
@@ -49,7 +56,13 @@ public class BootstrapDataRunner implements ApplicationRunner {
   @Transactional
   public void run(ApplicationArguments args) {
     RobotProfile profile = ensureNaraSimProfile();
-    ensureUser(properties.admin().enabled(), properties.admin().username(), properties.admin().password(), UserRole.ADMIN, profile, "admin");
+    ensureUser(
+        properties.admin().enabled(),
+        properties.admin().username(),
+        properties.admin().password(),
+        UserRole.ADMIN,
+        profile,
+        "admin");
     ensureUser(
         properties.operator().enabled(),
         properties.operator().username(),
@@ -57,6 +70,28 @@ public class BootstrapDataRunner implements ApplicationRunner {
         UserRole.OPERATOR,
         profile,
         "operator");
+    ensureTeleopParameters();
+  }
+
+  private void ensureTeleopParameters() {
+    if (parameterRepository.find(ParameterScope.GLOBAL, null, TeleopLimitsMerger.KEY_PRESETS).isEmpty()) {
+      Map<String, Object> presets = new LinkedHashMap<>();
+      presets.put("safety", Map.of("linearMax", 0.20, "angularMax", 0.60));
+      presets.put("normal", Map.of("linearMax", 0.50, "angularMax", 1.00));
+      presets.put("fast", Map.of("linearMax", 0.80, "angularMax", 1.40));
+      parameterRepository.save(
+          Parameter.create(ParameterScope.GLOBAL, null, TeleopLimitsMerger.KEY_PRESETS, presets));
+      log.info("Seeded global parameter {}", TeleopLimitsMerger.KEY_PRESETS);
+    }
+    if (parameterRepository.find(ParameterScope.GLOBAL, null, TeleopLimitsMerger.KEY_ACTIVE).isEmpty()) {
+      parameterRepository.save(
+          Parameter.create(
+              ParameterScope.GLOBAL,
+              null,
+              TeleopLimitsMerger.KEY_ACTIVE,
+              Map.of("value", "normal")));
+      log.info("Seeded global parameter {}", TeleopLimitsMerger.KEY_ACTIVE);
+    }
   }
 
   private RobotProfile ensureNaraSimProfile() {

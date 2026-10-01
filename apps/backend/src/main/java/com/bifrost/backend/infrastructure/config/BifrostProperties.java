@@ -13,6 +13,7 @@ public class BifrostProperties {
   private final AdminSeed admin = new AdminSeed();
   private final OperatorSeed operator = new OperatorSeed();
   private final Teleop teleop = new Teleop();
+  private final Audit audit = new Audit();
 
   public Jwt getJwt() { return jwt; }
   public Cookie getCookie() { return cookie; }
@@ -20,6 +21,7 @@ public class BifrostProperties {
   public AdminSeed getAdmin() { return admin; }
   public OperatorSeed getOperator() { return operator; }
   public Teleop getTeleop() { return teleop; }
+  public Audit getAudit() { return audit; }
 
   public Jwt jwt() { return jwt; }
   public Cookie cookie() { return cookie; }
@@ -27,6 +29,7 @@ public class BifrostProperties {
   public AdminSeed admin() { return admin; }
   public OperatorSeed operator() { return operator; }
   public Teleop teleop() { return teleop; }
+  public Audit audit() { return audit; }
 
   public static class Jwt {
     private String secret = "change-me-bifrost-dev-secret-at-least-32-chars";
@@ -101,5 +104,15 @@ public class BifrostProperties {
     public void setAngularMax(double angularMax) { this.angularMax = angularMax; }
     public String profile() { return profile; }
     public void setProfile(String profile) { this.profile = profile; }
+  }
+
+  public static class Audit {
+    private int retentionDays = 90;
+    private String purgeCron = "0 30 3 * * *";
+
+    public int retentionDays() { return retentionDays; }
+    public void setRetentionDays(int retentionDays) { this.retentionDays = retentionDays; }
+    public String purgeCron() { return purgeCron; }
+    public void setPurgeCron(String purgeCron) { this.purgeCron = purgeCron; }
   }
 }

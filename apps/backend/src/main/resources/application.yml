@@ -60,3 +60,6 @@ bifrost:
     linear-max: 0.5
     angular-max: 1.0
     profile: normal
+  audit:
+    retention-days: ${BIFROST_AUDIT_RETENTION_DAYS:90}
+    purge-cron: ${BIFROST_AUDIT_PURGE_CRON:0 30 3 * * *}

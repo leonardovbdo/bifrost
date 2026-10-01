@@ -68,7 +68,7 @@ public class GetSessionConfigUseCase {
     }
 
     Map<String, Object> limits = new LinkedHashMap<>();
-    limits.put("teleop", teleopLimitsProvider.defaultTeleopLimits());
+    limits.put("teleop", teleopLimitsProvider.resolveForUser(user.id()));
 
     return new SessionConfigView(
         1,
