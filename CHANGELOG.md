@@ -5,7 +5,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionament
 
 ## [Unreleased]
 
-## [0.4.0] — 2026-09-30
+### Added
+
+- Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles, grant access, seed operator opcional (`feat/etapa-a-auth-session`, PR #1)
+
 
 ### Added
 

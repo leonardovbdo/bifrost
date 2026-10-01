@@ -1,0 +1,73 @@
+package com.bifrost.backend.infrastructure.security;
+
+import com.bifrost.backend.infrastructure.config.BifrostProperties;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AuthCookieService {
+  private final BifrostProperties properties;
+
+  public AuthCookieService(BifrostProperties properties) {
+    this.properties = properties;
+  }
+
+  public void writeAuthCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+    writeCookie(
+        response,
+        properties.cookie().accessName(),
+        accessToken,
+        properties.jwt().accessTtl());
+    writeCookie(
+        response,
+        properties.cookie().refreshName(),
+        refreshToken,
+        properties.jwt().refreshTtl());
+  }
+
+  public void clearAuthCookies(HttpServletResponse response) {
+    writeCookie(response, properties.cookie().accessName(), "", Duration.ZERO);
+    writeCookie(response, properties.cookie().refreshName(), "", Duration.ZERO);
+  }
+
+  public String readCookie(HttpServletRequest request, String name) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies == null) {
+      return null;
+    }
+    for (Cookie cookie : cookies) {
+      if (name.equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+    return null;
+  }
+
+  public String accessCookieName() {
+    return properties.cookie().accessName();
+  }
+
+  public String refreshCookieName() {
+    return properties.cookie().refreshName();
+  }
+
+  private void writeCookie(HttpServletResponse response, String name, String value, Duration maxAge) {
+    ResponseCookie.ResponseCookieBuilder builder =
+        ResponseCookie.from(name, value == null ? "" : value)
+            .httpOnly(true)
+            .secure(properties.cookie().secure())
+            .path("/")
+            .sameSite(properties.cookie().sameSite());
+    if (maxAge.isZero() || maxAge.isNegative()) {
+      builder.maxAge(0);
+    } else {
+      builder.maxAge(maxAge);
+    }
+    response.addHeader(HttpHeaders.SET_COOKIE, builder.build().toString());
+  }
+}
