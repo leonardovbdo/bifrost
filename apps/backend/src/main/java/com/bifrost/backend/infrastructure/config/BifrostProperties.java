@@ -11,18 +11,21 @@ public class BifrostProperties {
   private final Cookie cookie = new Cookie();
   private final Cors cors = new Cors();
   private final AdminSeed admin = new AdminSeed();
+  private final OperatorSeed operator = new OperatorSeed();
   private final Teleop teleop = new Teleop();
 
   public Jwt getJwt() { return jwt; }
   public Cookie getCookie() { return cookie; }
   public Cors getCors() { return cors; }
   public AdminSeed getAdmin() { return admin; }
+  public OperatorSeed getOperator() { return operator; }
   public Teleop getTeleop() { return teleop; }
 
   public Jwt jwt() { return jwt; }
   public Cookie cookie() { return cookie; }
   public Cors cors() { return cors; }
   public AdminSeed admin() { return admin; }
+  public OperatorSeed operator() { return operator; }
   public Teleop teleop() { return teleop; }
 
   public static class Jwt {
@@ -63,6 +66,19 @@ public class BifrostProperties {
 
   public static class AdminSeed {
     private boolean enabled = true;
+    private String username;
+    private String password;
+
+    public boolean enabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public String username() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String password() { return password; }
+    public void setPassword(String password) { this.password = password; }
+  }
+
+  public static class OperatorSeed {
+    private boolean enabled = false;
     private String username;
     private String password;
 

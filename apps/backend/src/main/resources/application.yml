@@ -52,6 +52,10 @@ bifrost:
     enabled: ${BIFROST_ADMIN_SEED_ENABLED:true}
     username: ${BIFROST_ADMIN_USERNAME:}
     password: ${BIFROST_ADMIN_PASSWORD:}
+  operator:
+    enabled: ${BIFROST_OPERATOR_SEED_ENABLED:false}
+    username: ${BIFROST_OPERATOR_USERNAME:}
+    password: ${BIFROST_OPERATOR_PASSWORD:}
   teleop:
     linear-max: 0.5
     angular-max: 1.0

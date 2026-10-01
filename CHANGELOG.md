@@ -7,7 +7,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionament
 
 ### Added
 
-- Etapa A: auth JWT/cookies, refresh, `/me`, session-config, seeds admin + `nara-sim-alfa` (`feat/etapa-a-auth-session`)
+- Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles, grant access, seed operator opcional (`feat/etapa-a-auth-session`, PR #1)
 
 
 ### Added

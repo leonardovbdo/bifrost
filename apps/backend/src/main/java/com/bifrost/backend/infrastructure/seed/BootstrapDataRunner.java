@@ -9,11 +9,9 @@ import com.bifrost.backend.domain.repository.RobotProfileRepository;
 import com.bifrost.backend.domain.repository.UserProfileAccessRepository;
 import com.bifrost.backend.domain.repository.UserRepository;
 import com.bifrost.backend.infrastructure.config.BifrostProperties;
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -51,7 +49,14 @@ public class BootstrapDataRunner implements ApplicationRunner {
   @Transactional
   public void run(ApplicationArguments args) {
     RobotProfile profile = ensureNaraSimProfile();
-    ensureAdmin(profile);
+    ensureUser(properties.admin().enabled(), properties.admin().username(), properties.admin().password(), UserRole.ADMIN, profile, "admin");
+    ensureUser(
+        properties.operator().enabled(),
+        properties.operator().username(),
+        properties.operator().password(),
+        UserRole.OPERATOR,
+        profile,
+        "operator");
   }
 
   private RobotProfile ensureNaraSimProfile() {
@@ -59,7 +64,6 @@ public class BootstrapDataRunner implements ApplicationRunner {
         .findBySlug(NARA_SIM_SLUG)
         .orElseGet(
             () -> {
-              Instant now = Instant.now();
               Map<String, String> topics = new LinkedHashMap<>();
               topics.put("cmd_vel", "/noblenara/alfa/cmd_vel");
               topics.put("camera_link", "/noblenara/alfa/camera_link/image");
@@ -77,8 +81,7 @@ public class BootstrapDataRunner implements ApplicationRunner {
               frames.put("camera", "camera_link");
 
               RobotProfile created =
-                  new RobotProfile(
-                      UUID.randomUUID(),
+                  RobotProfile.create(
                       NARA_SIM_SLUG,
                       "NARA Sim Alfa",
                       "noblenara",
@@ -90,43 +93,37 @@ public class BootstrapDataRunner implements ApplicationRunner {
                       frames,
                       "ws://localhost:9090",
                       "http://localhost:8080",
-                      true,
-                      now,
-                      now);
+                      true);
               RobotProfile saved = profileRepository.save(created);
               log.info("Seeded robot profile {}", saved.slug());
               return saved;
             });
   }
 
-  private void ensureAdmin(RobotProfile profile) {
-    BifrostProperties.AdminSeed admin = properties.admin();
-    if (!admin.enabled()) {
+  private void ensureUser(
+      boolean enabled,
+      String username,
+      String password,
+      UserRole role,
+      RobotProfile profile,
+      String label) {
+    if (!enabled) {
       return;
     }
-    if (admin.username() == null
-        || admin.username().isBlank()
-        || admin.password() == null
-        || admin.password().isBlank()) {
-      log.warn(
-          "Admin seed enabled but BIFROST_ADMIN_USERNAME/PASSWORD not set; skipping admin creation");
+    if (username == null || username.isBlank() || password == null || password.isBlank()) {
+      log.warn("Seed {} enabled but username/password not set; skipping", label);
       return;
     }
-    if (userRepository.existsByUsername(admin.username())) {
+    if (userRepository.existsByUsername(username)) {
       userRepository
-          .findByUsername(admin.username())
+          .findByUsername(username)
           .ifPresent(existing -> accessRepository.grant(existing.id(), profile.id()));
       return;
     }
-    User user =
-        User.create(
-            admin.username(),
-            null,
-            passwordHasher.hash(admin.password()),
-            UserRole.ADMIN);
+    User user = User.create(username, null, passwordHasher.hash(password), role);
     user.switchActiveProfile(profile.id());
     User saved = userRepository.save(user);
     accessRepository.grant(saved.id(), profile.id());
-    log.info("Seeded admin user '{}'", saved.username());
+    log.info("Seeded {} user '{}'", label, saved.username());
   }
 }

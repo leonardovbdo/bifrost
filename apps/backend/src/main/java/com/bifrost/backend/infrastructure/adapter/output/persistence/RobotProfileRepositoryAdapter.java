@@ -7,6 +7,7 @@ import com.bifrost.backend.infrastructure.adapter.output.persistence.jpa.RobotPr
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,6 +29,11 @@ public class RobotProfileRepositoryAdapter implements RobotProfileRepository {
   }
 
   @Override
+  public List<RobotProfile> findAll() {
+    return jpaRepository.findAll(Sort.by("slug")).stream().map(RobotProfileMapper::toDomain).toList();
+  }
+
+  @Override
   public List<RobotProfile> findActiveByIds(List<UUID> ids) {
     if (ids == null || ids.isEmpty()) {
       return List.of();
@@ -35,6 +41,14 @@ public class RobotProfileRepositoryAdapter implements RobotProfileRepository {
     return jpaRepository.findByIdInAndActiveTrue(ids).stream()
         .map(RobotProfileMapper::toDomain)
         .toList();
+  }
+
+  @Override
+  public List<RobotProfile> findByIds(List<UUID> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return jpaRepository.findByIdIn(ids).stream().map(RobotProfileMapper::toDomain).toList();
   }
 
   @Override

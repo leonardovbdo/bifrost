@@ -1,6 +1,7 @@
 package com.bifrost.backend.infrastructure.exception;
 
 import com.bifrost.backend.domain.exception.AuthenticationFailedException;
+import com.bifrost.backend.domain.exception.ConflictException;
 import com.bifrost.backend.domain.exception.DomainException;
 import com.bifrost.backend.domain.exception.ForbiddenException;
 import com.bifrost.backend.domain.exception.NotFoundException;
@@ -9,6 +10,7 @@ import com.bifrost.backend.infrastructure.adapter.input.controller.v1.dto.ErrorR
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,10 +24,20 @@ public class GlobalExceptionHandler {
         .body(ErrorResponse.of(ex.code(), ex.getMessage()));
   }
 
-  @ExceptionHandler(ForbiddenException.class)
-  public ResponseEntity<ErrorResponse> forbidden(ForbiddenException ex) {
-    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<ErrorResponse> conflict(ConflictException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(ErrorResponse.of(ex.code(), ex.getMessage()));
+  }
+
+  @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
+  public ResponseEntity<ErrorResponse> forbidden(RuntimeException ex) {
+    if (ex instanceof ForbiddenException forbidden) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(ErrorResponse.of(forbidden.code(), forbidden.getMessage()));
+    }
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(ErrorResponse.of("ACCESS_DENIED", "Access denied"));
   }
 
   @ExceptionHandler(NotFoundException.class)

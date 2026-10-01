@@ -10,7 +10,11 @@ public interface RobotProfileRepository {
 
   Optional<RobotProfile> findBySlug(String slug);
 
+  List<RobotProfile> findAll();
+
   List<RobotProfile> findActiveByIds(List<UUID> ids);
+
+  List<RobotProfile> findByIds(List<UUID> ids);
 
   RobotProfile save(RobotProfile profile);
 

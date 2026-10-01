@@ -58,65 +58,83 @@ public class RobotProfile {
     this.updatedAt = Objects.requireNonNull(updatedAt);
   }
 
-  public UUID id() {
-    return id;
+  public static RobotProfile create(
+      String slug,
+      String displayName,
+      String project,
+      String prefix,
+      ProfileEnvironment environment,
+      String technology,
+      List<String> capabilities,
+      Map<String, String> topics,
+      Map<String, String> frames,
+      String rosbridgeUrl,
+      String videoBaseUrl,
+      boolean active) {
+    Instant now = Instant.now();
+    return new RobotProfile(
+        UUID.randomUUID(),
+        slug,
+        displayName,
+        project,
+        prefix,
+        environment,
+        technology,
+        capabilities,
+        topics,
+        frames == null ? Map.of() : frames,
+        rosbridgeUrl,
+        videoBaseUrl,
+        active,
+        now,
+        now);
   }
 
-  public String slug() {
-    return slug;
+  public RobotProfile applyPatch(
+      String displayName,
+      String project,
+      String prefix,
+      ProfileEnvironment environment,
+      String technology,
+      List<String> capabilities,
+      Map<String, String> topics,
+      Map<String, String> frames,
+      String rosbridgeUrl,
+      String videoBaseUrl,
+      Boolean active) {
+    return new RobotProfile(
+        id,
+        slug,
+        displayName != null ? displayName : this.displayName,
+        project != null ? project : this.project,
+        prefix != null ? prefix : this.prefix,
+        environment != null ? environment : this.environment,
+        technology != null ? technology : this.technology,
+        capabilities != null ? capabilities : this.capabilities,
+        topics != null ? topics : this.topics,
+        frames != null ? frames : this.frames,
+        rosbridgeUrl != null ? rosbridgeUrl : this.rosbridgeUrl,
+        videoBaseUrl != null ? videoBaseUrl : this.videoBaseUrl,
+        active != null ? active : this.active,
+        createdAt,
+        Instant.now());
   }
 
-  public String displayName() {
-    return displayName;
-  }
-
-  public String project() {
-    return project;
-  }
-
-  public String prefix() {
-    return prefix;
-  }
-
-  public ProfileEnvironment environment() {
-    return environment;
-  }
-
-  public String technology() {
-    return technology;
-  }
-
-  public List<String> capabilities() {
-    return capabilities;
-  }
-
-  public Map<String, String> topics() {
-    return topics;
-  }
-
-  public Map<String, String> frames() {
-    return frames;
-  }
-
-  public String rosbridgeUrl() {
-    return rosbridgeUrl;
-  }
-
-  public String videoBaseUrl() {
-    return videoBaseUrl;
-  }
-
-  public boolean active() {
-    return active;
-  }
-
-  public Instant createdAt() {
-    return createdAt;
-  }
-
-  public Instant updatedAt() {
-    return updatedAt;
-  }
+  public UUID id() { return id; }
+  public String slug() { return slug; }
+  public String displayName() { return displayName; }
+  public String project() { return project; }
+  public String prefix() { return prefix; }
+  public ProfileEnvironment environment() { return environment; }
+  public String technology() { return technology; }
+  public List<String> capabilities() { return capabilities; }
+  public Map<String, String> topics() { return topics; }
+  public Map<String, String> frames() { return frames; }
+  public String rosbridgeUrl() { return rosbridgeUrl; }
+  public String videoBaseUrl() { return videoBaseUrl; }
+  public boolean active() { return active; }
+  public Instant createdAt() { return createdAt; }
+  public Instant updatedAt() { return updatedAt; }
 
   public Map<String, Object> toSessionMap() {
     Map<String, Object> map = new LinkedHashMap<>();
@@ -132,6 +150,7 @@ public class RobotProfile {
     map.put("frames", frames);
     map.put("rosbridgeUrl", rosbridgeUrl);
     map.put("videoBaseUrl", videoBaseUrl);
+    map.put("active", active);
     return map;
   }
 }

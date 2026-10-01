@@ -13,4 +13,6 @@ public interface RobotProfileJpaRepository extends JpaRepository<RobotProfileJpa
   boolean existsBySlug(String slug);
 
   List<RobotProfileJpaEntity> findByIdInAndActiveTrue(Collection<UUID> ids);
+
+  List<RobotProfileJpaEntity> findByIdIn(Collection<UUID> ids);
 }
