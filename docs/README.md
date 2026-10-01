@@ -26,7 +26,7 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 
 | Camada | Tecnologia | Observações |
 |--------|------------|-------------|
-| **Backend** | Node.js + Express | API REST de governo (auth, perfis, params, auditoria, LLM proxy) |
+| **Backend** | Java + Spring Boot | API REST de governo (auth, perfis, params, auditoria, LLM proxy) — ADR-006 |
 | **Banco de dados** | MySQL | Usuários, papéis, robot profiles, parâmetros, telemetria/auditoria |
 | **Autenticação** | JWT + RBAC | Papéis `admin`, `operator`, `viewer` — ver ADR-004 |
 | **ROS (tempo real)** | Rosbridge + web_video_server | Cliente no browser; backend emite session-config/ACL — ver ADR-002 |
@@ -40,7 +40,7 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 2. [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md)
 3. [`docs/requirements/inventario-frontend-ihm.md`](docs/requirements/inventario-frontend-ihm.md)
 4. [`docs/requirements/levantamento-de-requisitos.md`](docs/requirements/levantamento-de-requisitos.md)
-5. ADRs 001–005 em [`docs/adrs/`](docs/adrs/) (stack vigente = ADR-001; ver também **ADR-006** `PROPOSTA` — Java/Spring, pendente com orientador)
+5. ADRs em [`docs/adrs/`](docs/adrs/) (stack vigente = **ADR-006** Java/Spring; ADR-001 histórica)
 6. [`docs/architecture/backend-functional-spec.md`](docs/architecture/backend-functional-spec.md)
 7. [`docs/operations/ambiente-local-nara.md`](docs/operations/ambiente-local-nara.md)
 

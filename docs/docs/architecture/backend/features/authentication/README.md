@@ -27,6 +27,6 @@ Substitui autenticação frágil (hardcoded / só no client) por JWT com papéis
 
 ## Dependências
 
-- ADR-001 (stack)
+- ADR-006 (stack Java/Spring)
 - ADR-004 (auth/RBAC)
 - ADR-005 (sem biometria no MVP)

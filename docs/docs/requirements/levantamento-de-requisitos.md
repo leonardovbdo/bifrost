@@ -18,7 +18,7 @@ Especificar requisitos funcionais e não funcionais do backend que integra clien
 
 **Dentro do escopo (MVP documental + implementação futura):**
 
-- API REST (Node.js + Express) para autenticação, autorização, perfis de robô, parâmetros e auditoria
+- API REST (Java + Spring Boot) para autenticação, autorização, perfis de robô, parâmetros e auditoria
 - MySQL para persistência
 - Modelo híbrido de integração ROS (governo no backend; tempo real no rosbridge)
 - Extensibilidade a múltiplos robôs/tecnologias via *Robot Profiles*
@@ -27,7 +27,7 @@ Especificar requisitos funcionais e não funcionais do backend que integra clien
 **Fora do escopo do MVP:**
 
 - Substituir Gazebo / Nav2 / pacotes ROS do `noblenara`
-- Proxy WebSocket total de todos os tópicos ROS pelo Express
+- Proxy WebSocket total de todos os tópicos ROS pelo backend
 - Entregar ou manter IHM completa de produto de terceiros
 - Reconhecimento facial em produção (fase 2)
 
@@ -136,7 +136,7 @@ O sistema deve persistir parâmetros e preferências:
 
 ### RNF-01 — Latência de controle
 
-O caminho teleop (`cmd_vel`) deve permanecer no rosbridge, evitando hop obrigatório pelo Express.
+O caminho teleop (`cmd_vel`) deve permanecer no rosbridge, evitando hop obrigatório pelo backend Spring.
 
 ### RNF-02 — Segurança
 
@@ -163,7 +163,7 @@ A modelagem de Robot Profile deve permitir novos robôs sem alterar o núcleo de
 
 ### RNF-06 — Alinhamento acadêmico
 
-Stack e objetivos devem permanecer rastreáveis à súmula (Node, Express, MySQL, Rosbridge, NARA).
+Stack e objetivos devem permanecer rastreáveis ao projeto acadêmico (Java/Spring Boot após ADR-006, MySQL, Rosbridge, NARA). A súmula original citava Node/Express; a troca foi aprovada pelo orientador.
 
 ---
 

@@ -1,23 +1,19 @@
-# ADR-006 — Proposta de mudança de stack: Java + Spring Boot (em vez de Node.js + Express)
+# ADR-006 — Stack Java + Spring Boot + MySQL
 
-**Status:** PROPOSTA  
-**Data:** 2026-09-29  
-**Decisores (pendente):** Leonardo Vilasboas de Oliveira (discente); Prof. Crescencio Rodrigues Lima Neto (orientador)  
-**Relacionada a:** ADR-001 (stack vigente, status `ACEITA` até esta proposta ser decidida), ADR-002 (ROS híbrido)
+**Status:** ACEITA  
+**Data de proposta:** 2026-09-29  
+**Data de aceite:** 2026-09-30  
+**Decisores:** Leonardo Vilasboas de Oliveira (discente); Prof. Crescencio Rodrigues Lima Neto (orientador)  
+**Substitui:** [`ADR-001-stack-node-express-mysql.md`](ADR-001-stack-node-express-mysql.md)  
+**Relacionada a:** ADR-002 (ROS híbrido)
 
 ---
 
 ## Contexto
 
-A ADR-001 fixou a stack do backend do TCC como **Node.js + Express + MySQL**, alinhada à súmula / slides / fundamentação.
+A ADR-001 havia fixado **Node.js + Express + MySQL** alinhada à súmula inicial. Com a arquitetura de **backend de governo** e integração **híbrida** ao ROS (ADR-002), a API é majoritariamente REST + MySQL + JWT; o client fala com rosbridge. Nesse cenário, **Java + Spring Boot** encaixa melhor nas convenções de Clean Architecture / ports & adapters desejadas.
 
-Em seguida, a arquitetura de produto foi refinada como **backend de governo** (auth, RBAC, robot profiles, parâmetros, auditoria, proxy LLM) com integração **híbrida** ao ROS (ADR-002): o client fala com rosbridge / web_video_server; o backend não precisa mediar cada mensagem de teleop.
-
-Nesse desenho, a afinidade “Node ↔ Roslibjs” perde peso no servidor: o runtime crítico continua no `noblenara` (ROS 2), e a API é majoritariamente REST + MySQL + JWT.
-
-Surge a possibilidade de adotar **Java + Spring Boot** (+ MySQL) por encaixe com Clean Architecture / ports & adapters, maturidade para RBAC/JPA/migrations/testes e familiaridade do discente com esse estilo de backend — **desde que o orientador concorde**, dado o desvio em relação ao texto da súmula.
-
-Esta ADR **não altera** a stack vigente. Enquanto o status for `PROPOSTA`, permanece válida a ADR-001.
+Em 2026-09-30 o orientador **aprovou** a mudança de stack.
 
 ---
 
@@ -25,61 +21,45 @@ Esta ADR **não altera** a stack vigente. Enquanto o status for `PROPOSTA`, perm
 
 | Opção | Prós | Contras |
 |-------|------|---------|
-| **A — Manter Node.js + Express + MySQL (ADR-001)** | Fidelidade à súmula; ecossistema web ROS familiar no JS (mais no *client*); menos atrito documental | Estrutura Clean/ports exige mais disciplina manual; tipagem/tooling a definir (JS vs TS) |
-| **B — Migrar para Java + Spring Boot + MySQL** | Camadas, segurança, JPA, migrations e testes bem suportados; encaixa no control plane descrito; MySQL permanece (sem trocar o BD da súmula) | Exige atualização acadêmica (súmula/slides/ADRs); curva Java se o foco recente foi JS; não “aproxima” nativamente do ROS (e não precisa, no híbrido) |
-| C — Spring Boot + PostgreSQL | Ecossistema Spring muito comum com Postgres | Troca o BD declarado na súmula (MySQL) sem necessidade para o caso NARA |
-
-### Compatibilidade com NARA / ROS (importante)
-
-No modelo híbrido (ADR-002):
-
-- `rosbridge` (WebSocket/JSON) e `web_video_server` (HTTP) são **agnósticos** à linguagem do backend
-- O estudo de caso `noblenara` / `nara-sim` **não muda**
-- O protótipo de UI do TCC (futuro) pode continuar em JS/TS para falar com rosbridge
-- **Não** se exige `rcljava` no MVP
-
-Conclusão técnica: **Spring não prejudica** a conversa com o stack robótico já validado; o impacto é de plataforma da API e de alinhamento acadêmico.
+| A — Manter Node.js + Express + MySQL | Fidelidade literal à súmula original | Menos natural para o monólito modular desejado |
+| **B — Java + Spring Boot + MySQL** | Security, JPA, Flyway, testes, camadas; MySQL permanece | Atualizar docs/materiais acadêmicos |
+| C — Spring Boot + PostgreSQL | Comum no ecossistema Spring | Trocaria o BD da súmula sem necessidade |
 
 ---
 
 ## Decisão
 
-**Pendente — aguardando alinhamento com o orientador.**
+Adotar **Opção B: Java + Spring Boot + MySQL** como stack oficial do backend **Bifrost**.
 
-Pergunta a resolver:
+- Pacote base sugerido: `com.bifrost.backend`
+- Persistência: Spring Data JPA + Flyway + MySQL
+- Segurança: Spring Security + JWT + RBAC
+- Integração ROS: permanece híbrida (ADR-002); sem `rcljava` no MVP
+- Convenções de código: [`../conventions/backend-architecture-and-code.md`](../conventions/backend-architecture-and-code.md)
 
-1. Pode-se atualizar o pré-projeto/súmula para **Java + Spring Boot + MySQL**?
-2. Se sim, a ADR-001 passa a `SUBSTITUÍDA` por esta (após aceite).
-3. Se não, esta ADR passa a `REJEITADA` e a ADR-001 permanece a referência.
-
-Critério sugerido de fechamento: anotação de orientação ou e-mail/registro com a decisão do orientador + data.
+A súmula/slides devem ser alinhados a esta decisão quando houver revisão acadêmica formal.
 
 ---
 
-## Consequências (se ACEITA no futuro)
+## Consequências
 
 **Positivas**
 
-- Backend de governo com tooling Spring (Security, Data JPA, validation, Actuator, etc.)
-- Docs de convenções alinhadas a monólito modular Java
-- MySQL mantido → desvio menor que trocar também o banco
+- Tooling maduro para auth, persistência, migrations e testes
+- Docs de arquitetura alinhados a monólito modular Spring
+- MySQL mantido (desvio menor que trocar também o banco)
 
 **Negativas / trabalho**
 
-- Revisar README, stack declarada, `backend-functional-spec`, conventions e menções a Node/Express
-- Atualizar materiais acadêmicos (súmula/slides) para refletir a troca
-- Skeleton `apps/backend` nasce em Java, não em Node
-
-**Se REJEITADA**
-
-- Nenhuma alteração de stack; seguir ADR-001
-- Opcional: adotar TypeScript no Node para ganhar tipagem sem mudar a narrativa da súmula
+- Propagar a stack em README, specs e conventions (feito com o aceite)
+- Skeleton `apps/backend` nasce em Java
+- Atualizar narrativa da súmula junto ao orientador quando couber
 
 ---
 
 ## Checklist pós-decisão
 
-- [ ] Registrar data e parecer do orientador nesta ADR  
-- [ ] Atualizar status → `ACEITA` ou `REJEITADA`  
-- [ ] Se aceita: marcar ADR-001 como `SUBSTITUÍDA` (link para ADR-006)  
-- [ ] Se aceita: propagar stack nos docs raiz / architecture / conventions  
+- [x] Registrar data e parecer do orientador nesta ADR  
+- [x] Atualizar status → `ACEITA`  
+- [x] Marcar ADR-001 como `SUBSTITUÍDA`  
+- [x] Propagar stack nos docs raiz / architecture / conventions  

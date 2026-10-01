@@ -12,7 +12,7 @@ A súmula prevê integração da API com o ROS via Rosbridge / Roslibjs para lei
 
 Há tensão entre:
 
-1. Colocar **todo** o tráfego ROS atrás do backend Express (controle acadêmico “puro”)
+1. Colocar **todo** o tráfego ROS atrás do backend Spring (controle acadêmico “puro”)
 2. Preservar **baixa latência** no teleop e nos streams de vídeo (requisito de segurança/usabilidade)
 
 O TCC precisa de um backend que **governe** o sistema sem se tornar gargalo de cada `geometry_msgs/Twist`.
@@ -23,7 +23,7 @@ O TCC precisa de um backend que **governe** o sistema sem se tornar gargalo de c
 
 | Opção | Prós | Contras |
 |-------|------|---------|
-| **A — Híbrida** | Backend governa auth/perfis/ACL/auditoria; client mantém rosbridge para tempo real; alinhada à validação com NARA | Controle ROS não é 100% mediado pelo Express; exige contrato claro de session-config |
+| **A — Híbrida** | Backend governa auth/perfis/ACL/auditoria; client mantém rosbridge para tempo real; alinhada à validação com NARA | Controle ROS não é 100% mediado pelo Spring; exige contrato claro de session-config |
 | B — Proxy total no backend | Todo publish/subscribe passa pelo servidor; auditoria fina possível | Maior latência; complexidade (WS duplex, fan-out, backpressure); risco ao teleop |
 | C — Só frontend (status quo) | Simples | Não cumpre o objetivo do TCC de backendizar governo e segurança |
 
@@ -33,7 +33,7 @@ O TCC precisa de um backend que **governe** o sistema sem se tornar gargalo de c
 
 Adotar **Opção A — integração híbrida**:
 
-1. **Backend (Express)**  
+1. **Backend (Spring Boot)**  
    - Autenticação/RBAC  
    - Robot Profiles e bindings de tópicos  
    - Parâmetros e limites  

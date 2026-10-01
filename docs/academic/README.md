@@ -12,4 +12,4 @@ Cópias de trabalho na máquina local:
 | `Final.pptx.pdf` | Apresentação do projeto de TCC |
 | `Fundamentação Teórica.docx.pdf` | Fundamentação teórica (sistemas autônomos, IHC, ROS, APIs, MySQL, LGPD) |
 
-Esses materiais fixam a stack acadêmica (**Node.js, Express, MySQL, Rosbridge**) e o estudo de caso **NARA**. Decisões de arquitetura detalhadas estão nas ADRs em `docs/docs/adrs/`.
+Esses materiais descrevem o estudo de caso **NARA** e a súmula inicial (que citava Node/Express). A stack **vigente** do Bifrost é **Java + Spring Boot + MySQL** (ADR-006, aprovada pelo orientador). Decisões detalhadas: `docs/docs/adrs/`.

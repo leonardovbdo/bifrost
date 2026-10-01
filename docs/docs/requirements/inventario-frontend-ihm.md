@@ -61,7 +61,7 @@ Padrões observados em stacks legadas (ex.: login hardcoded, face + NoSQL):
 |--------|----------------|
 | Users em código | Substituído por Auth JWT + MySQL |
 | Face/biometria | **FASE 2** (ADR-005) |
-| Mongo como store principal | **Não** — MySQL (ADR-001) |
+| Mongo como store principal | **Não** — MySQL (ADR-006) |
 
 ---
 
@@ -77,7 +77,7 @@ Padrões observados em stacks legadas (ex.: login hardcoded, face + NoSQL):
 ## 6. Matriz resumida
 
 ```text
-GOVERNO / DADOS          → Backend TCC (Express + MySQL)
+GOVERNO / DADOS          → Backend Bifrost (Spring Boot + MySQL)
 POLÍTICA DE SESSÃO       → Backend emite; Client obedece
 TEMPO REAL ROS           → Client ↔ rosbridge / web_video_server
 UI / UX                  → Protótipo TCC ou outro client compatível

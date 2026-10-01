@@ -2,7 +2,7 @@
 
 **Versão:** 0.2  
 **Status:** Vigente (docs-first)  
-**ADRs relacionadas:** ADR-001, ADR-002, ADR-003, ADR-004, ADR-005  
+**ADRs relacionadas:** ADR-006 (stack), ADR-002, ADR-003, ADR-004, ADR-005  
 
 ---
 
@@ -22,7 +22,7 @@ flowchart LR
     WebClient[Client_UI_Prototype_or_compatible]
   end
 
-  subgraph tccBackend [TCC_Backend_Node_Express]
+  subgraph tccBackend [TCC_Backend_Spring_Boot]
     API[REST_API]
     Auth[Auth_RBAC]
     Profiles[Robot_Profiles]

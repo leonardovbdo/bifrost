@@ -3,7 +3,7 @@
 **Projeto:** TCC Backend NARA  
 **Versão:** 0.1  
 **Status:** Rascunho para implementação futura  
-**Stack:** Node.js + Express + MySQL (ADR-001)  
+**Stack:** Java + Spring Boot + MySQL (ADR-006)  
 
 ---
 
@@ -175,10 +175,12 @@ Exemplo ilustrativo:
 ## 6. Regras transversais
 
 - Todas as rotas (exceto login/health) exigem JWT Bearer
-- Validação de input (schemas)
+- Validação de input (Bean Validation / schemas)
 - Erros JSON padronizados `{ error: { code, message } }`
 - CORS configurável para a origem do protótipo/client de testes
-- Migrations versionadas (ex.: knex / prisma / flyway-equivalente Node) — decisão de ferramenta em ADR futura se necessário
+- Migrations versionadas com Flyway
+- Seeds só para desenvolvimento / bootstrap documentado
+- Evitar lógica de negócio em stored procedures no MVP
 
 ---
 

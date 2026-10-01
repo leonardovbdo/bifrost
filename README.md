@@ -11,7 +11,7 @@ Metáfora e posicionamento do nome: [`docs/docs/architecture/bifrost-nome-e-meta
 
 ## Propósito
 
-Desenvolver e documentar **Bifrost**, uma arquitetura de **backend** (Node.js + Express + MySQL) que **governa** identidade, perfis de robô, parametrização, níveis de acesso e telemetria para sistemas autônomos — com o NARA como caso de uso, sem se limitar a uma única tecnologia ou a um frontend de terceiros.
+Desenvolver e documentar **Bifrost**, uma arquitetura de **backend** (Java + Spring Boot + MySQL) que **governa** identidade, perfis de robô, parametrização, níveis de acesso e telemetria para sistemas autônomos — com o NARA como caso de uso, sem se limitar a uma única tecnologia ou a um frontend de terceiros.
 
 A comunicação de **baixa latência** com o ROS (teleop, sensores, câmeras) permanece no modelo **híbrido**: o cliente (protótipo de UI do TCC ou outro front) fala com rosbridge / web_video_server; o backend autoriza, configura e audita.
 
@@ -21,7 +21,7 @@ Este repositório começa **docs-first**. A implementação em `apps/backend` (e
 
 | Camada | Tecnologia |
 |--------|------------|
-| Backend | Node.js + Express |
+| Backend | Java + Spring Boot |
 | Banco | MySQL |
 | Integração ROS | Rosbridge (cliente no browser; governo no backend) |
 | Cliente de testes | Protótipo de UI do próprio TCC (futuro; opcional) |

@@ -39,7 +39,7 @@ Adotar **Opção A**:
 - Tabela `users` (id, email/username, password_hash, role, active, timestamps)
 - Login `POST /auth/login` → access JWT (claims: `sub`, `role`, opcional `allowed_profile_ids`)
 - `GET /me` e `GET /me/session-config` para hidratar qualquer client da API
-- Middleware Express de autenticação + checagem de papel em rotas administrativas
+- Middleware Spring Security + checagem de papel em rotas administrativas
 - O client **não** pode elevar privilégios localmente; preferências de UI não alteram a role do token
 
 Reconhecimento facial: **fora do MVP** (ver ADR-005).
