@@ -8,7 +8,7 @@
 
 ## Visão Geral
 
-Substitui autenticação frágil (hardcoded / só no client) por JWT com papéis em MySQL (`admin`, `operator`, `viewer`) e emissão de session-config.
+Substitui autenticação frágil (hardcoded / só no client) por JWT com papéis em PostgreSQL (`admin`, `operator`, `viewer`) e emissão de session-config.
 
 ## Objetivos
 

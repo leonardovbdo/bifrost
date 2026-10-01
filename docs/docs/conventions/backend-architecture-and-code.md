@@ -2,7 +2,7 @@
 
 **Projeto:** Bifrost  
 **Status:** Vigente  
-**Stack:** Java + Spring Boot + MySQL (ADR-006)
+**Stack:** Java + Spring Boot + PostgreSQL (ADR-006 + ADR-007)
 
 ---
 
@@ -395,6 +395,6 @@ Handler global → payload HTTP padronizado `{ "error": { "code", "message" } }`
 | Pacote base | `com.bifrost.backend` |
 | Build | Maven (preferencial) ou Gradle — fixar no skeleton |
 | Java | 21 LTS (recomendado) |
-| Banco | MySQL 8.x |
+| Banco | PostgreSQL 16.x (recomendado) |
 | Migrations | Flyway |
 | Auth | Spring Security + JWT (ADR-004 / ADR-006) |

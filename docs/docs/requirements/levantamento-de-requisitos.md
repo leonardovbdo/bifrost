@@ -19,7 +19,7 @@ Especificar requisitos funcionais e não funcionais do backend que integra clien
 **Dentro do escopo (MVP documental + implementação futura):**
 
 - API REST (Java + Spring Boot) para autenticação, autorização, perfis de robô, parâmetros e auditoria
-- MySQL para persistência
+- PostgreSQL para persistência
 - Modelo híbrido de integração ROS (governo no backend; tempo real no rosbridge)
 - Extensibilidade a múltiplos robôs/tecnologias via *Robot Profiles*
 - Proxy de assistente LLM (sem chave no browser)
@@ -55,7 +55,7 @@ Especificar requisitos funcionais e não funcionais do backend que integra clien
 
 ### RF-01 — Autenticação de usuários
 
-O sistema deve autenticar usuários com credenciais persistidas em MySQL e emitir token JWT.
+O sistema deve autenticar usuários com credenciais persistidas em PostgreSQL e emitir token JWT.
 
 **Critérios:**
 
@@ -163,7 +163,7 @@ A modelagem de Robot Profile deve permitir novos robôs sem alterar o núcleo de
 
 ### RNF-06 — Alinhamento acadêmico
 
-Stack e objetivos devem permanecer rastreáveis ao projeto acadêmico (Java/Spring Boot após ADR-006, MySQL, Rosbridge, NARA). A súmula original citava Node/Express; a troca foi aprovada pelo orientador.
+Stack e objetivos devem permanecer rastreáveis ao projeto acadêmico (Java/Spring Boot + PostgreSQL após ADR-006/007, Rosbridge, NARA). A súmula original citava Node/Express e MySQL; as trocas foram registradas nas ADRs.
 
 ---
 
@@ -183,11 +183,11 @@ Stack e objetivos devem permanecer rastreáveis ao projeto acadêmico (Java/Spri
 
 | Área | Padrão problemático em clients | Alvo |
 |------|--------------------------------|------|
-| Auth | Hardcoded / só no browser | JWT + MySQL + RBAC |
+| Auth | Hardcoded / só no browser | JWT + PostgreSQL + RBAC |
 | Papéis | Toggle local de privilégio | Claims no token |
 | Robôs/tópicos | Presets no client | Robot Profiles |
 | LLM | Key no frontend | Proxy backend |
-| Telemetria | Ephemeral | MySQL (eventos → séries) |
+| Telemetria | Ephemeral | PostgreSQL (eventos → séries) |
 | ROS tempo real | Client ↔ rosbridge | Mantido (híbrido) |
 
 Detalhamento: [`inventario-frontend-ihm.md`](inventario-frontend-ihm.md).

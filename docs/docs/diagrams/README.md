@@ -9,5 +9,5 @@ Esta pasta pode receber exports (PNG/SVG/Excalidraw) à medida que o TCC avança
 Sugestões futuras:
 
 - C4 container diagram
-- ER diagram do MySQL
+- ER diagram do PostgreSQL
 - Sequência de teleop + auditoria de goal

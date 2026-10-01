@@ -8,7 +8,7 @@
 
 ## Contexto
 
-A fundamentação teórica e a súmula exigem alinhamento à **LGPD**. Captura automática de webcam / login facial em clients web é um padrão sensível observado em algumas IHMs e não será o caminho do MVP deste TCC (MySQL + auth clássica).
+A fundamentação teórica e a súmula exigem alinhamento à **LGPD**. Captura automática de webcam / login facial em clients web é um padrão sensível observado em algumas IHMs e não será o caminho do MVP deste TCC (PostgreSQL + auth clássica).
 
 É preciso delimitar quais dados pessoais entram no MVP e como tratar biometria.
 
@@ -19,7 +19,7 @@ A fundamentação teórica e a súmula exigem alinhamento à **LGPD**. Captura a
 | Opção | Prós | Contras |
 |-------|------|---------|
 | **A — MVP sem biometria; face na fase 2** | Reduz risco LGPD; acelera auth clássica; evita Mongo | Perde feature de face no curto prazo |
-| B — Portar face/biometria para MySQL no MVP | Mantém feature vista em algumas IHMs | Dado biométrico sensível; complexidade alta cedo |
+| B — Portar face/biometria para PostgreSQL no MVP | Mantém feature vista em algumas IHMs | Dado biométrico sensível; complexidade alta cedo |
 | C — Face só no device sem servidor | Privacidade | Não atende login centralizado do backend |
 
 ---
@@ -42,7 +42,7 @@ Quando face for retomada: avaliar templates/vetores com consentimento explícito
 **Positivas**
 
 - MVP mais seguro e defendável academicamente
-- Foco no core (API + MySQL + governo ROS híbrido)
+- Foco no core (API + PostgreSQL + governo ROS híbrido)
 
 **Negativas**
 

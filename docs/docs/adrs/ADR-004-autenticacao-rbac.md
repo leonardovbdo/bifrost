@@ -8,7 +8,7 @@
 
 ## Contexto
 
-Em muitas IHMs robóticas a autenticação é frágil (credenciais no client ou backend mínimo) e o “papel” pode ser alterado só na UI, o que não é segurança real. Fluxos biométricos (ex.: webcam + store NoSQL) também aparecem e não estão alinhados ao MySQL do TCC.
+Em muitas IHMs robóticas a autenticação é frágil (credenciais no client ou backend mínimo) e o “papel” pode ser alterado só na UI, o que não é segurança real. Fluxos biométricos (ex.: webcam + store NoSQL) também aparecem e não estão alinhados ao PostgreSQL do TCC.
 
 É necessário um modelo de identidade adequado à súmula (usuários, permissões, LGPD) e a papéis de produto (admin / operator / viewer).
 
@@ -18,7 +18,7 @@ Em muitas IHMs robóticas a autenticação é frágil (credenciais no client ou 
 
 | Opção | Prós | Contras |
 |-------|------|---------|
-| **A — JWT + RBAC em MySQL** | Padrão para APIs; stateless no client; papéis claros | Precisa refresh/expiração e seed inicial |
+| **A — JWT + RBAC em PostgreSQL** | Padrão para APIs; stateless no client; papéis claros | Precisa refresh/expiração e seed inicial |
 | B — Sessão server-side (cookie) apenas | Simples em same-site | Pior para clientes múltiplos; menos alinhado a API REST pura |
 | C — Manter hardcoded | Zero esforço | Inaceitável para o TCC |
 

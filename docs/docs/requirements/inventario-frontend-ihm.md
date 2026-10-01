@@ -59,9 +59,9 @@ Padrões observados em stacks legadas (ex.: login hardcoded, face + NoSQL):
 
 | Padrão | Destino no TCC |
 |--------|----------------|
-| Users em código | Substituído por Auth JWT + MySQL |
+| Users em código | Substituído por Auth JWT + PostgreSQL |
 | Face/biometria | **FASE 2** (ADR-005) |
-| Mongo como store principal | **Não** — MySQL (ADR-006) |
+| Mongo como store principal | **Não** — PostgreSQL (ADR-007) |
 
 ---
 
@@ -77,7 +77,7 @@ Padrões observados em stacks legadas (ex.: login hardcoded, face + NoSQL):
 ## 6. Matriz resumida
 
 ```text
-GOVERNO / DADOS          → Backend Bifrost (Spring Boot + MySQL)
+GOVERNO / DADOS          → Backend Bifrost (Spring Boot + PostgreSQL)
 POLÍTICA DE SESSÃO       → Backend emite; Client obedece
 TEMPO REAL ROS           → Client ↔ rosbridge / web_video_server
 UI / UX                  → Protótipo TCC ou outro client compatível

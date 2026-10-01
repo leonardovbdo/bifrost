@@ -5,7 +5,7 @@
 **Substituída por:** [`ADR-006-proposta-stack-java-spring.md`](ADR-006-proposta-stack-java-spring.md) (`ACEITA` em 2026-09-30)  
 **Decisores (históricos):** Leonardo Vilasboas de Oliveira (discente), alinhamento inicial com súmula TCC I  
 
-> **Esta ADR não está mais vigente.** A stack oficial do Bifrost é **Java + Spring Boot + MySQL** (ADR-006), após aprovação do orientador.
+> **Esta ADR não está mais vigente.** A stack oficial do Bifrost é **Java + Spring Boot + PostgreSQL** (ADR-006 + ADR-007).
 
 ---
 

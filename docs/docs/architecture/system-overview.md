@@ -32,7 +32,7 @@ flowchart LR
   end
 
   subgraph data [Data]
-    MySQL[(MySQL)]
+    PostgreSQL[(PostgreSQL)]
   end
 
   subgraph robotRuntime [Robot_Runtime]
@@ -47,10 +47,10 @@ flowchart LR
   API --> Params
   API --> Audit
   API --> LLMProxy
-  Auth --> MySQL
-  Profiles --> MySQL
-  Params --> MySQL
-  Audit --> MySQL
+  Auth --> PostgreSQL
+  Profiles --> PostgreSQL
+  Params --> PostgreSQL
+  Audit --> PostgreSQL
 
   WebClient -->|"authorized_topics_cmd_vel_sensors"| Rosbridge
   WebClient -->|mjpeg_streams| Video
@@ -67,7 +67,7 @@ flowchart LR
 | Backend TCC | Auth, RBAC, profiles, params, session-config, auditoria, LLM proxy | Encaminhar cada Twist; UI completa; Nav2 |
 | Client UI | UI, teleop local, subscribe ROS, câmeras/mapa | Fonte da verdade de papéis/tópicos |
 | `noblenara` / ROS | Simulação/hardware, tópicos, navegação | Persistência de usuários do produto |
-| MySQL | Estado de produto | Grafo TF / bags ROS |
+| PostgreSQL | Estado de produto | Grafo TF / bags ROS |
 
 ---
 
@@ -77,7 +77,7 @@ flowchart LR
 sequenceDiagram
   participant UI as Client_UI
   participant API as Backend_TCC
-  participant DB as MySQL
+  participant DB as PostgreSQL
   participant RB as Rosbridge
 
   UI->>API: POST /auth/login
@@ -107,7 +107,7 @@ Robot Profiles carregam o ambiente e as URLs de bridge/vídeo adequadas.
 ## 6. Evolução
 
 1. Docs-first (agora)  
-2. Skeleton `apps/backend` + migrations MySQL  
+2. Skeleton `apps/backend` + migrations PostgreSQL  
 3. Auth + session-config  
 4. Profiles + params  
 5. Protótipo leve de client UI (testes)  

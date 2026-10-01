@@ -8,4 +8,4 @@
 
 ## Opção rejeitada
 
-Mirror completo de bag ROS no MySQL — custo/complexidade incompatível com o TCC e com o objetivo de governo de produto.
+Mirror completo de bag ROS no PostgreSQL — custo/complexidade incompatível com o TCC e com o objetivo de governo de produto.

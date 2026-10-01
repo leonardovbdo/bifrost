@@ -18,7 +18,7 @@ O TCC deve permitir **outras tecnologias de robôs autônomos** além da cadeira
 
 | Opção | Prós | Contras |
 |-------|------|---------|
-| **A — Robot Profile persistido** | Catálogo no MySQL; bindings versionáveis; ACL por perfil; extensível | Exige modelagem e seed inicial NARA |
+| **A — Robot Profile persistido** | Catálogo no PostgreSQL; bindings versionáveis; ACL por perfil; extensível | Exige modelagem e seed inicial NARA |
 | B — Hardcode por projeto no backend | Rápido para um único robô | Não escala; repete o problema do front |
 | C — Discovery dinâmico só via rosapi | Flexível em runtime | Instável para UI; difícil autorizar a priori; frágil offline |
 
@@ -26,7 +26,7 @@ O TCC deve permitir **outras tecnologias de robôs autônomos** além da cadeira
 
 ## Decisão
 
-Adotar **Opção A**: entidade **Robot Profile** no MySQL, consumida via API.
+Adotar **Opção A**: entidade **Robot Profile** no PostgreSQL, consumida via API.
 
 Campos mínimos:
 

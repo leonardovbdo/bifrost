@@ -3,7 +3,7 @@
 **Projeto:** TCC Backend NARA  
 **Versão:** 0.1  
 **Status:** Rascunho para implementação futura  
-**Stack:** Java + Spring Boot + MySQL (ADR-006)  
+**Stack:** Java + Spring Boot + PostgreSQL (ADR-006 + ADR-007)  
 
 ---
 
