@@ -5,7 +5,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionament
 
 ## [Unreleased]
 
-## [0.4.0] — 2026-09-30
+### Added
+
+- Etapa A: auth JWT/cookies, refresh, `/me`, session-config, seeds admin + `nara-sim-alfa` (`feat/etapa-a-auth-session`)
+
 
 ### Added
 

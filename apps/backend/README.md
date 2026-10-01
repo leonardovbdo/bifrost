@@ -37,12 +37,24 @@ com.bifrost.backend
 └── infrastructure/
 ```
 
-Skeleton mínimo: Actuator health, Flyway baseline, filtro `X-Correlation-Id` (ADR-013). Auth/JWT e demais módulos vêm nas tasks das feature packs.
+Skeleton: Actuator health, Flyway, correlation-id, **auth/session (Etapa A)**.
+
+## Auth local (Etapa A)
+
+```bash
+docker compose up -d
+export BIFROST_ADMIN_USERNAME=admin
+export BIFROST_ADMIN_PASSWORD=change-me
+export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
+./mvnw spring-boot:run
+```
+
+- `POST /api/v1/auth/login` → cookies `BIFROST_ACCESS` / `BIFROST_REFRESH`
+- `GET /api/v1/me/session-config`
+- `PUT /api/v1/me/active-profile`
 
 ## Próximos passos
 
-Ver o guia canônico de retomada:
-
 → [`../../docs/docs/operations/proximos-passos.md`](../../docs/docs/operations/proximos-passos.md)
 
-**Próxima task de código:** AUTH-01 (migration `users`).
+**Próximo código sugerido:** PROF-03/04 ou Etapa B (parameters).

@@ -8,7 +8,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         jdbc:
@@ -35,5 +35,24 @@ logging:
     level: "%5p [corr=%X{correlationId}]"
 
 bifrost:
+  jwt:
+    secret: ${BIFROST_JWT_SECRET:change-me-bifrost-dev-secret-at-least-32-chars}
+    access-ttl: ${BIFROST_JWT_ACCESS_TTL:15m}
+    refresh-ttl: ${BIFROST_JWT_REFRESH_TTL:7d}
+  cookie:
+    access-name: BIFROST_ACCESS
+    refresh-name: BIFROST_REFRESH
+    same-site: Lax
+    secure: ${BIFROST_COOKIE_SECURE:false}
   cors:
-    allowed-origins: ${BIFROST_CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:3000
+  admin:
+    enabled: ${BIFROST_ADMIN_SEED_ENABLED:true}
+    username: ${BIFROST_ADMIN_USERNAME:}
+    password: ${BIFROST_ADMIN_PASSWORD:}
+  teleop:
+    linear-max: 0.5
+    angular-max: 1.0
+    profile: normal
