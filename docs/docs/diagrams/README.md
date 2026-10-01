@@ -1,13 +1,9 @@
-# Diagramas
+# Diagramas — Bifrost
 
-Os diagramas canônicos em Mermaid estão embutidos em:
+Prioridade de leitura (Fase 5):
 
-- [`../architecture/system-overview.md`](../architecture/system-overview.md)
+1. [`sequencia-session-config.md`](sequencia-session-config.md) — login → session-config → ROS híbrido  
+2. [`c4-contexto-containers.md`](c4-contexto-containers.md) — contexto / containers  
+3. [`er-postgres.md`](er-postgres.md) — modelo relacional MVP  
 
-Esta pasta pode receber exports (PNG/SVG/Excalidraw) à medida que o TCC avançar.
-
-Sugestões futuras:
-
-- C4 container diagram
-- ER diagram do PostgreSQL
-- Sequência de teleop + auditoria de goal
+Ferramenta: **Mermaid** embutido nos Markdown (sem Excalidraw no MVP).

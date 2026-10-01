@@ -36,9 +36,11 @@ Campos mínimos:
 - `technology` (ex.: `wheelchair_nara`, `generic_diff_drive`)
 - `capabilities` (JSON: teleop, nav2, cameras, slam, battery, …)
 - `topics` (JSON: mapa lógico → nome ROS)
-- `frames` (JSON opcional)
-- `rosbridge_url`, `video_server_base_url` (ou herdados de ambiente)
+- `frames` (JSON; nomes TF — detalhe ADR-010)
+- `rosbridge_url`, `video_server_base_url` **obrigatórios no profile** (ADR-009)
 - `active` boolean
+
+Schema fechado de `capabilities`/`topics` e seed NARA: **ADR-010**.
 
 O profile **NARA sim (`noblenara`/`alfa`)** é o seed do estudo de caso.
 

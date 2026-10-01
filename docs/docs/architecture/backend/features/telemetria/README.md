@@ -14,8 +14,9 @@ Persistir eventos de alto nível (auditoria) e preparar evolução para telemetr
 
 1. API para registrar eventos autenticados
 2. Consulta admin com filtros
-3. Tipos mínimos: login, logout, profile_switch, goal_pose, llm_ask, config_change
-4. Desenhar tabela futura de samples de telemetria (sem obrigar ingestão contínua no MVP)
+3. Tipos MVP: login_success/failure, logout, profile_switch, goal_pose, parameter_change, llm_ask
+4. Retenção 90 dias + purge automático
+5. Desenhar tabela futura de samples de telemetria (sem ingestão contínua no MVP)
 
 ## Documentos
 

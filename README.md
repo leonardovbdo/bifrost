@@ -15,23 +15,35 @@ Desenvolver e documentar **Bifrost**, uma arquitetura de **backend** (Java + Spr
 
 A comunicação de **baixa latência** com o ROS (teleop, sensores, câmeras) permanece no modelo **híbrido**: o cliente (protótipo de UI do TCC ou outro front) fala com rosbridge / web_video_server; o backend autoriza, configura e audita.
 
-Este repositório começa **docs-first**. A implementação em `apps/backend` (e, se necessário, um **protótipo leve de frontend** só para testes da API) virá em etapas posteriores.
+Este repositório é **docs-first** com skeleton em [`apps/backend`](apps/backend/README.md) (Java 21 + Spring Boot). Features de produto seguem as ADRs e packs em `docs/`.
 
 ## Stack declarada
 
 | Camada | Tecnologia |
 |--------|------------|
-| Backend | Java + Spring Boot |
-| Banco | PostgreSQL |
+| Backend | Java 21 + Spring Boot (`apps/backend`) |
+| Banco | PostgreSQL 16 (`docker compose`) |
 | Integração ROS | Rosbridge (cliente no browser; governo no backend) |
 | Cliente de testes | Protótipo de UI do próprio TCC (futuro; opcional) |
 | Runtime robótico | ROS 2 Jazzy (`noblenara` / `nara-sim`) |
 
+## Quick start (API local)
+
+```bash
+docker compose up -d
+cd apps/backend && ./mvnw spring-boot:run
+# health: http://localhost:8081/actuator/health
+```
+
 ## Documentação
 
-Toda a documentação arquitetural vive em [`docs/`](docs/README.md), organizada em `adrs/`, `architecture/`, `conventions/`, `requirements/` e `operations/`.
+Toda a documentação arquitetural vive em [`docs/`](docs/README.md), organizada em `adrs/`, `architecture/`, `conventions/`, `requirements/`, `operations/` e `diagrams/`.
 
-Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em [`docs/academic/`](docs/academic/README.md) — PDFs ficam fora do git (`~/Desktop/teste da silva/`).
+**Retomar o trabalho:** [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md) — estado atual, ordem de implementação e próxima task (AUTH-01).
+
+Changelog: [`CHANGELOG.md`](CHANGELOG.md).
+
+Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em [`docs/academic/`](docs/academic/README.md) — PDFs ficam fora do git.
 
 ## Repositórios relacionados
 
@@ -42,4 +54,8 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 
 ## Status
 
-Fase atual: **planejamento e especificação** (sem código de produção do backend ainda).
+| Fase | Situação |
+|------|----------|
+| Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** (2026-09-30) |
+| Skeleton `apps/backend` | **Pronto** (health + Flyway baseline + correlation-id) |
+| Implementação de domínio (auth → profiles → …) | **Próximo** — ver [próximos passos](docs/docs/operations/proximos-passos.md) |

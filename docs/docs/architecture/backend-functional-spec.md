@@ -43,6 +43,7 @@ Prefixo sugerido: `/api/v1`.
 | password_hash | string | bcrypt |
 | role | ENUM | `admin` \| `operator` \| `viewer` |
 | active | bool | |
+| last_active_profile_id | FK NULL | profile ativo (ACL); ADR-009 |
 | created_at / updated_at | timestamps | |
 
 ### 3.2 `robot_profiles`
@@ -56,11 +57,11 @@ Prefixo sugerido: `/api/v1`.
 | prefix | string | ex.: `alfa` |
 | environment | ENUM | `sim` \| `physical` |
 | technology | string | ex.: `wheelchair_nara` |
-| capabilities | JSON | |
-| topics | JSON | mapa lógico → tópico ROS |
-| frames | JSON | opcional |
-| rosbridge_url | string | |
-| video_base_url | string | |
+| capabilities | JSON | enum fechado — ADR-010 |
+| topics | JSON | chaves enum — ADR-010 |
+| frames | JSON | TF lógico → nome ROS; IHM pode ignorar |
+| rosbridge_url | string | obrigatório (só no profile) |
+| video_base_url | string | obrigatório (só no profile) |
 | active | bool | |
 
 ### 3.3 `user_profile_access`
@@ -99,9 +100,12 @@ Prefixo sugerido: `/api/v1`.
 
 ### Auth
 
-- `POST /api/v1/auth/login` `{ username, password }` → `{ accessToken, expiresIn, user }`
+- `POST /api/v1/auth/login` `{ username, password }` → cookies httpOnly (access + refresh) + body com user; ADR-008
+- `POST /api/v1/auth/refresh` → renova cookies
+- `POST /api/v1/auth/logout` → invalida refresh / limpa cookies
 - `GET /api/v1/me` → usuário autenticado
-- `GET /api/v1/me/session-config` → papel, profile(s), topics, urls, limits
+- `GET /api/v1/me/session-config` → contrato ADR-009 (`schemaVersion`, profile ativo, permissions, limits)
+- `PUT /api/v1/me/active-profile` `{ profileId }` → persiste ativo (403 se sem ACL)
 
 ### Profiles
 
@@ -112,8 +116,10 @@ Prefixo sugerido: `/api/v1`.
 
 ### Parameters
 
-- `GET /api/v1/parameters?scope=...`
-- `PUT /api/v1/parameters` (`admin` ou dono no escopo `user`)
+- `GET /api/v1/parameters?scope=global|user`
+- `PUT /api/v1/parameters` — admin: `global`; usuário: próprio `user` (preset de teleop)
+- Escopos MVP: `global` + `user` — ver [`backend/features/parameters/`](backend/features/parameters/)
+- `limits.teleop` na session-config = merge user sobre global
 
 ### Audit
 
@@ -122,7 +128,9 @@ Prefixo sugerido: `/api/v1`.
 
 ### LLM
 
-- `POST /api/v1/llm/ask` `{ prompt, context? }` → `{ reply }`
+- `POST /api/v1/llm/ask` `{ prompt, context? }` → `{ reply, model }` — ADR-011
+- Papéis: `admin`, `operator` (viewer 403)
+- Sem histórico de chat no Postgres; audit `llm_ask`
 
 ### Health
 
@@ -136,6 +144,7 @@ Exemplo ilustrativo:
 
 ```json
 {
+  "schemaVersion": 1,
   "user": { "id": "…", "username": "gipar", "role": "admin" },
   "activeProfile": {
     "id": "…",
@@ -153,11 +162,17 @@ Exemplo ilustrativo:
       "battery": "/noblenara/alfa/battery_status",
       "goal_pose": "/noblenara/alfa/goal_pose"
     },
-    "capabilities": ["teleop", "cameras", "slam", "nav2"],
+    "capabilities": ["teleop", "cameras", "slam", "nav2", "battery"],
+    "frames": {
+      "map": "map",
+      "odom": "odom",
+      "base": "base_link",
+      "camera": "camera_link"
+    },
     "rosbridgeUrl": "ws://localhost:9090",
     "videoBaseUrl": "http://localhost:8080"
   },
-  "allowedProfiles": ["…"],
+  "allowedProfiles": [{ "id": "…", "slug": "nara-sim-alfa", "displayName": "NARA Sim Alfa" }],
   "permissions": {
     "canTeleop": true,
     "canSendGoal": true,
@@ -170,6 +185,7 @@ Exemplo ilustrativo:
 }
 ```
 
+Contrato canônico: [`../adrs/ADR-009-session-config.md`](../adrs/ADR-009-session-config.md).
 ---
 
 ## 6. Regras transversais

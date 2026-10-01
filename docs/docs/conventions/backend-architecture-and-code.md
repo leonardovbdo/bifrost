@@ -375,7 +375,8 @@ Exemplos Bifrost: purge de audit antigo, jobs de telemetria amostrada (evoluçã
 - `DatabaseInconsistencyException`
 - `CodingErrorException`
 
-Handler global → payload HTTP padronizado `{ "error": { "code", "message" } }`.
+Handler global → payload HTTP padronizado conforme [`api-http.md`](api-http.md):  
+`{ "error": { "code", "message", "details?" } }`.
 
 ---
 

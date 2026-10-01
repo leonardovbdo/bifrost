@@ -10,6 +10,9 @@ Thumbs.db
 *.pdf
 docs/academic/*.pdf
 
+# Backlog local de metas/dúvidas (não versionar)
+docs/docs/requirements/metas-documentacao.md
+
 # Node (futuro apps/backend)
 node_modules/
 dist/

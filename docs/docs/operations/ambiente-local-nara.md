@@ -62,11 +62,19 @@ Expõe:
 
 ## 5. Backend TCC (ainda não implementado)
 
+PostgreSQL local (já disponível):
+
+```bash
+docker compose up -d
+```
+
+Detalhes: [`docker-postgres-local.md`](docker-postgres-local.md).
+
 Quando `apps/backend` existir:
 
-1. PostgreSQL up + migrations  
-2. API em porta dedicada (ex.: `3000`)  
-3. Protótipo de UI do TCC (ou outro client) usando JWT + session-config  
+1. PostgreSQL up + migrations Flyway  
+2. API em porta dedicada + Actuator `/health` (ADR-013)  
+3. Protótipo de UI do TCC usando cookies JWT + session-config  
 4. Rosbridge permanece `:9090` (híbrido)
 
 ---

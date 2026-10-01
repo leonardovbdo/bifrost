@@ -16,6 +16,9 @@
 | Convenções | `docs/docs/conventions/` |
 | Acadêmico | `docs/academic/` |
 
+Convenções de engenharia vigentes: `api-http`, `git-and-releases`, `testing`, `security`, `backend-architecture-and-code`, `documentation`.  
+Changelog na raiz: `CHANGELOG.md`.
+
 ---
 
 ## 2. ADR
