@@ -1,5 +1,6 @@
 package com.bifrost.backend;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -7,7 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,12 +58,16 @@ class AuthSessionIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.role").value("admin"));
 
-    mockMvc
-        .perform(get("/api/v1/me/session-config").cookie(cookie("BIFROST_ACCESS", adminAccess)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.schemaVersion").value(1))
-        .andExpect(jsonPath("$.activeProfile.slug").value("nara-sim-alfa"))
-        .andExpect(jsonPath("$.permissions.canManageProfiles").value(true));
+    MvcResult sessionConfig =
+        mockMvc
+            .perform(get("/api/v1/me/session-config").cookie(cookie("BIFROST_ACCESS", adminAccess)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.schemaVersion").value(1))
+            .andExpect(jsonPath("$.activeProfile.slug").value("nara-sim-alfa"))
+            .andExpect(jsonPath("$.permissions.canManageProfiles").value(true))
+            .andReturn();
+    assertThat(hasRootPathClear(sessionConfig, "BIFROST_ACCESS")).isTrue();
+    assertThat(hasRootPathClear(sessionConfig, "BIFROST_REFRESH")).isTrue();
 
     mockMvc
         .perform(get("/api/v1/robot-profiles").cookie(cookie("BIFROST_ACCESS", operatorAccess)))
@@ -184,16 +190,52 @@ class AuthSessionIntegrationTest {
                         "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}"))
             .andExpect(status().isOk())
             .andReturn();
+    assertThat(hasRootPathClear(login, "BIFROST_ACCESS")).isTrue();
+    assertThat(hasRootPathClear(login, "BIFROST_REFRESH")).isTrue();
+    assertThat(hasScopedSessionCookie(login, "BIFROST_ACCESS")).isTrue();
+    assertThat(hasScopedSessionCookie(login, "BIFROST_REFRESH")).isTrue();
     return extractCookie(login, "BIFROST_ACCESS");
   }
 
   private static String extractCookie(MvcResult result, String name) {
     for (String header : result.getResponse().getHeaders("Set-Cookie")) {
       if (header.startsWith(name + "=")) {
-        return header.substring(name.length() + 1, header.indexOf(';'));
+        String value = header.substring(name.length() + 1, header.indexOf(';'));
+        // Skip Max-Age=0 clears (legacy Path=/ and logout).
+        if (!value.isEmpty()) {
+          return value;
+        }
       }
     }
     throw new IllegalStateException("Missing cookie " + name);
+  }
+
+  private static boolean hasRootPathClear(MvcResult result, String name) {
+    for (String header : result.getResponse().getHeaders("Set-Cookie")) {
+      if (!header.startsWith(name + "=") || header.contains("Path=/api")) {
+        continue;
+      }
+      String value = header.substring(name.length() + 1, header.indexOf(';'));
+      if (value.isEmpty()
+          && header.contains("Path=/")
+          && header.toLowerCase().contains("max-age=0")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean hasScopedSessionCookie(MvcResult result, String name) {
+    for (String header : result.getResponse().getHeaders("Set-Cookie")) {
+      if (!header.startsWith(name + "=") || !header.contains("Path=/api")) {
+        continue;
+      }
+      String value = header.substring(name.length() + 1, header.indexOf(';'));
+      if (!value.isEmpty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static jakarta.servlet.http.Cookie cookie(String name, String value) {

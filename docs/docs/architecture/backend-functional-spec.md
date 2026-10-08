@@ -186,7 +186,6 @@ Exemplo ilustrativo:
 ```
 
 Contrato canônico: [`../adrs/ADR-009-session-config.md`](../adrs/ADR-009-session-config.md).
----
 
 ## 6. Regras transversais
 

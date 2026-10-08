@@ -48,9 +48,9 @@ Ingestão via job/bridge — **não** no caminho crítico do teleop.
 
 ## Critérios de aceite (MVP auditoria)
 
-- [ ] Login/logout/failure geram evento server-side
-- [ ] Profile switch e parameter_change geram evento
-- [ ] Goal reportado pelo client aparece na listagem admin
-- [ ] Job de purge remove eventos fora da janela de 90 dias
-- [ ] Operator não lista auditoria global
-- [ ] Nenhum evento por tick de teleop
+- [x] Login/logout/failure geram evento server-side
+- [x] Profile switch e parameter_change geram evento
+- [x] Goal reportado pelo client aparece na listagem admin
+- [x] Job de purge remove eventos fora da janela de 90 dias
+- [x] Operator não lista auditoria global
+- [x] Nenhum evento por tick de teleop

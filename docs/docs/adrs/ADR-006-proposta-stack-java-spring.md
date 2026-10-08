@@ -56,6 +56,7 @@ A súmula/slides devem ser alinhados a esta decisão quando houver revisão acad
 - Skeleton `apps/backend` nasce em Java
 - Atualizar narrativa da súmula junto ao orientador quando couber
 - SGBD: ver ADR-007 (PostgreSQL)
+
 ---
 
 ## Checklist pós-decisão

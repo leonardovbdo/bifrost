@@ -37,24 +37,26 @@ com.bifrost.backend
 └── infrastructure/
 ```
 
-Skeleton: Actuator health, Flyway, correlation-id, **auth/session (Etapa A)**.
+Skeleton + Etapas A–C: auth/session/profiles, parameters/audit, LLM proxy + CI.
 
-## Auth local (Etapa A)
+## Auth / LLM local
 
 ```bash
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin
 export BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
+# opcional: export BIFROST_LLM_API_KEY=...
 ./mvnw spring-boot:run
 ```
 
 - `POST /api/v1/auth/login` → cookies `BIFROST_ACCESS` / `BIFROST_REFRESH`
 - `GET /api/v1/me/session-config`
 - `PUT /api/v1/me/active-profile`
+- `POST /api/v1/llm/ask` `{ "prompt": "…", "context": {} }` → `{ "reply", "model" }` (admin/operator)
 
 ## Próximos passos
 
 → [`../../docs/docs/operations/proximos-passos.md`](../../docs/docs/operations/proximos-passos.md)
 
-**Próximo código sugerido:** PROF-03/04 ou Etapa B (parameters).
+**Próximo código sugerido:** Etapa D (UI / demo NARA).

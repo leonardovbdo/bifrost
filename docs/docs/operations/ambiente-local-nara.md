@@ -10,7 +10,7 @@
 | Pasta | Uso |
 |-------|-----|
 | `~/Desktop/noblenara` | ROS 2 / simulação (`nara-sim`) — estudo de caso |
-| `~/Desktop/TCC` | Docs + futuro `apps/backend` (+ eventual protótipo de UI) |
+| `~/Desktop/TCC` | Docs + `apps/backend` + protótipo UI `apps/web` |
 
 ---
 
@@ -60,9 +60,9 @@ Expõe:
 
 ---
 
-## 5. Backend TCC (ainda não implementado)
+## 5. Backend TCC + protótipo UI
 
-PostgreSQL local (já disponível):
+PostgreSQL local:
 
 ```bash
 docker compose up -d
@@ -70,12 +70,10 @@ docker compose up -d
 
 Detalhes: [`docker-postgres-local.md`](docker-postgres-local.md).
 
-Quando `apps/backend` existir:
-
 1. PostgreSQL up + migrations Flyway  
-2. API em porta dedicada + Actuator `/health` (ADR-013)  
-3. Protótipo de UI do TCC usando cookies JWT + session-config  
-4. Rosbridge permanece `:9090` (híbrido)
+2. API em `:8081` + Actuator `/health` (ADR-013)  
+3. Protótipo UI: `cd apps/web && npm run dev` → `http://localhost:5173`  
+4. Rosbridge permanece `:9090` (híbrido); câmera via web_video_server `:8080`
 
 ---
 

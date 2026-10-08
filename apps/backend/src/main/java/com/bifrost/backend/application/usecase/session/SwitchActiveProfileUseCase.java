@@ -4,9 +4,11 @@ import com.bifrost.backend.domain.exception.ForbiddenException;
 import com.bifrost.backend.domain.exception.NotFoundException;
 import com.bifrost.backend.domain.model.RobotProfile;
 import com.bifrost.backend.domain.model.User;
+import com.bifrost.backend.domain.port.output.AuditRecorder;
 import com.bifrost.backend.domain.repository.RobotProfileRepository;
 import com.bifrost.backend.domain.repository.UserProfileAccessRepository;
 import com.bifrost.backend.domain.repository.UserRepository;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +18,17 @@ public class SwitchActiveProfileUseCase {
   private final UserRepository userRepository;
   private final UserProfileAccessRepository accessRepository;
   private final RobotProfileRepository profileRepository;
+  private final AuditRecorder auditRecorder;
 
   public SwitchActiveProfileUseCase(
       UserRepository userRepository,
       UserProfileAccessRepository accessRepository,
-      RobotProfileRepository profileRepository) {
+      RobotProfileRepository profileRepository,
+      AuditRecorder auditRecorder) {
     this.userRepository = userRepository;
     this.accessRepository = accessRepository;
     this.profileRepository = profileRepository;
+    this.auditRecorder = auditRecorder;
   }
 
   @Transactional
@@ -46,5 +51,10 @@ public class SwitchActiveProfileUseCase {
 
     user.switchActiveProfile(profile.id());
     userRepository.save(user);
+    auditRecorder.record(
+        "profile_switch",
+        user.id(),
+        profile.id(),
+        Map.of("profileId", profile.id().toString(), "slug", profile.slug()));
   }
 }

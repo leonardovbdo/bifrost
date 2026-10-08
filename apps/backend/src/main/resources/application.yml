@@ -56,7 +56,21 @@ bifrost:
     enabled: ${BIFROST_OPERATOR_SEED_ENABLED:false}
     username: ${BIFROST_OPERATOR_USERNAME:}
     password: ${BIFROST_OPERATOR_PASSWORD:}
+  viewer:
+    enabled: ${BIFROST_VIEWER_SEED_ENABLED:false}
+    username: ${BIFROST_VIEWER_USERNAME:}
+    password: ${BIFROST_VIEWER_PASSWORD:}
   teleop:
     linear-max: 0.5
     angular-max: 1.0
     profile: normal
+  audit:
+    retention-days: ${BIFROST_AUDIT_RETENTION_DAYS:90}
+    purge-cron: ${BIFROST_AUDIT_PURGE_CRON:0 30 3 * * *}
+  llm:
+    api-key: ${BIFROST_LLM_API_KEY:}
+    model: ${BIFROST_LLM_MODEL:gemini-3.6-flash}
+    base-url: ${BIFROST_LLM_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    max-prompt-length: ${BIFROST_LLM_MAX_PROMPT_LENGTH:4000}
+    timeout-ms: ${BIFROST_LLM_TIMEOUT_MS:30000}
+    stub-when-missing-key: ${BIFROST_LLM_STUB_WHEN_MISSING_KEY:true}
