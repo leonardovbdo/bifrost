@@ -45,12 +45,13 @@ O client **é** responsável por:
 
 ## 4. Protótipo de frontend do TCC
 
-Escopo sugerido (quando houver implementação):
+Implementado em [`apps/web`](../../../apps/web/README.md) (Vite + React):
 
 - Login + exibição de role  
 - Lista/seleção de robot profiles permitidos  
-- Conexão rosbridge + teleop mínimo + uma câmera  
-- Envio opcional de eventos de auditoria (ex.: goal)
+- Conexão rosbridge + teleop mínimo (WASD) + uma câmera  
+- Assistente via `/llm/ask` (admin/operator)  
+- Preset de teleop (`safety`/`normal`/`fast`) via parameters
 
 Não é objetivo reproduzir uma IHM completa de produto de terceiros.
 

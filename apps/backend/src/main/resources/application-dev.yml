@@ -1,0 +1,5 @@
+# Local demo only. Activate with: --spring.profiles.active=dev
+# Prefer a unique BIFROST_JWT_SECRET even in dev.
+bifrost:
+  jwt:
+    secret: ${BIFROST_JWT_SECRET:change-me-bifrost-dev-secret-at-least-32-chars}

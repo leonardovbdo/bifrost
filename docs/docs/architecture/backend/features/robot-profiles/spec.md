@@ -45,7 +45,7 @@ IHM simples **pode ignorar**; campo existe para evolução (pose no mapa, etc.).
 
 ## Critérios de aceite
 
-- [ ] Seed NARA retorna tópicos/URLs compatíveis com simulação local validada
-- [ ] Admin cria profile para outra tecnologia sem alterar código de auth
-- [ ] Operator sem ACL recebe 403 ao tentar ativar profile alheio
-- [ ] Validação bloqueia profile `teleop` sem `cmd_vel`
+- [x] Seed NARA retorna tópicos/URLs compatíveis com simulação local validada
+- [x] Admin cria profile para outra tecnologia sem alterar código de auth
+- [x] Operator sem ACL recebe 403 ao tentar ativar/ler profile alheio
+- [x] Validação bloqueia profile `teleop` sem `cmd_vel`
