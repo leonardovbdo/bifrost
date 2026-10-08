@@ -7,14 +7,18 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 @Component
 public class GeminiLlmClient implements LlmClient {
+  private static final Logger log = LoggerFactory.getLogger(GeminiLlmClient.class);
   private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
       new ParameterizedTypeReference<>() {};
 
@@ -40,8 +44,7 @@ public class GeminiLlmClient implements LlmClient {
     }
 
     String model = properties.llm().model();
-    String url =
-        properties.llm().baseUrl() + "/models/" + model + ":generateContent?key=" + apiKey;
+    String url = properties.llm().baseUrl() + "/models/" + model + ":generateContent";
 
     String text = buildPrompt(prompt, context);
     Map<String, Object> body = new LinkedHashMap<>();
@@ -52,6 +55,7 @@ public class GeminiLlmClient implements LlmClient {
           restClient
               .post()
               .uri(url)
+              .header("x-goog-api-key", apiKey)
               .contentType(MediaType.APPLICATION_JSON)
               .body(body)
               .retrieve()
@@ -60,7 +64,11 @@ public class GeminiLlmClient implements LlmClient {
       return new LlmReply(extractText(response), model);
     } catch (LlmException ex) {
       throw ex;
+    } catch (RestClientResponseException ex) {
+      log.warn("LLM provider error model={} status={}", model, ex.getStatusCode().value());
+      throw new LlmException("LLM_PROVIDER_ERROR", "LLM provider request failed");
     } catch (Exception ex) {
+      log.warn("LLM provider request failed model={}", model);
       throw new LlmException("LLM_PROVIDER_ERROR", "LLM provider request failed");
     }
   }

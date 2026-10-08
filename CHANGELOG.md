@@ -38,6 +38,8 @@ Versionamento: [SemVer](https://semver.org/)
   rosbridge
 - Etapa D: publicar Twist zero no disconnect antes do unadvertise
 - Config markdownlint-cli2 (`config` + MD024 siblings_only)
+- Etapa C: default Gemini `gemini-3.6-flash`, API key em header,
+  LLM fora da transação e limite prompt+context
 
 ### Changed
 

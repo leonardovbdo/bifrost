@@ -137,7 +137,7 @@ public class BifrostProperties {
 
   public static class Llm {
     private String apiKey = "";
-    private String model = "gemini-2.0-flash";
+    private String model = "gemini-3.6-flash";
     private String baseUrl = "https://generativelanguage.googleapis.com/v1beta";
     private int maxPromptLength = 4000;
     private int timeoutMs = 30000;

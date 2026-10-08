@@ -69,7 +69,7 @@ bifrost:
     purge-cron: ${BIFROST_AUDIT_PURGE_CRON:0 30 3 * * *}
   llm:
     api-key: ${BIFROST_LLM_API_KEY:}
-    model: ${BIFROST_LLM_MODEL:gemini-2.0-flash}
+    model: ${BIFROST_LLM_MODEL:gemini-3.6-flash}
     base-url: ${BIFROST_LLM_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
     max-prompt-length: ${BIFROST_LLM_MAX_PROMPT_LENGTH:4000}
     timeout-ms: ${BIFROST_LLM_TIMEOUT_MS:30000}

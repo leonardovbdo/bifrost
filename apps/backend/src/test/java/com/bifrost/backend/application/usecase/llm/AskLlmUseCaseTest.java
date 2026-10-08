@@ -34,6 +34,20 @@ class AskLlmUseCaseTest {
   }
 
   @Test
+  void rejectsOversizedPromptPlusContext() {
+    UserRepository users = mock(UserRepository.class);
+    LlmClient llm = mock(LlmClient.class);
+    AuditRecorder audit = mock(AuditRecorder.class);
+    User user = User.create("op", null, "hash", UserRole.OPERATOR);
+    when(users.findById(user.id())).thenReturn(Optional.of(user));
+
+    AskLlmUseCase useCase = new AskLlmUseCase(users, llm, audit, 20);
+    assertThrows(
+        ValidationException.class,
+        () -> useCase.execute(user.id(), "hello", Map.of("blob", "x".repeat(50))));
+  }
+
+  @Test
   void recordsAuditMetadataOnly() {
     UserRepository users = mock(UserRepository.class);
     LlmClient llm = mock(LlmClient.class);

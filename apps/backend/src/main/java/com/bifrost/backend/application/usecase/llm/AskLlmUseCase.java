@@ -12,10 +12,11 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AskLlmUseCase {
+  private static final String CONTEXT_PREFIX = "\n\nContext:\n";
+
   private final UserRepository userRepository;
   private final LlmClient llmClient;
   private final AuditRecorder auditRecorder;
@@ -32,7 +33,10 @@ public class AskLlmUseCase {
     this.maxPromptLength = maxPromptLength;
   }
 
-  @Transactional
+  /**
+   * HTTP to the LLM provider runs outside a DB transaction. User lookup and audit each use short
+   * repository transactions.
+   */
   public LlmClient.LlmReply execute(UUID userId, String prompt, Map<String, Object> context) {
     User user =
         userRepository
@@ -43,26 +47,37 @@ public class AskLlmUseCase {
     if (prompt == null || prompt.isBlank()) {
       throw new ValidationException("LLM_PROMPT_REQUIRED", "prompt is required");
     }
-    if (prompt.length() > maxPromptLength) {
+
+    Map<String, Object> safeContext = context == null ? Map.of() : context;
+    int composedLength = composedPromptLength(prompt, safeContext);
+    if (composedLength > maxPromptLength) {
       throw new ValidationException(
-          "LLM_PROMPT_TOO_LONG", "prompt exceeds max length of " + maxPromptLength);
+          "LLM_PROMPT_TOO_LONG",
+          "prompt+context exceeds max length of " + maxPromptLength);
     }
 
-    try {
-      LlmClient.LlmReply reply = llmClient.ask(prompt, context == null ? Map.of() : context);
-      Map<String, Object> auditPayload = new LinkedHashMap<>();
-      auditPayload.put("model", reply.model());
-      auditPayload.put("promptLength", prompt.length());
-      auditPayload.put("replyLength", reply.reply() == null ? 0 : reply.reply().length());
-      if (context != null && !context.isEmpty()) {
-        auditPayload.put("contextKeys", context.keySet());
-      }
-      auditRecorder.record("llm_ask", user.id(), user.lastActiveProfileId(), auditPayload);
-      return reply;
-    } catch (LlmException ex) {
-      throw ex;
-    } catch (Exception ex) {
-      throw new LlmException("LLM_PROVIDER_ERROR", "LLM provider request failed");
+    LlmClient.LlmReply reply = llmClient.ask(prompt, safeContext);
+
+    Map<String, Object> auditPayload = new LinkedHashMap<>();
+    auditPayload.put("model", reply.model());
+    auditPayload.put("promptLength", prompt.length());
+    auditPayload.put("composedLength", composedLength);
+    auditPayload.put("replyLength", reply.reply() == null ? 0 : reply.reply().length());
+    if (!safeContext.isEmpty()) {
+      auditPayload.put("contextKeys", safeContext.keySet());
     }
+    try {
+      auditRecorder.record("llm_ask", user.id(), user.lastActiveProfileId(), auditPayload);
+    } catch (RuntimeException ex) {
+      throw new LlmException("LLM_AUDIT_FAILED", "LLM reply ok but audit record failed");
+    }
+    return reply;
+  }
+
+  static int composedPromptLength(String prompt, Map<String, Object> context) {
+    if (context == null || context.isEmpty()) {
+      return prompt.length();
+    }
+    return prompt.length() + CONTEXT_PREFIX.length() + String.valueOf(context).length();
   }
 }
