@@ -212,7 +212,8 @@ class AuthSessionIntegrationTest {
 
     mockMvc
         .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", successorAccess)))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.error.code").value("UNAUTHORIZED"));
     mockMvc
         .perform(post("/api/v1/auth/refresh").cookie(cookie("BIFROST_REFRESH", successorRefresh)))
         .andExpect(status().isUnauthorized());
@@ -227,12 +228,14 @@ class AuthSessionIntegrationTest {
         .andExpect(status().isNoContent());
     mockMvc
         .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", access)))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.error.code").value("UNAUTHORIZED"));
 
     // access from first login is also dead once sessions were revoked
     mockMvc
         .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", accessAfterLogin)))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.error.code").value("UNAUTHORIZED"));
   }
 
   private String login(String username, String password) throws Exception {
