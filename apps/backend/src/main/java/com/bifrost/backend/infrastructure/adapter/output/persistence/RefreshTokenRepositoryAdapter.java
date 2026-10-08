@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
@@ -30,6 +31,12 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
   @Override
   @Transactional
   public void revokeAllForUser(UUID userId) {
+    jpaRepository.revokeAllForUser(userId);
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void revokeAllForUserNow(UUID userId) {
     jpaRepository.revokeAllForUser(userId);
   }
 

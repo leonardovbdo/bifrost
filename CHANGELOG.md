@@ -47,8 +47,9 @@ Versionamento: [SemVer](https://semver.org/)
   valida x/y/yaw sem nulls; login/logout/session-config
   expiram cookie legado `Path=/`
 - Auth: JWT secret placeholder só com profile `dev`; reuso de
-  refresh revoga todas as sessões; access exige sessão ativa e
-  role/`active` do banco; teleop manda zero no `pagehide`
+  refresh revoga todas as sessões (`REQUIRES_NEW`); access exige
+  sessão ativa e role/`active` do banco; teleop manda zero no
+  `pagehide`
 
 ### Changed
 
