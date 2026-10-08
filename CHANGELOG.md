@@ -43,6 +43,8 @@ Versionamento: [SemVer](https://semver.org/)
 - Etapa B: `login_failure` com REQUIRES_NEW; Stop limpa teclas;
   presets teleop numéricos; goal_pose só com canSendGoal;
   ip/userAgent do request sempre sobrescritos
+- Etapa B: cookies JWT com `Path=/api`; payload `goal_pose`
+  valida x/y/yaw sem nulls
 
 ### Changed
 

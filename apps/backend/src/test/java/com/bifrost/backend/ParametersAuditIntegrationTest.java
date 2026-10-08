@@ -122,6 +122,18 @@ class ParametersAuditIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
+                    {"type":"goal_pose","payload":{"x":1.0,"y":null,"yaw":0.1}}
+                    """))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error.code").value("AUDIT_PAYLOAD_INVALID"));
+
+    mockMvc
+        .perform(
+            post("/api/v1/audit/events")
+                .cookie(cookie("BIFROST_ACCESS", operator))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
                     {"type":"login_success","payload":{}}
                     """))
         .andExpect(status().isBadRequest());

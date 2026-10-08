@@ -1,6 +1,7 @@
 package com.bifrost.backend.domain.model;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,13 +25,26 @@ public class AuditEvent {
     this.userId = userId;
     this.type = Objects.requireNonNull(type);
     this.robotProfileId = robotProfileId;
-    this.payload = Map.copyOf(payload == null ? Map.of() : payload);
+    this.payload = copyWithoutNulls(payload);
     this.createdAt = Objects.requireNonNull(createdAt);
   }
 
   public static AuditEvent create(
       String type, UUID userId, UUID robotProfileId, Map<String, Object> payload) {
     return new AuditEvent(UUID.randomUUID(), userId, type, robotProfileId, payload, Instant.now());
+  }
+
+  private static Map<String, Object> copyWithoutNulls(Map<String, Object> payload) {
+    if (payload == null || payload.isEmpty()) {
+      return Map.of();
+    }
+    Map<String, Object> copy = new LinkedHashMap<>();
+    for (Map.Entry<String, Object> entry : payload.entrySet()) {
+      if (entry.getKey() != null && entry.getValue() != null) {
+        copy.put(entry.getKey(), entry.getValue());
+      }
+    }
+    return Map.copyOf(copy);
   }
 
   public UUID id() { return id; }

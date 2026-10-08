@@ -61,7 +61,8 @@ public class AuthCookieService {
         ResponseCookie.from(name, value == null ? "" : value)
             .httpOnly(true)
             .secure(properties.cookie().secure())
-            .path("/")
+            // Scope to /api so localhost rosbridge (:9090) / video (:8080) do not receive JWTs.
+            .path("/api")
             .sameSite(properties.cookie().sameSite());
     if (maxAge.isZero() || maxAge.isNegative()) {
       builder.maxAge(0);
