@@ -31,4 +31,7 @@ npm run build
 
 ## Escopo MVP
 
-Não é uma IHM completa: foco em hidratar session-config, teleop mínimo e demo do proxy LLM.
+Não é uma IHM completa: foca em session-config, teleop mínimo e demo do LLM.
+
+Teleop publica `geometry_msgs/msg/Twist` (ROS 2 / Jazzy) e só captura
+teclas fora de `input`/`textarea`/`select`.

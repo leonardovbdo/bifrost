@@ -12,6 +12,18 @@ import type { SessionConfig, User } from '../types/session'
 
 type AuthState = 'loading' | 'anonymous' | 'authenticated'
 
+/** Dedupes StrictMode double-mount refresh rotation. */
+let inflightRefresh: Promise<unknown> | null = null
+
+function refreshShared() {
+  if (!inflightRefresh) {
+    inflightRefresh = refresh().finally(() => {
+      inflightRefresh = null
+    })
+  }
+  return inflightRefresh
+}
+
 export function useSession() {
   const [authState, setAuthState] = useState<AuthState>('loading')
   const [user, setUser] = useState<User | null>(null)
@@ -19,11 +31,18 @@ export function useSession() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const clearSession = useCallback(() => {
+    setUser(null)
+    setSession(null)
+    setAuthState('anonymous')
+  }, [])
+
   const loadSession = useCallback(async () => {
     const config = await fetchSessionConfig()
     setSession(config)
     setUser(config.user)
     setAuthState('authenticated')
+    setError(null)
     return config
   }, [])
 
@@ -33,31 +52,37 @@ export function useSession() {
       try {
         await loadSession()
       } catch (err) {
-        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        if (cancelled) return
+
+        if (err instanceof ApiError && err.status === 401) {
           try {
-            await refresh()
-            if (!cancelled) await loadSession()
+            if (cancelled) return
+            await refreshShared()
+            if (cancelled) return
+            await loadSession()
             return
           } catch {
             if (!cancelled) {
-              setAuthState('anonymous')
-              setUser(null)
-              setSession(null)
+              clearSession()
             }
             return
           }
         }
+
         if (!cancelled) {
-          setAuthState('anonymous')
-          setUser(null)
-          setSession(null)
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Falha ao carregar sessão',
+          )
+          clearSession()
         }
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [loadSession])
+  }, [loadSession, clearSession])
 
   const login = useCallback(
     async (username: string, password: string) => {
@@ -82,12 +107,10 @@ export function useSession() {
     try {
       await apiLogout()
     } finally {
-      setUser(null)
-      setSession(null)
-      setAuthState('anonymous')
+      clearSession()
       setBusy(false)
     }
-  }, [])
+  }, [clearSession])
 
   const selectProfile = useCallback(
     async (profileId: string) => {

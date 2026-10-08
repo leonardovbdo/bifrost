@@ -9,6 +9,32 @@ type Twist = {
   angular: { x: number; y: number; z: number }
 }
 
+const TELEOP_KEYS = new Set([
+  'w',
+  'a',
+  's',
+  'd',
+  'arrowup',
+  'arrowdown',
+  'arrowleft',
+  'arrowright',
+  ' ',
+])
+
+/** ROS 2 / Jazzy message type (rosbridge). */
+const TWIST_TYPE = 'geometry_msgs/msg/Twist'
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName
+  return (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    target.isContentEditable
+  )
+}
+
 export function useRos(
   profile: ActiveProfile | null,
   enabled: boolean,
@@ -20,6 +46,7 @@ export function useRos(
   const cmdVelRef = useRef<Topic<Twist> | null>(null)
   const keysRef = useRef<Set<string>>(new Set())
   const loopRef = useRef<number | null>(null)
+  const hadKeysRef = useRef(false)
 
   const disconnect = useCallback(() => {
     if (loopRef.current != null) {
@@ -27,7 +54,15 @@ export function useRos(
       loopRef.current = null
     }
     keysRef.current.clear()
-    cmdVelRef.current = null
+    hadKeysRef.current = false
+    if (cmdVelRef.current) {
+      try {
+        cmdVelRef.current.unadvertise()
+      } catch {
+        // ignore
+      }
+      cmdVelRef.current = null
+    }
     if (rosRef.current) {
       try {
         rosRef.current.close()
@@ -53,12 +88,28 @@ export function useRos(
     const onConnection = () => {
       setStatus('connected')
       const topicName = profile.topics.cmd_vel
-      if (topicName) {
-        cmdVelRef.current = new Topic<Twist>({
-          ros,
-          name: topicName,
-          messageType: 'geometry_msgs/Twist',
-        })
+      if (!topicName) {
+        setError('Profile sem tópico cmd_vel')
+        return
+      }
+      const topic = new Topic<Twist>({
+        ros,
+        name: topicName,
+        messageType: TWIST_TYPE,
+      })
+      topic.on('warning', (warning) => {
+        setError(
+          typeof warning === 'string'
+            ? warning
+            : 'Falha no advertise de cmd_vel (verifique o messageType ROS 2)',
+        )
+      })
+      try {
+        topic.advertise()
+        cmdVelRef.current = topic
+      } catch {
+        setError('Falha ao anunciar cmd_vel no rosbridge')
+        cmdVelRef.current = null
       }
     }
     const onError = () => {
@@ -84,10 +135,14 @@ export function useRos(
       if (!cmdVelRef.current || !limits) return
       const lx = Math.max(-limits.linearMax, Math.min(limits.linearMax, linearX))
       const az = Math.max(-limits.angularMax, Math.min(limits.angularMax, angularZ))
-      cmdVelRef.current.publish({
-        linear: { x: lx, y: 0, z: 0 },
-        angular: { x: 0, y: 0, z: az },
-      })
+      try {
+        cmdVelRef.current.publish({
+          linear: { x: lx, y: 0, z: 0 },
+          angular: { x: 0, y: 0, z: az },
+        })
+      } catch {
+        setError('Falha ao publicar Twist no rosbridge')
+      }
     },
     [limits],
   )
@@ -97,29 +152,47 @@ export function useRos(
   useEffect(() => {
     if (!enabled || status !== 'connected' || !limits) return
 
+    const releaseKeys = () => {
+      if (keysRef.current.size === 0 && !hadKeysRef.current) return
+      keysRef.current.clear()
+      hadKeysRef.current = false
+      stop()
+    }
+
     const onKeyDown = (e: KeyboardEvent) => {
+      if (isEditableTarget(e.target)) return
       if (e.repeat) return
       const key = e.key.toLowerCase()
-      if (!['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) {
-        return
-      }
+      if (!TELEOP_KEYS.has(key)) return
       e.preventDefault()
       if (key === ' ') {
-        keysRef.current.clear()
-        stop()
+        releaseKeys()
         return
       }
       keysRef.current.add(key)
+      hadKeysRef.current = true
     }
     const onKeyUp = (e: KeyboardEvent) => {
+      if (isEditableTarget(e.target)) return
       keysRef.current.delete(e.key.toLowerCase())
+      if (keysRef.current.size === 0 && hadKeysRef.current) {
+        hadKeysRef.current = false
+        stop()
+      }
+    }
+    const onBlur = () => releaseKeys()
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') releaseKeys()
     }
 
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', onBlur)
+    document.addEventListener('visibilitychange', onVisibility)
 
     loopRef.current = window.setInterval(() => {
       const keys = keysRef.current
+      if (keys.size === 0) return
       let linear = 0
       let angular = 0
       if (keys.has('w') || keys.has('arrowup')) linear += limits.linearMax
@@ -132,11 +205,13 @@ export function useRos(
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', onBlur)
+      document.removeEventListener('visibilitychange', onVisibility)
       if (loopRef.current != null) {
         window.clearInterval(loopRef.current)
         loopRef.current = null
       }
-      stop()
+      releaseKeys()
     }
   }, [enabled, status, limits, publishTwist, stop])
 

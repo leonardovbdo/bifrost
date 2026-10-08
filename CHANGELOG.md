@@ -1,16 +1,27 @@
 # Changelog
 
 Todas as mudanças notáveis deste projeto são documentadas aqui.  
-Formato baseado em [Keep a Changelog](https://keepachangelog.com/). Versionamento: [SemVer](https://semver.org/) (ver `docs/docs/conventions/git-and-releases.md`).
+Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
+Versionamento: [SemVer](https://semver.org/)
+(ver `docs/docs/conventions/git-and-releases.md`).
 
 ## [Unreleased]
 
 ### Added
 
-- Etapa D: protótipo UI `apps/web` (login, session-config, teleop roslib, câmera, LLM) + CI Node (`.github/workflows/web.yml`) (`feat/etapa-d-ui-demo`)
-- Etapa C: proxy LLM `POST /api/v1/llm/ask` (Gemini pluggable + stub), audit `llm_ask`, seed viewer, CI Maven `.github/workflows/backend.yml` (`feat/etapa-c-llm-ci`)
-- Etapa B: parameters (`global`/`user`, merge em session-config) + audit events, allowlist `goal_pose`, purge 90d (`feat/etapa-b-parameters-audit`)
-- Etapa A completa: auth JWT/cookies, session-config, CRUD/listagem ACL de robot profiles (`feat/etapa-a-auth-session`, PR #1)
+- Etapa D: protótipo UI `apps/web` (login, session-config, teleop,
+  câmera, LLM) + CI Node (`feat/etapa-d-ui-demo`)
+- Etapa C: proxy LLM `/llm/ask` (Gemini + stub), audit `llm_ask`,
+  CI Maven (`feat/etapa-c-llm-ci`)
+- Etapa B: parameters + audit events, purge 90d
+  (`feat/etapa-b-parameters-audit`)
+- Etapa A: auth JWT/cookies, session-config, robot profiles
+  (`feat/etapa-a-auth-session`, PR #1)
+
+### Fixed
+
+- Etapa D: envelope de erro da API, teleop sem capturar inputs,
+  Twist ROS 2, deadman/blur e bootstrap de sessão (StrictMode)
 
 
 ### Added
