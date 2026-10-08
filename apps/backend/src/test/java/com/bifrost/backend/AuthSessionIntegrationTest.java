@@ -180,6 +180,61 @@ class AuthSessionIntegrationTest {
         .andExpect(jsonPath("$.items.length()").value(2));
   }
 
+  @Test
+  void refreshReuseRevokesSuccessorAndAccessStopsAfterLogout() throws Exception {
+    MvcResult firstLogin =
+        mockMvc
+            .perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"username\":\"admin\",\"password\":\"admin-pass\"}"))
+            .andExpect(status().isOk())
+            .andReturn();
+    String oldRefresh = extractCookie(firstLogin, "BIFROST_REFRESH");
+    String accessAfterLogin = extractCookie(firstLogin, "BIFROST_ACCESS");
+
+    MvcResult rotated =
+        mockMvc
+            .perform(post("/api/v1/auth/refresh").cookie(cookie("BIFROST_REFRESH", oldRefresh)))
+            .andExpect(status().isOk())
+            .andReturn();
+    String successorRefresh = extractCookie(rotated, "BIFROST_REFRESH");
+    String successorAccess = extractCookie(rotated, "BIFROST_ACCESS");
+
+    mockMvc
+        .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", successorAccess)))
+        .andExpect(status().isOk());
+
+    // Reuse of the rotated refresh → 401 and all sessions for the user die.
+    mockMvc
+        .perform(post("/api/v1/auth/refresh").cookie(cookie("BIFROST_REFRESH", oldRefresh)))
+        .andExpect(status().isUnauthorized());
+
+    mockMvc
+        .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", successorAccess)))
+        .andExpect(status().isUnauthorized());
+    mockMvc
+        .perform(post("/api/v1/auth/refresh").cookie(cookie("BIFROST_REFRESH", successorRefresh)))
+        .andExpect(status().isUnauthorized());
+
+    // Fresh login; logout must kill access immediately (not wait for JWT exp).
+    String access = login("admin", "admin-pass");
+    mockMvc
+        .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", access)))
+        .andExpect(status().isOk());
+    mockMvc
+        .perform(post("/api/v1/auth/logout").cookie(cookie("BIFROST_ACCESS", access)))
+        .andExpect(status().isNoContent());
+    mockMvc
+        .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", access)))
+        .andExpect(status().isUnauthorized());
+
+    // access from first login is also dead once sessions were revoked
+    mockMvc
+        .perform(get("/api/v1/me").cookie(cookie("BIFROST_ACCESS", accessAfterLogin)))
+        .andExpect(status().isUnauthorized());
+  }
+
   private String login(String username, String password) throws Exception {
     MvcResult login =
         mockMvc

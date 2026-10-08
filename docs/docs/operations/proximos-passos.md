@@ -21,11 +21,12 @@ Branch atual de trabalho: `feat/etapa-d-ui-demo`
 ## Como retomar
 
 ```bash
-git checkout feat/etapa-d-ui-demo
+git checkout feat/etapa-a-auth-session
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
-export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
+export BIFROST_JWT_SECRET="$(openssl rand -base64 48)"
 cd apps/backend && ./mvnw spring-boot:run
+# demo com placeholder: ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 # outro terminal:
 cd apps/web && npm install && npm run dev
 ```

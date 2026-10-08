@@ -50,6 +50,9 @@ public class LoginUserUseCase {
       throw new AuthenticationFailedException();
     }
 
+    // New login invalidates prior refresh sessions for this account.
+    refreshTokenRepository.revokeAllForUser(user.id());
+
     String access = tokenProvider.createAccessToken(user.id(), user.username(), user.role());
     String refreshRaw = tokenProvider.createRefreshTokenValue();
     RefreshToken refresh =

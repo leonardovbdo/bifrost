@@ -45,9 +45,11 @@ Skeleton + Etapas A–C: auth/session/profiles, parameters/audit, LLM proxy + CI
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin
 export BIFROST_ADMIN_PASSWORD=change-me
-export BIFROST_JWT_SECRET=change-me-bifrost-dev-secret-at-least-32-chars
+# Secret único (≥32 chars). Placeholder público só com profile `dev`.
+export BIFROST_JWT_SECRET="$(openssl rand -base64 48)"
 # opcional: export BIFROST_LLM_API_KEY=...
 ./mvnw spring-boot:run
+# demo local com placeholder: ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 - `POST /api/v1/auth/login` → cookies `BIFROST_ACCESS` / `BIFROST_REFRESH`

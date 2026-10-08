@@ -3,6 +3,7 @@ package com.bifrost.backend.infrastructure.adapter.output.persistence;
 import com.bifrost.backend.domain.model.RefreshToken;
 import com.bifrost.backend.domain.repository.RefreshTokenRepository;
 import com.bifrost.backend.infrastructure.adapter.output.persistence.jpa.RefreshTokenJpaRepository;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -30,5 +31,10 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
   @Transactional
   public void revokeAllForUser(UUID userId) {
     jpaRepository.revokeAllForUser(userId);
+  }
+
+  @Override
+  public boolean hasActiveSession(UUID userId) {
+    return jpaRepository.existsByUserIdAndRevokedFalseAndExpiresAtAfter(userId, Instant.now());
   }
 }

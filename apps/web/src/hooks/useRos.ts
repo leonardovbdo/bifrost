@@ -160,7 +160,12 @@ export function useRos(
       setStatus('error')
       setError('Falha ao conectar no rosbridge')
     }
-    const onClose = () => setStatus('closed')
+    const onClose = () => {
+      // Socket already gone — clear local teleop state; zero may not land.
+      keysRef.current.clear()
+      hadKeysRef.current = false
+      setStatus('closed')
+    }
 
     ros.on('connection', onConnection)
     ros.on('error', onError)
@@ -235,10 +240,15 @@ export function useRos(
     const onVisibility = () => {
       if (document.visibilityState === 'hidden') releaseKeys()
     }
+    // pagehide/beforeunload fire while the socket may still be open — unlike
+    // rosbridge `close`, where a late stop() cannot leave the robot.
+    const onPageHide = () => releaseKeys()
 
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
     window.addEventListener('blur', onBlur)
+    window.addEventListener('pagehide', onPageHide)
+    window.addEventListener('beforeunload', onPageHide)
     document.addEventListener('focusin', onFocusIn)
     document.addEventListener('visibilitychange', onVisibility)
 
@@ -258,6 +268,8 @@ export function useRos(
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
+      window.removeEventListener('pagehide', onPageHide)
+      window.removeEventListener('beforeunload', onPageHide)
       document.removeEventListener('focusin', onFocusIn)
       document.removeEventListener('visibilitychange', onVisibility)
       if (loopRef.current != null) {

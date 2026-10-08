@@ -46,6 +46,9 @@ Versionamento: [SemVer](https://semver.org/)
 - Etapa B: cookies JWT com `Path=/api`; payload `goal_pose`
   valida x/y/yaw sem nulls; login/logout/session-config
   expiram cookie legado `Path=/`
+- Auth: JWT secret placeholder só com profile `dev`; reuso de
+  refresh revoga todas as sessões; access exige sessão ativa e
+  role/`active` do banco; teleop manda zero no `pagehide`
 
 ### Changed
 

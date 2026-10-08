@@ -10,4 +10,6 @@ public interface RefreshTokenRepository {
   Optional<RefreshToken> findByTokenHash(String tokenHash);
 
   void revokeAllForUser(UUID userId);
+
+  boolean hasActiveSession(UUID userId);
 }

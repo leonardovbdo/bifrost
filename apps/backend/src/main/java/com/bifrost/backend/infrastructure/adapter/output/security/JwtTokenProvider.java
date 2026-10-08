@@ -11,20 +11,36 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HexFormat;
 import java.util.UUID;
 import javax.crypto.SecretKey;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {
+  static final String PUBLIC_PLACEHOLDER_SECRET = "change-me-bifrost-dev-secret-at-least-32-chars";
+
   private final BifrostProperties properties;
   private final SecretKey key;
 
-  public JwtTokenProvider(BifrostProperties properties) {
+  public JwtTokenProvider(BifrostProperties properties, Environment environment) {
     this.properties = properties;
-    byte[] secretBytes = properties.jwt().secret().getBytes(StandardCharsets.UTF_8);
+    String secret = properties.jwt().secret();
+    boolean allowDevPlaceholder =
+        Arrays.asList(environment.getActiveProfiles()).contains("dev");
+    if (secret == null || secret.isBlank()) {
+      throw new IllegalStateException(
+          "bifrost.jwt.secret (BIFROST_JWT_SECRET) must be set (≥32 chars)");
+    }
+    if (PUBLIC_PLACEHOLDER_SECRET.equals(secret) && !allowDevPlaceholder) {
+      throw new IllegalStateException(
+          "bifrost.jwt.secret is the public placeholder; set a unique BIFROST_JWT_SECRET "
+              + "or activate spring profile 'dev'");
+    }
+    byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
     if (secretBytes.length < 32) {
       throw new IllegalStateException("bifrost.jwt.secret must be at least 32 characters");
     }

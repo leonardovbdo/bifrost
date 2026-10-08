@@ -38,7 +38,7 @@ public class BifrostProperties {
   public Llm llm() { return llm; }
 
   public static class Jwt {
-    private String secret = "change-me-bifrost-dev-secret-at-least-32-chars";
+    private String secret = "";
     private Duration accessTtl = Duration.ofMinutes(15);
     private Duration refreshTtl = Duration.ofDays(7);
 

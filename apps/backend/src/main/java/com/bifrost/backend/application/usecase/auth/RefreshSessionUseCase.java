@@ -38,7 +38,12 @@ public class RefreshSessionUseCase {
     RefreshToken existing =
         refreshTokenRepository.findByTokenHash(hash).orElseThrow(AuthenticationFailedException::new);
 
-    if (!existing.isValid(Instant.now())) {
+    // Reuse of a rotated refresh token → steal-in-progress: kill all sessions.
+    if (existing.revoked()) {
+      refreshTokenRepository.revokeAllForUser(existing.userId());
+      throw new AuthenticationFailedException();
+    }
+    if (!existing.expiresAt().isAfter(Instant.now())) {
       throw new AuthenticationFailedException();
     }
 
