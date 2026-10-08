@@ -12,24 +12,30 @@ public class BifrostProperties {
   private final Cors cors = new Cors();
   private final AdminSeed admin = new AdminSeed();
   private final OperatorSeed operator = new OperatorSeed();
+  private final ViewerSeed viewer = new ViewerSeed();
   private final Teleop teleop = new Teleop();
   private final Audit audit = new Audit();
+  private final Llm llm = new Llm();
 
   public Jwt getJwt() { return jwt; }
   public Cookie getCookie() { return cookie; }
   public Cors getCors() { return cors; }
   public AdminSeed getAdmin() { return admin; }
   public OperatorSeed getOperator() { return operator; }
+  public ViewerSeed getViewer() { return viewer; }
   public Teleop getTeleop() { return teleop; }
   public Audit getAudit() { return audit; }
+  public Llm getLlm() { return llm; }
 
   public Jwt jwt() { return jwt; }
   public Cookie cookie() { return cookie; }
   public Cors cors() { return cors; }
   public AdminSeed admin() { return admin; }
   public OperatorSeed operator() { return operator; }
+  public ViewerSeed viewer() { return viewer; }
   public Teleop teleop() { return teleop; }
   public Audit audit() { return audit; }
+  public Llm llm() { return llm; }
 
   public static class Jwt {
     private String secret = "change-me-bifrost-dev-secret-at-least-32-chars";
@@ -93,6 +99,19 @@ public class BifrostProperties {
     public void setPassword(String password) { this.password = password; }
   }
 
+  public static class ViewerSeed {
+    private boolean enabled = false;
+    private String username;
+    private String password;
+
+    public boolean enabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public String username() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String password() { return password; }
+    public void setPassword(String password) { this.password = password; }
+  }
+
   public static class Teleop {
     private double linearMax = 0.5;
     private double angularMax = 1.0;
@@ -114,5 +133,29 @@ public class BifrostProperties {
     public void setRetentionDays(int retentionDays) { this.retentionDays = retentionDays; }
     public String purgeCron() { return purgeCron; }
     public void setPurgeCron(String purgeCron) { this.purgeCron = purgeCron; }
+  }
+
+  public static class Llm {
+    private String apiKey = "";
+    private String model = "gemini-3.6-flash";
+    private String baseUrl = "https://generativelanguage.googleapis.com/v1beta";
+    private int maxPromptLength = 4000;
+    private int timeoutMs = 30000;
+    private boolean stubWhenMissingKey = true;
+
+    public String apiKey() { return apiKey; }
+    public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+    public String model() { return model; }
+    public void setModel(String model) { this.model = model; }
+    public String baseUrl() { return baseUrl; }
+    public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+    public int maxPromptLength() { return maxPromptLength; }
+    public void setMaxPromptLength(int maxPromptLength) { this.maxPromptLength = maxPromptLength; }
+    public int timeoutMs() { return timeoutMs; }
+    public void setTimeoutMs(int timeoutMs) { this.timeoutMs = timeoutMs; }
+    public boolean stubWhenMissingKey() { return stubWhenMissingKey; }
+    public void setStubWhenMissingKey(boolean stubWhenMissingKey) {
+      this.stubWhenMissingKey = stubWhenMissingKey;
+    }
   }
 }

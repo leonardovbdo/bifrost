@@ -6,6 +6,7 @@
 - Integração Gemini via port `LlmClient`
 - Audit `llm_ask`
 - Config: API key, modelo, timeout, max prompt length
+- Stub local quando `BIFROST_LLM_API_KEY` estiver vazia e `stub-when-missing-key=true`
 
 ## Fora de escopo (MVP)
 
@@ -34,7 +35,8 @@
 
 ## Critérios de aceite
 
-- [ ] Operator recebe reply com key só no server
-- [ ] Viewer recebe 403
-- [ ] Falha Gemini não vaza key
-- [ ] Evento `llm_ask` aparece na auditoria admin
+- [x] Operator recebe reply com key só no server
+- [x] Viewer recebe 403
+- [x] Falha Gemini não vaza key
+- [x] Evento `llm_ask` aparece na auditoria admin
+- [x] Sem key: stub responde (dev/CI) ou 503 se stub desligado
