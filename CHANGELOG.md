@@ -50,6 +50,9 @@ Versionamento: [SemVer](https://semver.org/)
   refresh revoga todas as sessões (`REQUIRES_NEW`); access exige
   sessão ativa e role/`active` do banco; teleop manda zero no
   `pagehide`
+- Etapa D: câmera MJPEG sem `encodeURIComponent` no tópico
+  (web_video_server rejeita `%2F`); seletor `camera_user` /
+  `camera_link`; evita flood de `/snapshot`
 
 ### Changed
 

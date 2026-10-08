@@ -25,3 +25,6 @@ coverage/
 # MySQL / dumps locais
 *.sql.gz
 tmp/
+
+# Postgres local (quando Docker não está disponível)
+.data/

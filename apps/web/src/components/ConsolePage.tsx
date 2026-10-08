@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
+import { CameraStage } from './CameraFeed'
 
 interface ConsolePageProps {
   session: SessionConfig
@@ -8,7 +9,6 @@ interface ConsolePageProps {
   error: string | null
   rosStatus: RosStatus
   rosError: string | null
-  cameraUrl: string | null
   onLogout: () => Promise<void>
   onSelectProfile: (profileId: string) => Promise<void>
   onChangePreset: (preset: string) => Promise<void>
@@ -24,7 +24,6 @@ export function ConsolePage({
   error,
   rosStatus,
   rosError,
-  cameraUrl,
   onLogout,
   onSelectProfile,
   onChangePreset,
@@ -124,22 +123,7 @@ export function ConsolePage({
         </aside>
 
         <section className="console-stage panel stage-panel">
-          <div className="stage-header">
-            <h2>Câmera</h2>
-            <span className="muted">{activeProfile.topics.camera_link ?? 'sem tópico'}</span>
-          </div>
-          {cameraUrl ? (
-            <img
-              className="camera-feed"
-              src={cameraUrl}
-              alt={`Stream ${activeProfile.displayName}`}
-            />
-          ) : (
-            <div className="camera-placeholder">
-              <p>Sem tópico de câmera no profile ativo.</p>
-              <p className="muted">Suba web_video_server e o bridgelaunch do NARA para ver o feed.</p>
-            </div>
-          )}
+          <CameraStage profile={activeProfile} />
           {error ? <p className="form-error">{error}</p> : null}
         </section>
       </div>

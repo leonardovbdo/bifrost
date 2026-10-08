@@ -1,7 +1,7 @@
 import { LoginPage } from './components/LoginPage'
 import { ConsolePage } from './components/ConsolePage'
 import { LlmPanel } from './components/LlmPanel'
-import { cameraStreamUrl, useRos } from './hooks/useRos'
+import { useRos } from './hooks/useRos'
 import { useSession } from './hooks/useSession'
 import './styles.css'
 
@@ -44,7 +44,6 @@ export default function App() {
       error={error}
       rosStatus={rosStatus}
       rosError={rosError}
-      cameraUrl={cameraStreamUrl(session.activeProfile)}
       onLogout={logout}
       onSelectProfile={selectProfile}
       onChangePreset={changeTeleopPreset}
