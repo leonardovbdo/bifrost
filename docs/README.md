@@ -2,7 +2,8 @@
 
 > **Bifrost** — ponte governada entre pessoas e sistemas autônomos. Documentação do backend (docs-first) + skeleton em `apps/backend`. Protótipo de frontend próprio apenas para validar a API, se necessário.
 
-**Retomar implementação:** [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md).
+**Retomar implementação:** [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md).  
+**Esteira pós-MVP (E–H):** [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md).
 
 Metáfora do nome: [`docs/architecture/bifrost-nome-e-metafora.md`](docs/architecture/bifrost-nome-e-metafora.md).
 
@@ -39,15 +40,16 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 
 ## Leitura sugerida (ordem)
 
-1. [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md) — **onde paramos e o que fazer a seguir**
-2. [`docs/architecture/bifrost-nome-e-metafora.md`](docs/architecture/bifrost-nome-e-metafora.md)
-3. [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md)
-4. [`docs/requirements/inventario-frontend-ihm.md`](docs/requirements/inventario-frontend-ihm.md)
-5. [`docs/requirements/levantamento-de-requisitos.md`](docs/requirements/levantamento-de-requisitos.md)
-6. ADRs em [`docs/adrs/`](docs/adrs/) (stack vigente = **ADR-006/007** Java/Spring + PostgreSQL; JWT/session/profile = **008–010**)
-7. [`docs/architecture/backend-functional-spec.md`](docs/architecture/backend-functional-spec.md)
-8. [`docs/diagrams/`](docs/diagrams/)
-9. [`docs/operations/ambiente-local-nara.md`](docs/operations/ambiente-local-nara.md)
+1. [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md) — **onde paramos**
+2. [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md) — **fila normativa E–H**
+3. [`docs/architecture/bifrost-nome-e-metafora.md`](docs/architecture/bifrost-nome-e-metafora.md)
+4. [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md)
+5. [`docs/requirements/inventario-frontend-ihm.md`](docs/requirements/inventario-frontend-ihm.md)
+6. [`docs/requirements/levantamento-de-requisitos.md`](docs/requirements/levantamento-de-requisitos.md)
+7. ADRs em [`docs/adrs/`](docs/adrs/) (stack vigente = **ADR-006/007** Java/Spring + PostgreSQL; JWT/session/profile = **008–010**)
+8. [`docs/architecture/backend-functional-spec.md`](docs/architecture/backend-functional-spec.md)
+9. [`docs/diagrams/`](docs/diagrams/)
+10. [`docs/operations/ambiente-local-nara.md`](docs/operations/ambiente-local-nara.md)
 10. [`docs/operations/auditoria-retencao.md`](docs/operations/auditoria-retencao.md)
 
 ## Relação com outros repositórios
