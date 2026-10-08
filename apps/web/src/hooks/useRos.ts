@@ -35,8 +35,39 @@ const TELEOP_KEYS = new Set([
   ' ',
 ])
 
-/** ROS 2 / Jazzy message type (rosbridge). */
+/** ROS 2 / Jazzy message types (rosbridge). */
 const TWIST_TYPE = 'geometry_msgs/msg/Twist'
+const POSE_STAMPED_TYPE = 'geometry_msgs/msg/PoseStamped'
+const BATTERY_STATE_TYPE = 'sensor_msgs/msg/BatteryState'
+const LASER_SCAN_TYPE = 'sensor_msgs/msg/LaserScan'
+
+type PoseStamped = {
+  header: { stamp: { sec: number; nanosec: number }; frame_id: string }
+  pose: {
+    position: { x: number; y: number; z: number }
+    orientation: { x: number; y: number; z: number; w: number }
+  }
+}
+
+export type LaserScanSample = {
+  angleMin: number
+  angleIncrement: number
+  ranges: number[]
+  rangeMax: number
+}
+
+type BatteryStateMsg = { percentage?: number }
+type LaserScanMsg = {
+  angle_min?: number
+  angle_increment?: number
+  range_max?: number
+  ranges?: number[]
+}
+
+function yawToQuat(yaw: number): { x: number; y: number; z: number; w: number } {
+  const half = yaw / 2
+  return { x: 0, y: 0, z: Math.sin(half), w: Math.cos(half) }
+}
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
@@ -56,14 +87,21 @@ export function useRos(
 ) {
   const [status, setStatus] = useState<RosStatus>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [batteryPercent, setBatteryPercent] = useState<number | null>(null)
+  const [scan, setScan] = useState<LaserScanSample | null>(null)
   const rosRef = useRef<Ros | null>(null)
   const cmdVelRef = useRef<Topic<Twist> | null>(null)
+  const goalPoseRef = useRef<Topic<PoseStamped> | null>(null)
+  const batteryRef = useRef<Topic<BatteryStateMsg> | null>(null)
+  const scanRef = useRef<Topic<LaserScanMsg> | null>(null)
   const keysRef = useRef<Set<string>>(new Set())
   const loopRef = useRef<number | null>(null)
   const hadKeysRef = useRef(false)
   const statusHandlerRef = useRef<((message: unknown) => void) | null>(null)
   const statusEventRef = useRef<string | null>(null)
   const advertiseIdRef = useRef<string | null>(null)
+  const scanRafRef = useRef<number | null>(null)
+  const pendingScanRef = useRef<LaserScanSample | null>(null)
 
   const disconnect = useCallback(() => {
     if (loopRef.current != null) {
@@ -99,6 +137,35 @@ export function useRos(
       }
       cmdVelRef.current = null
     }
+    if (goalPoseRef.current) {
+      try {
+        goalPoseRef.current.unadvertise()
+      } catch {
+        // ignore
+      }
+      goalPoseRef.current = null
+    }
+    if (batteryRef.current) {
+      try {
+        batteryRef.current.unsubscribe()
+      } catch {
+        // ignore
+      }
+      batteryRef.current = null
+    }
+    if (scanRef.current) {
+      try {
+        scanRef.current.unsubscribe()
+      } catch {
+        // ignore
+      }
+      scanRef.current = null
+    }
+    if (scanRafRef.current != null) {
+      cancelAnimationFrame(scanRafRef.current)
+      scanRafRef.current = null
+    }
+    pendingScanRef.current = null
     if (rosRef.current) {
       try {
         rosRef.current.close()
@@ -107,6 +174,8 @@ export function useRos(
       }
       rosRef.current = null
     }
+    setBatteryPercent(null)
+    setScan(null)
     setStatus('idle')
   }, [])
 
@@ -124,36 +193,96 @@ export function useRos(
     const onConnection = () => {
       setStatus('connected')
       const topicName = profile.topics.cmd_vel
-      if (!topicName) {
-        setError('Profile sem tópico cmd_vel')
-        return
-      }
-      const topic = new Topic<Twist>({
-        ros,
-        name: topicName,
-        messageType: TWIST_TYPE,
-      })
-      topic.advertise()
-      cmdVelRef.current = topic
-      advertiseIdRef.current = topic.advertiseId ?? null
+      if (topicName) {
+        const topic = new Topic<Twist>({
+          ros,
+          name: topicName,
+          messageType: TWIST_TYPE,
+        })
+        topic.advertise()
+        cmdVelRef.current = topic
+        advertiseIdRef.current = topic.advertiseId ?? null
 
-      const onRosStatus = (message: unknown) => {
-        const statusMsg = asStatusMessage(message)
-        if (!statusMsg) return
-        const level = statusMsg.level?.toLowerCase()
-        if (level !== 'error' && level !== 'warning') return
-        const advertiseId = advertiseIdRef.current
-        if (statusMsg.id && advertiseId && statusMsg.id !== advertiseId) return
-        setError(
-          statusMsg.msg?.trim() ||
-            'rosbridge recusou cmd_vel (verifique messageType ROS 2)',
-        )
+        const onRosStatus = (message: unknown) => {
+          const statusMsg = asStatusMessage(message)
+          if (!statusMsg) return
+          const level = statusMsg.level?.toLowerCase()
+          if (level !== 'error' && level !== 'warning') return
+          const advertiseId = advertiseIdRef.current
+          if (statusMsg.id && advertiseId && statusMsg.id !== advertiseId) return
+          setError(
+            statusMsg.msg?.trim() ||
+              'rosbridge recusou cmd_vel (verifique messageType ROS 2)',
+          )
+        }
+        statusHandlerRef.current = onRosStatus
+        ros.on('status', onRosStatus)
+        if (topic.advertiseId) {
+          statusEventRef.current = `status:${topic.advertiseId}`
+          ros.on(statusEventRef.current, onRosStatus)
+        }
+      } else {
+        setError('Profile sem tópico cmd_vel')
       }
-      statusHandlerRef.current = onRosStatus
-      ros.on('status', onRosStatus)
-      if (topic.advertiseId) {
-        statusEventRef.current = `status:${topic.advertiseId}`
-        ros.on(statusEventRef.current, onRosStatus)
+
+      const goalTopicName = profile.topics.goal_pose
+      if (goalTopicName) {
+        const goalTopic = new Topic<PoseStamped>({
+          ros,
+          name: goalTopicName,
+          messageType: POSE_STAMPED_TYPE,
+        })
+        goalTopic.advertise()
+        goalPoseRef.current = goalTopic
+      }
+
+      const batteryTopicName = profile.topics.battery
+      if (batteryTopicName) {
+        const batteryTopic = new Topic<BatteryStateMsg>({
+          ros,
+          name: batteryTopicName,
+          messageType: BATTERY_STATE_TYPE,
+        })
+        batteryTopic.subscribe((msg) => {
+          const p = msg.percentage
+          if (typeof p === 'number' && Number.isFinite(p) && p >= 0) {
+            setBatteryPercent(p <= 1 ? p * 100 : p)
+          }
+        })
+        batteryRef.current = batteryTopic
+      }
+
+      const scanTopicName = profile.topics.scan
+      if (scanTopicName) {
+        const scanTopic = new Topic<LaserScanMsg>({
+          ros,
+          name: scanTopicName,
+          messageType: LASER_SCAN_TYPE,
+        })
+        scanTopic.subscribe((msg) => {
+          if (
+            typeof msg.angle_min !== 'number' ||
+            typeof msg.angle_increment !== 'number' ||
+            !Array.isArray(msg.ranges)
+          ) {
+            return
+          }
+          pendingScanRef.current = {
+            angleMin: msg.angle_min,
+            angleIncrement: msg.angle_increment,
+            ranges: msg.ranges,
+            rangeMax:
+              typeof msg.range_max === 'number' && msg.range_max > 0
+                ? msg.range_max
+                : 10,
+          }
+          if (scanRafRef.current != null) return
+          scanRafRef.current = requestAnimationFrame(() => {
+            scanRafRef.current = null
+            if (pendingScanRef.current) setScan(pendingScanRef.current)
+          })
+        })
+        scanRef.current = scanTopic
       }
     }
     const onError = () => {
@@ -177,7 +306,16 @@ export function useRos(
       ros.off('close', onClose)
       disconnect()
     }
-  }, [enabled, profile?.id, profile?.rosbridgeUrl, profile?.topics.cmd_vel, disconnect])
+  }, [
+    enabled,
+    profile?.id,
+    profile?.rosbridgeUrl,
+    profile?.topics.cmd_vel,
+    profile?.topics.goal_pose,
+    profile?.topics.battery,
+    profile?.topics.scan,
+    disconnect,
+  ])
 
   const publishTwist = useCallback(
     (linearX: number, angularZ: number) => {
@@ -201,6 +339,27 @@ export function useRos(
     hadKeysRef.current = false
     publishTwist(0, 0)
   }, [publishTwist])
+
+  const sendGoalPose = useCallback(
+    (x: number, y: number, yaw: number, frameId = 'map') => {
+      if (!goalPoseRef.current) {
+        throw new Error('Tópico goal_pose indisponível')
+      }
+      const orientation = yawToQuat(yaw)
+      const msg: PoseStamped = {
+        header: {
+          stamp: { sec: 0, nanosec: 0 },
+          frame_id: frameId,
+        },
+        pose: {
+          position: { x, y, z: 0 },
+          orientation,
+        },
+      }
+      goalPoseRef.current.publish(msg)
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!enabled || status !== 'connected' || !limits) return
@@ -280,6 +439,14 @@ export function useRos(
     }
   }, [enabled, status, limits, publishTwist, stop])
 
-  return { status, error, publishTwist, stop }
+  return {
+    status,
+    error,
+    publishTwist,
+    stop,
+    sendGoalPose,
+    batteryPercent,
+    scan,
+  }
 }
 
