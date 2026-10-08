@@ -8,6 +8,24 @@ const LABEL_BY_KEY: Record<string, string> = {
   camera_link: 'Frente (link)',
 }
 
+/**
+ * Encode path segments but keep `/`. Full encodeURIComponent turns `/` into
+ * `%2F`, which web_video_server rejects as an invalid ROS name (it does not
+ * decode the query value). Segment encoding still escapes `&` / `#` if a
+ * malformed topic slips into a profile.
+ */
+export function encodeRosTopicQuery(topic: string): string {
+  return topic
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/')
+}
+
+export function mjpegStreamUrl(videoBaseUrl: string, topic: string): string {
+  const base = videoBaseUrl.replace(/\/$/, '')
+  return `${base}/stream?topic=${encodeRosTopicQuery(topic)}&type=mjpeg`
+}
+
 export function listCameraOptions(profile: ActiveProfile): CameraOption[] {
   const options: CameraOption[] = []
   const seen = new Set<string>()
@@ -22,21 +40,12 @@ export function listCameraOptions(profile: ActiveProfile): CameraOption[] {
     })
   }
 
+  // Seed NARA: camera_user = /…/camera_user ; camera_link = /…/camera_link/image
   push('camera_user', profile.topics.camera_user)
   push('camera_link', profile.topics.camera_link)
-  for (const [key, topic] of Object.entries(profile.topics)) {
-    if (!key.startsWith('camera') || key === 'camera_user' || key === 'camera_link') continue
-    if (key.includes('depth') || key.includes('info') || key.includes('points')) continue
-    push(key, topic)
-  }
   return options
 }
 
-/**
- * One persistent MJPEG stream. Do not poll snapshots — web_video_server
- * stalls under many concurrent /snapshot connections.
- * Do not encodeURIComponent(topic): server rejects "%2F...".
- */
 export function CameraFeed({
   profile,
   topic,
@@ -44,11 +53,13 @@ export function CameraFeed({
   profile: ActiveProfile
   topic: string | null
 }) {
+  const [failed, setFailed] = useState(false)
   const base = profile.videoBaseUrl?.replace(/\/$/, '') ?? ''
-  const src =
-    topic && base
-      ? `${base}/stream?topic=${topic}&type=mjpeg`
-      : null
+  const src = topic && base ? mjpegStreamUrl(profile.videoBaseUrl, topic) : null
+
+  useEffect(() => {
+    setFailed(false)
+  }, [src])
 
   if (!src) {
     return (
@@ -59,12 +70,25 @@ export function CameraFeed({
     )
   }
 
+  if (failed) {
+    return (
+      <div className="camera-placeholder">
+        <p>Falha ao carregar o stream de câmera.</p>
+        <p className="muted">
+          Confira se o web_video_server está em {base} e se o tópico existe:
+        </p>
+        <p className="muted mono">{topic}</p>
+      </div>
+    )
+  }
+
   return (
     <img
       key={src}
       className="camera-feed"
       src={src}
       alt={`Câmera ${profile.displayName}`}
+      onError={() => setFailed(true)}
     />
   )
 }
