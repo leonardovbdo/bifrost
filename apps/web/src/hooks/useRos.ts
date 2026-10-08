@@ -283,13 +283,3 @@ export function useRos(
   return { status, error, publishTwist, stop }
 }
 
-export function cameraStreamUrl(profile: ActiveProfile | null): string | null {
-  if (!profile?.videoBaseUrl) return null
-  const topic =
-    profile.topics.camera_link ??
-    profile.topics.camera_user ??
-    Object.entries(profile.topics).find(([k]) => k.startsWith('camera'))?.[1]
-  if (!topic) return null
-  const base = profile.videoBaseUrl.replace(/\/$/, '')
-  return `${base}/stream?topic=${encodeURIComponent(topic)}`
-}
