@@ -50,7 +50,7 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 8. [`docs/architecture/backend-functional-spec.md`](docs/architecture/backend-functional-spec.md)
 9. [`docs/diagrams/`](docs/diagrams/)
 10. [`docs/operations/ambiente-local-nara.md`](docs/operations/ambiente-local-nara.md)
-10. [`docs/operations/auditoria-retencao.md`](docs/operations/auditoria-retencao.md)
+11. [`docs/operations/auditoria-retencao.md`](docs/operations/auditoria-retencao.md)
 
 ## Relação com outros repositórios
 
