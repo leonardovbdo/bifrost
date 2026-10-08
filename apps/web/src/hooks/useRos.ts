@@ -9,6 +9,20 @@ type Twist = {
   angular: { x: number; y: number; z: number }
 }
 
+function asStatusMessage(message: unknown): {
+  level?: string
+  msg?: string
+  id?: string
+} | null {
+  if (!message || typeof message !== 'object') return null
+  const m = message as Record<string, unknown>
+  return {
+    level: typeof m.level === 'string' ? m.level : undefined,
+    msg: typeof m.msg === 'string' ? m.msg : undefined,
+    id: typeof m.id === 'string' ? m.id : undefined,
+  }
+}
+
 const TELEOP_KEYS = new Set([
   'w',
   'a',
@@ -47,6 +61,9 @@ export function useRos(
   const keysRef = useRef<Set<string>>(new Set())
   const loopRef = useRef<number | null>(null)
   const hadKeysRef = useRef(false)
+  const statusHandlerRef = useRef<((message: unknown) => void) | null>(null)
+  const statusEventRef = useRef<string | null>(null)
+  const advertiseIdRef = useRef<string | null>(null)
 
   const disconnect = useCallback(() => {
     if (loopRef.current != null) {
@@ -55,6 +72,15 @@ export function useRos(
     }
     keysRef.current.clear()
     hadKeysRef.current = false
+    if (rosRef.current && statusHandlerRef.current) {
+      rosRef.current.off('status', statusHandlerRef.current)
+      if (statusEventRef.current) {
+        rosRef.current.off(statusEventRef.current, statusHandlerRef.current)
+      }
+    }
+    statusHandlerRef.current = null
+    statusEventRef.current = null
+    advertiseIdRef.current = null
     if (cmdVelRef.current) {
       try {
         cmdVelRef.current.unadvertise()
@@ -97,19 +123,27 @@ export function useRos(
         name: topicName,
         messageType: TWIST_TYPE,
       })
-      topic.on('warning', (warning) => {
+      topic.advertise()
+      cmdVelRef.current = topic
+      advertiseIdRef.current = topic.advertiseId ?? null
+
+      const onRosStatus = (message: unknown) => {
+        const statusMsg = asStatusMessage(message)
+        if (!statusMsg) return
+        const level = statusMsg.level?.toLowerCase()
+        if (level !== 'error' && level !== 'warning') return
+        const advertiseId = advertiseIdRef.current
+        if (statusMsg.id && advertiseId && statusMsg.id !== advertiseId) return
         setError(
-          typeof warning === 'string'
-            ? warning
-            : 'Falha no advertise de cmd_vel (verifique o messageType ROS 2)',
+          statusMsg.msg?.trim() ||
+            'rosbridge recusou cmd_vel (verifique messageType ROS 2)',
         )
-      })
-      try {
-        topic.advertise()
-        cmdVelRef.current = topic
-      } catch {
-        setError('Falha ao anunciar cmd_vel no rosbridge')
-        cmdVelRef.current = null
+      }
+      statusHandlerRef.current = onRosStatus
+      ros.on('status', onRosStatus)
+      if (topic.advertiseId) {
+        statusEventRef.current = `status:${topic.advertiseId}`
+        ros.on(statusEventRef.current, onRosStatus)
       }
     }
     const onError = () => {
@@ -172,13 +206,18 @@ export function useRos(
       keysRef.current.add(key)
       hadKeysRef.current = true
     }
+    // Always honor keyup: the press may have started outside an input.
     const onKeyUp = (e: KeyboardEvent) => {
-      if (isEditableTarget(e.target)) return
-      keysRef.current.delete(e.key.toLowerCase())
+      const key = e.key.toLowerCase()
+      if (!TELEOP_KEYS.has(key) && key !== ' ') return
+      keysRef.current.delete(key)
       if (keysRef.current.size === 0 && hadKeysRef.current) {
         hadKeysRef.current = false
         stop()
       }
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      if (isEditableTarget(e.target)) releaseKeys()
     }
     const onBlur = () => releaseKeys()
     const onVisibility = () => {
@@ -188,6 +227,7 @@ export function useRos(
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
     window.addEventListener('blur', onBlur)
+    document.addEventListener('focusin', onFocusIn)
     document.addEventListener('visibilitychange', onVisibility)
 
     loopRef.current = window.setInterval(() => {
@@ -206,6 +246,7 @@ export function useRos(
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
+      document.removeEventListener('focusin', onFocusIn)
       document.removeEventListener('visibilitychange', onVisibility)
       if (loopRef.current != null) {
         window.clearInterval(loopRef.current)
