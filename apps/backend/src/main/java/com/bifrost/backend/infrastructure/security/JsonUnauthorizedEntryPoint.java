@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JsonUnauthorizedEntryPoint implements AuthenticationEntryPoint {
   private static final byte[] BODY =
-      "{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication required\"}}"
+      "{\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication required\",\"details\":null}}"
           .getBytes(StandardCharsets.UTF_8);
 
   @Override
