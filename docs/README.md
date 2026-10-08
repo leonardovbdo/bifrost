@@ -33,7 +33,7 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 | **Autenticação** | JWT + RBAC (cookies httpOnly) | Papéis `admin`, `operator`, `viewer` — ADR-004 / ADR-008 |
 | **ROS (tempo real)** | Rosbridge + web_video_server | Cliente no browser; backend emite session-config/ACL — ADR-002 / ADR-009 |
 | **Estudo de caso** | NARA / `noblenara` | Extensível via Robot Profiles — ADR-003 / ADR-010 |
-| **Cliente UI** | Protótipo do TCC (futuro) | Não depende de IHM de terceiros |
+| **Cliente UI** | Protótipo Vite/React (`apps/web`) | Session-config + teleop híbrido + LLM |
 | **LLM** | Proxy no backend (Gemini, pluggable) | ADR-011; chave nunca no frontend; admin+operator |
 | **Ops local** | Docker Compose (Postgres) | `bifrost`/`bifrost` @ `5432` — ver `operations/docker-postgres-local.md` |
 
