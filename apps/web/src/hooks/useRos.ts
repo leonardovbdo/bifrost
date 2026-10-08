@@ -191,15 +191,17 @@ export function useRos(
     [limits],
   )
 
-  const stop = useCallback(() => publishTwist(0, 0), [publishTwist])
+  const stop = useCallback(() => {
+    keysRef.current.clear()
+    hadKeysRef.current = false
+    publishTwist(0, 0)
+  }, [publishTwist])
 
   useEffect(() => {
     if (!enabled || status !== 'connected' || !limits) return
 
     const releaseKeys = () => {
       if (keysRef.current.size === 0 && !hadKeysRef.current) return
-      keysRef.current.clear()
-      hadKeysRef.current = false
       stop()
     }
 

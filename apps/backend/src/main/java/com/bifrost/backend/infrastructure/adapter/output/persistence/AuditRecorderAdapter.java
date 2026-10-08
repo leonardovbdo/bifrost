@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -19,7 +21,11 @@ public class AuditRecorderAdapter implements AuditRecorder {
     this.auditEventRepository = auditEventRepository;
   }
 
+  /**
+   * Always commits in a new transaction so audit survives caller rollback (e.g. login_failure).
+   */
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void record(String type, UUID userId, UUID robotProfileId, Map<String, Object> payload) {
     Map<String, Object> enriched = new LinkedHashMap<>();
     if (payload != null) {
@@ -36,10 +42,10 @@ public class AuditRecorderAdapter implements AuditRecorder {
         HttpServletRequest request = servletAttrs.getRequest();
         String ip = request.getRemoteAddr();
         String ua = request.getHeader("User-Agent");
-        if (ip != null && !payload.containsKey("ip")) {
+        if (ip != null) {
           payload.put("ip", ip);
         }
-        if (ua != null && !payload.containsKey("userAgent")) {
+        if (ua != null) {
           payload.put("userAgent", ua.length() > 180 ? ua.substring(0, 180) : ua);
         }
       }

@@ -61,14 +61,7 @@ public class UpsertParameterUseCase {
 
   private void validateGlobal(String key, Map<String, Object> value) {
     if (TeleopLimitsMerger.KEY_PRESETS.equals(key)) {
-      if (value == null || value.isEmpty()) {
-        throw new ValidationException("PARAMETER_VALUE_INVALID", "presets cannot be empty");
-      }
-      for (String preset : ACTIVE_PRESETS) {
-        if (!value.containsKey(preset)) {
-          throw new ValidationException("PARAMETER_VALUE_INVALID", "Missing preset: " + preset);
-        }
-      }
+      validatePresets(value);
       return;
     }
     if (TeleopLimitsMerger.KEY_ACTIVE.equals(key)) {
@@ -76,6 +69,33 @@ public class UpsertParameterUseCase {
       return;
     }
     throw new ValidationException("PARAMETER_KEY_INVALID", "Unknown global key: " + key);
+  }
+
+  private void validatePresets(Map<String, Object> value) {
+    if (value == null || value.isEmpty()) {
+      throw new ValidationException("PARAMETER_VALUE_INVALID", "presets cannot be empty");
+    }
+    for (String preset : ACTIVE_PRESETS) {
+      Object raw = value.get(preset);
+      if (!(raw instanceof Map<?, ?> presetMap)) {
+        throw new ValidationException(
+            "PARAMETER_VALUE_INVALID", "preset " + preset + " must be an object");
+      }
+      requirePositiveLimit(presetMap.get("linearMax"), preset + ".linearMax");
+      requirePositiveLimit(presetMap.get("angularMax"), preset + ".angularMax");
+    }
+  }
+
+  private void requirePositiveLimit(Object value, String field) {
+    if (!(value instanceof Number number)) {
+      throw new ValidationException(
+          "PARAMETER_VALUE_INVALID", field + " must be a finite positive number");
+    }
+    double numeric = number.doubleValue();
+    if (!Double.isFinite(numeric) || numeric <= 0.0 || numeric > 5.0) {
+      throw new ValidationException(
+          "PARAMETER_VALUE_INVALID", field + " must be in (0, 5]");
+    }
   }
 
   private void validateUserKey(String key, Map<String, Object> value) {
@@ -121,6 +141,18 @@ public class UpsertParameterUseCase {
         profile = value.get("profile");
       }
       return Map.of("value", String.valueOf(profile));
+    }
+    if (TeleopLimitsMerger.KEY_PRESETS.equals(key)) {
+      Map<String, Object> normalized = new LinkedHashMap<>();
+      for (String preset : ACTIVE_PRESETS) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> presetMap = (Map<String, Object>) value.get(preset);
+        Map<String, Object> limits = new LinkedHashMap<>();
+        limits.put("linearMax", ((Number) presetMap.get("linearMax")).doubleValue());
+        limits.put("angularMax", ((Number) presetMap.get("angularMax")).doubleValue());
+        normalized.put(preset, limits);
+      }
+      return normalized;
     }
     return value;
   }

@@ -39,6 +39,9 @@ class ParametersAuditIntegrationTest {
     registry.add("bifrost.operator.enabled", () -> "true");
     registry.add("bifrost.operator.username", () -> "operator");
     registry.add("bifrost.operator.password", () -> "operator-pass");
+    registry.add("bifrost.viewer.enabled", () -> "true");
+    registry.add("bifrost.viewer.username", () -> "viewer");
+    registry.add("bifrost.viewer.password", () -> "viewer-pass");
   }
 
   @Autowired MockMvc mockMvc;
@@ -122,6 +125,52 @@ class ParametersAuditIntegrationTest {
                     {"type":"login_success","payload":{}}
                     """))
         .andExpect(status().isBadRequest());
+
+    String viewer = login("viewer", "viewer-pass");
+    mockMvc
+        .perform(
+            post("/api/v1/audit/events")
+                .cookie(cookie("BIFROST_ACCESS", viewer))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {"type":"goal_pose","payload":{"x":1.0,"y":2.0,"yaw":0.1}}
+                    """))
+        .andExpect(status().isForbidden());
+
+    mockMvc
+        .perform(
+            post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"admin\",\"password\":\"wrong-pass\"}"))
+        .andExpect(status().isUnauthorized());
+
+    mockMvc
+        .perform(
+            get("/api/v1/audit/events?type=login_failure")
+                .cookie(cookie("BIFROST_ACCESS", admin)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.items.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)));
+
+    mockMvc
+        .perform(
+            put("/api/v1/parameters")
+                .cookie(cookie("BIFROST_ACCESS", admin))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {
+                      "scope":"global",
+                      "key":"teleop.presets",
+                      "value":{
+                        "safety":{"linearMax":"fast","angularMax":0.6},
+                        "normal":{"linearMax":0.5,"angularMax":1.0},
+                        "fast":{"linearMax":0.8,"angularMax":1.4}
+                      }
+                    }
+                    """))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error.code").value("PARAMETER_VALUE_INVALID"));
   }
 
   private String login(String username, String password) throws Exception {

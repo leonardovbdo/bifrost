@@ -40,6 +40,9 @@ Versionamento: [SemVer](https://semver.org/)
 - Config markdownlint-cli2 (`config` + MD024 siblings_only)
 - Etapa C: default Gemini `gemini-3.6-flash`, API key em header,
   LLM fora da transação e limite prompt+context
+- Etapa B: `login_failure` com REQUIRES_NEW; Stop limpa teclas;
+  presets teleop numéricos; goal_pose só com canSendGoal;
+  ip/userAgent do request sempre sobrescritos
 
 ### Changed
 
