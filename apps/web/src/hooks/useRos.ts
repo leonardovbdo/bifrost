@@ -83,6 +83,16 @@ export function useRos(
     advertiseIdRef.current = null
     if (cmdVelRef.current) {
       try {
+        // Publish stop before tearing down — keyboard cleanup may run later
+        // with keysRef already cleared and skip stop().
+        cmdVelRef.current.publish({
+          linear: { x: 0, y: 0, z: 0 },
+          angular: { x: 0, y: 0, z: 0 },
+        })
+      } catch {
+        // ignore
+      }
+      try {
         cmdVelRef.current.unadvertise()
       } catch {
         // ignore

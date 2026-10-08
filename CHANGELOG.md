@@ -36,6 +36,8 @@ Versionamento: [SemVer](https://semver.org/)
   Twist ROS 2, deadman/blur e bootstrap de sessão (StrictMode)
 - Etapa D: soltar teleop ao focar inputs e status de advertise
   rosbridge
+- Etapa D: publicar Twist zero no disconnect antes do unadvertise
+- Config markdownlint-cli2 (`config` + MD024 siblings_only)
 
 ### Changed
 
