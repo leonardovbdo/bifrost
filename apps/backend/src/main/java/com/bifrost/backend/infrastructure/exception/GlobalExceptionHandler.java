@@ -12,6 +12,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,11 +33,21 @@ public class GlobalExceptionHandler {
         .body(ErrorResponse.of(ex.code(), ex.getMessage()));
   }
 
-  @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
-  public ResponseEntity<ErrorResponse> forbidden(RuntimeException ex) {
-    if (ex instanceof ForbiddenException forbidden) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN)
-          .body(ErrorResponse.of(forbidden.code(), forbidden.getMessage()));
+  @ExceptionHandler(ForbiddenException.class)
+  public ResponseEntity<ErrorResponse> forbidden(ForbiddenException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(ErrorResponse.of(ex.code(), ex.getMessage()));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> accessDenied(
+      AccessDeniedException ex, Authentication authentication) {
+    // Anonymous / missing auth → 401 (session revoked, bad cookie). Role ACL → 403.
+    if (authentication == null
+        || !authentication.isAuthenticated()
+        || authentication instanceof AnonymousAuthenticationToken) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(ErrorResponse.of("UNAUTHORIZED", "Authentication required"));
     }
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(ErrorResponse.of("ACCESS_DENIED", "Access denied"));
