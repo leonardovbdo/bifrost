@@ -96,7 +96,10 @@ class LlmIntegrationTest {
             .andReturn();
     for (String header : login.getResponse().getHeaders("Set-Cookie")) {
       if (header.startsWith("BIFROST_ACCESS=")) {
-        return header.substring("BIFROST_ACCESS=".length(), header.indexOf(';'));
+        String value = header.substring("BIFROST_ACCESS=".length(), header.indexOf(';'));
+        if (!value.isEmpty()) {
+          return value;
+        }
       }
     }
     throw new IllegalStateException("missing access cookie");

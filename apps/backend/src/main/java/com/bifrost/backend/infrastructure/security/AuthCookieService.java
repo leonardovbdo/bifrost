@@ -18,6 +18,8 @@ public class AuthCookieService {
   }
 
   public void writeAuthCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+    // Drop legacy Path=/ cookies so they stop leaking to rosbridge/video on localhost.
+    clearLegacyRootPathCookies(response);
     writeCookie(
         response,
         properties.cookie().accessName(),
@@ -31,6 +33,7 @@ public class AuthCookieService {
   }
 
   public void clearAuthCookies(HttpServletResponse response) {
+    clearLegacyRootPathCookies(response);
     writeCookie(response, properties.cookie().accessName(), "", Duration.ZERO);
     writeCookie(response, properties.cookie().refreshName(), "", Duration.ZERO);
   }
@@ -56,6 +59,11 @@ public class AuthCookieService {
     return properties.cookie().refreshName();
   }
 
+  private void clearLegacyRootPathCookies(HttpServletResponse response) {
+    expireCookie(response, properties.cookie().accessName(), "/");
+    expireCookie(response, properties.cookie().refreshName(), "/");
+  }
+
   private void writeCookie(HttpServletResponse response, String name, String value, Duration maxAge) {
     ResponseCookie.ResponseCookieBuilder builder =
         ResponseCookie.from(name, value == null ? "" : value)
@@ -70,5 +78,17 @@ public class AuthCookieService {
       builder.maxAge(maxAge);
     }
     response.addHeader(HttpHeaders.SET_COOKIE, builder.build().toString());
+  }
+
+  private void expireCookie(HttpServletResponse response, String name, String path) {
+    ResponseCookie cookie =
+        ResponseCookie.from(name, "")
+            .httpOnly(true)
+            .secure(properties.cookie().secure())
+            .path(path)
+            .sameSite(properties.cookie().sameSite())
+            .maxAge(0)
+            .build();
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 }

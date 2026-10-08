@@ -44,7 +44,7 @@ Versionamento: [SemVer](https://semver.org/)
   presets teleop numéricos; goal_pose só com canSendGoal;
   ip/userAgent do request sempre sobrescritos
 - Etapa B: cookies JWT com `Path=/api`; payload `goal_pose`
-  valida x/y/yaw sem nulls
+  valida x/y/yaw sem nulls; login/logout expiram cookie legado `Path=/`
 
 ### Changed
 

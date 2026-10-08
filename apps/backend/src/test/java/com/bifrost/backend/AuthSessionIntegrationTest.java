@@ -191,7 +191,11 @@ class AuthSessionIntegrationTest {
   private static String extractCookie(MvcResult result, String name) {
     for (String header : result.getResponse().getHeaders("Set-Cookie")) {
       if (header.startsWith(name + "=")) {
-        return header.substring(name.length() + 1, header.indexOf(';'));
+        String value = header.substring(name.length() + 1, header.indexOf(';'));
+        // Skip Max-Age=0 clears (legacy Path=/ and logout).
+        if (!value.isEmpty()) {
+          return value;
+        }
       }
     }
     throw new IllegalStateException("Missing cookie " + name);
