@@ -59,7 +59,8 @@ public class AuthCookieService {
     return properties.cookie().refreshName();
   }
 
-  private void clearLegacyRootPathCookies(HttpServletResponse response) {
+  /** Expire pre-migration cookies so they stop reaching rosbridge/video on localhost. */
+  public void clearLegacyRootPathCookies(HttpServletResponse response) {
     expireCookie(response, properties.cookie().accessName(), "/");
     expireCookie(response, properties.cookie().refreshName(), "/");
   }

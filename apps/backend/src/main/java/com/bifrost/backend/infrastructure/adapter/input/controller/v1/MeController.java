@@ -6,7 +6,9 @@ import com.bifrost.backend.application.usecase.session.GetSessionConfigUseCase;
 import com.bifrost.backend.application.usecase.session.SwitchActiveProfileUseCase;
 import com.bifrost.backend.infrastructure.adapter.input.controller.v1.dto.ActiveProfileRequest;
 import com.bifrost.backend.infrastructure.adapter.input.controller.v1.dto.UserResponse;
+import com.bifrost.backend.infrastructure.security.AuthCookieService;
 import com.bifrost.backend.infrastructure.security.SecurityUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,14 +25,17 @@ public class MeController {
   private final GetCurrentUserUseCase getCurrentUserUseCase;
   private final GetSessionConfigUseCase getSessionConfigUseCase;
   private final SwitchActiveProfileUseCase switchActiveProfileUseCase;
+  private final AuthCookieService cookieService;
 
   public MeController(
       GetCurrentUserUseCase getCurrentUserUseCase,
       GetSessionConfigUseCase getSessionConfigUseCase,
-      SwitchActiveProfileUseCase switchActiveProfileUseCase) {
+      SwitchActiveProfileUseCase switchActiveProfileUseCase,
+      AuthCookieService cookieService) {
     this.getCurrentUserUseCase = getCurrentUserUseCase;
     this.getSessionConfigUseCase = getSessionConfigUseCase;
     this.switchActiveProfileUseCase = switchActiveProfileUseCase;
+    this.cookieService = cookieService;
   }
 
   @GetMapping
@@ -39,7 +44,9 @@ public class MeController {
   }
 
   @GetMapping("/session-config")
-  public Map<String, Object> sessionConfig() {
+  public Map<String, Object> sessionConfig(HttpServletResponse response) {
+    // Console bootstrap: drop legacy Path=/ cookies before rosbridge/video connect.
+    cookieService.clearLegacyRootPathCookies(response);
     SessionConfigView view = getSessionConfigUseCase.execute(SecurityUtils.currentUserId());
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("schemaVersion", view.schemaVersion());
