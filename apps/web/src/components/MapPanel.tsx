@@ -23,18 +23,22 @@ export function MapPanel({ session, rosStatus, mapGrid }: MapPanelProps) {
     canvas.width = width
     canvas.height = height
     const img = ctx.createImageData(width, height)
-    for (let i = 0; i < data.length; i++) {
-      const v = data[i]
-      let gray = 128
-      if (v === 0) gray = 240
-      else if (v === 100) gray = 20
-      else if (v < 0) gray = 90
-      else gray = 240 - Math.round((v / 100) * 220)
-      const o = i * 4
-      img.data[o] = gray
-      img.data[o + 1] = gray
-      img.data[o + 2] = gray
-      img.data[o + 3] = 255
+    // OccupancyGrid row 0 is map +y at origin; canvas row 0 is top — flip Y.
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const i = y * width + x
+        const v = data[i] ?? -1
+        let gray = 128
+        if (v === 0) gray = 240
+        else if (v === 100) gray = 20
+        else if (v < 0) gray = 90
+        else gray = 240 - Math.round((v / 100) * 220)
+        const o = ((height - 1 - y) * width + x) * 4
+        img.data[o] = gray
+        img.data[o + 1] = gray
+        img.data[o + 2] = gray
+        img.data[o + 3] = 255
+      }
     }
     ctx.putImageData(img, 0, 0)
   }, [mapGrid])

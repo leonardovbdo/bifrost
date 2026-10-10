@@ -239,7 +239,8 @@ export function useRos(
       const text =
         statusMsg.msg?.trim() ||
         `rosbridge recusou ${topicLabel} (verifique messageType ROS 2)`
-      if (label === 'goal_pose') {
+      // Only hard-fail goal on error — warning must not stick forever (audit-before-publish).
+      if (label === 'goal_pose' && level === 'error') {
         goalRejectedRef.current = true
       }
       setError(text)
@@ -259,10 +260,12 @@ export function useRos(
       ros.on(ev, onRosStatus)
     }
 
+    const advertiseCmdVel = limits != null
+
     const onConnection = () => {
       setStatus('connected')
 
-      if (limits && profile.topics.cmd_vel) {
+      if (advertiseCmdVel && profile.topics.cmd_vel) {
         const topic = new Topic<Twist>({
           ros,
           name: profile.topics.cmd_vel,
@@ -394,7 +397,8 @@ export function useRos(
   }, [
     enabled,
     canSendGoal,
-    limits,
+    // Boolean only — preset changes must not tear down rosbridge.
+    limits != null,
     profile?.id,
     profile?.rosbridgeUrl,
     profile?.topics.cmd_vel,
