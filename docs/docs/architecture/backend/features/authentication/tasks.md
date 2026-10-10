@@ -13,5 +13,6 @@ Contratos: ADR-008, ADR-009. Skeleton: `apps/backend`.
 | AUTH-07 | Seed admin via env (primeiro boot) | `DONE` |
 | AUTH-08 | `POST /auth/refresh` + logout | `DONE` |
 | AUTH-09 | Testes integração (Testcontainers) | `DONE` (skip sem Docker) |
+| AUTH-10 | API admin `GET`/`POST`/`PATCH /api/v1/users` (Etapa F-01) | `DONE` |
 
-Ordem sugerida: 01 → 02 → 03 → 05 → 04 → 07 → 08 → 06 → 09.
+Ordem sugerida: 01 → 02 → 03 → 05 → 04 → 07 → 08 → 06 → 09 → 10.

@@ -107,6 +107,12 @@ Prefixo sugerido: `/api/v1`.
 - `GET /api/v1/me/session-config` → contrato ADR-009 (`schemaVersion`, profile ativo, permissions, limits)
 - `PUT /api/v1/me/active-profile` `{ profileId }` → persiste ativo (403 se sem ACL)
 
+### Users (admin)
+
+- `GET /api/v1/users` → `{ items: [{ id, username, email, role, active, createdAt, updatedAt }] }` (`admin`; sem `password_hash`)
+- `POST /api/v1/users` `{ username, password, role, email?, active? }` → `201` (`admin`)
+- `PATCH /api/v1/users/:id` `{ active?, role? }` → usuário atualizado (`admin`)
+
 ### Profiles
 
 - `GET /api/v1/robot-profiles` (filtrado pelo acesso do usuário; admin vê todos)
