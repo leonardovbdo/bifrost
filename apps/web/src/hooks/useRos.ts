@@ -40,6 +40,7 @@ const TWIST_TYPE = 'geometry_msgs/msg/Twist'
 const POSE_STAMPED_TYPE = 'geometry_msgs/msg/PoseStamped'
 const BATTERY_STATE_TYPE = 'sensor_msgs/msg/BatteryState'
 const LASER_SCAN_TYPE = 'sensor_msgs/msg/LaserScan'
+const OCCUPANCY_GRID_TYPE = 'nav_msgs/msg/OccupancyGrid'
 
 type PoseStamped = {
   header: { stamp: { sec: number; nanosec: number }; frame_id: string }
@@ -56,12 +57,23 @@ export type LaserScanSample = {
   rangeMax: number
 }
 
+export type OccupancyGridSample = {
+  width: number
+  height: number
+  resolution: number
+  data: number[]
+}
+
 type BatteryStateMsg = { percentage?: number }
 type LaserScanMsg = {
   angle_min?: number
   angle_increment?: number
   range_max?: number
   ranges?: number[]
+}
+type OccupancyGridMsg = {
+  info?: { width?: number; height?: number; resolution?: number }
+  data?: number[]
 }
 
 function yawToQuat(yaw: number): { x: number; y: number; z: number; w: number } {
@@ -84,24 +96,36 @@ export function useRos(
   profile: ActiveProfile | null,
   enabled: boolean,
   limits: TeleopLimits | null,
+  canSendGoal = false,
 ) {
   const [status, setStatus] = useState<RosStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [batteryPercent, setBatteryPercent] = useState<number | null>(null)
   const [scan, setScan] = useState<LaserScanSample | null>(null)
+  const [mapGrid, setMapGrid] = useState<OccupancyGridSample | null>(null)
   const rosRef = useRef<Ros | null>(null)
   const cmdVelRef = useRef<Topic<Twist> | null>(null)
   const goalPoseRef = useRef<Topic<PoseStamped> | null>(null)
   const batteryRef = useRef<Topic<BatteryStateMsg> | null>(null)
   const scanRef = useRef<Topic<LaserScanMsg> | null>(null)
+  const mapRef = useRef<Topic<OccupancyGridMsg> | null>(null)
   const keysRef = useRef<Set<string>>(new Set())
   const loopRef = useRef<number | null>(null)
   const hadKeysRef = useRef(false)
   const statusHandlerRef = useRef<((message: unknown) => void) | null>(null)
-  const statusEventRef = useRef<string | null>(null)
-  const advertiseIdRef = useRef<string | null>(null)
+  const statusEventRefs = useRef<string[]>([])
+  const advertiseLabelsRef = useRef<Map<string, 'cmd_vel' | 'goal_pose'>>(new Map())
+  const goalRejectedRef = useRef(false)
   const scanRafRef = useRef<number | null>(null)
+  const mapRafRef = useRef<number | null>(null)
   const pendingScanRef = useRef<LaserScanSample | null>(null)
+  const pendingMapRef = useRef<OccupancyGridSample | null>(null)
+
+  const clearTelemetry = useCallback(() => {
+    setBatteryPercent(null)
+    setScan(null)
+    setMapGrid(null)
+  }, [])
 
   const disconnect = useCallback(() => {
     if (loopRef.current != null) {
@@ -112,17 +136,16 @@ export function useRos(
     hadKeysRef.current = false
     if (rosRef.current && statusHandlerRef.current) {
       rosRef.current.off('status', statusHandlerRef.current)
-      if (statusEventRef.current) {
-        rosRef.current.off(statusEventRef.current, statusHandlerRef.current)
+      for (const ev of statusEventRefs.current) {
+        rosRef.current.off(ev, statusHandlerRef.current)
       }
     }
     statusHandlerRef.current = null
-    statusEventRef.current = null
-    advertiseIdRef.current = null
+    statusEventRefs.current = []
+    advertiseLabelsRef.current.clear()
+    goalRejectedRef.current = false
     if (cmdVelRef.current) {
       try {
-        // Publish stop before tearing down — keyboard cleanup may run later
-        // with keysRef already cleared and skip stop().
         cmdVelRef.current.publish({
           linear: { x: 0, y: 0, z: 0 },
           angular: { x: 0, y: 0, z: 0 },
@@ -161,11 +184,24 @@ export function useRos(
       }
       scanRef.current = null
     }
+    if (mapRef.current) {
+      try {
+        mapRef.current.unsubscribe()
+      } catch {
+        // ignore
+      }
+      mapRef.current = null
+    }
     if (scanRafRef.current != null) {
       cancelAnimationFrame(scanRafRef.current)
       scanRafRef.current = null
     }
+    if (mapRafRef.current != null) {
+      cancelAnimationFrame(mapRafRef.current)
+      mapRafRef.current = null
+    }
     pendingScanRef.current = null
+    pendingMapRef.current = null
     if (rosRef.current) {
       try {
         rosRef.current.close()
@@ -174,10 +210,9 @@ export function useRos(
       }
       rosRef.current = null
     }
-    setBatteryPercent(null)
-    setScan(null)
+    clearTelemetry()
     setStatus('idle')
-  }, [])
+  }, [clearTelemetry])
 
   useEffect(() => {
     if (!enabled || !profile?.rosbridgeUrl) {
@@ -187,53 +222,66 @@ export function useRos(
 
     setStatus('connecting')
     setError(null)
+    goalRejectedRef.current = false
     const ros = new Ros({ url: profile.rosbridgeUrl })
     rosRef.current = ros
 
+    const onRosStatus = (message: unknown) => {
+      const statusMsg = asStatusMessage(message)
+      if (!statusMsg) return
+      const level = statusMsg.level?.toLowerCase()
+      if (level !== 'error' && level !== 'warning') return
+      const label = statusMsg.id
+        ? advertiseLabelsRef.current.get(statusMsg.id)
+        : undefined
+      if (statusMsg.id && !label) return
+      const topicLabel = label ?? 'advertise'
+      const text =
+        statusMsg.msg?.trim() ||
+        `rosbridge recusou ${topicLabel} (verifique messageType ROS 2)`
+      if (label === 'goal_pose') {
+        goalRejectedRef.current = true
+      }
+      setError(text)
+    }
+    statusHandlerRef.current = onRosStatus
+    ros.on('status', onRosStatus)
+
+    const trackAdvertise = (
+      topic: Topic<Twist> | Topic<PoseStamped>,
+      label: 'cmd_vel' | 'goal_pose',
+    ) => {
+      const id = topic.advertiseId
+      if (!id) return
+      advertiseLabelsRef.current.set(id, label)
+      const ev = `status:${id}`
+      statusEventRefs.current.push(ev)
+      ros.on(ev, onRosStatus)
+    }
+
     const onConnection = () => {
       setStatus('connected')
-      const topicName = profile.topics.cmd_vel
-      if (topicName) {
+
+      if (limits && profile.topics.cmd_vel) {
         const topic = new Topic<Twist>({
           ros,
-          name: topicName,
+          name: profile.topics.cmd_vel,
           messageType: TWIST_TYPE,
         })
         topic.advertise()
         cmdVelRef.current = topic
-        advertiseIdRef.current = topic.advertiseId ?? null
-
-        const onRosStatus = (message: unknown) => {
-          const statusMsg = asStatusMessage(message)
-          if (!statusMsg) return
-          const level = statusMsg.level?.toLowerCase()
-          if (level !== 'error' && level !== 'warning') return
-          const advertiseId = advertiseIdRef.current
-          if (statusMsg.id && advertiseId && statusMsg.id !== advertiseId) return
-          setError(
-            statusMsg.msg?.trim() ||
-              'rosbridge recusou cmd_vel (verifique messageType ROS 2)',
-          )
-        }
-        statusHandlerRef.current = onRosStatus
-        ros.on('status', onRosStatus)
-        if (topic.advertiseId) {
-          statusEventRef.current = `status:${topic.advertiseId}`
-          ros.on(statusEventRef.current, onRosStatus)
-        }
-      } else {
-        setError('Profile sem tópico cmd_vel')
+        trackAdvertise(topic, 'cmd_vel')
       }
 
-      const goalTopicName = profile.topics.goal_pose
-      if (goalTopicName) {
+      if (canSendGoal && profile.topics.goal_pose) {
         const goalTopic = new Topic<PoseStamped>({
           ros,
-          name: goalTopicName,
+          name: profile.topics.goal_pose,
           messageType: POSE_STAMPED_TYPE,
         })
         goalTopic.advertise()
         goalPoseRef.current = goalTopic
+        trackAdvertise(goalTopic, 'goal_pose')
       }
 
       const batteryTopicName = profile.topics.battery
@@ -284,15 +332,52 @@ export function useRos(
         })
         scanRef.current = scanTopic
       }
+
+      const mapTopicName = profile.topics.map
+      if (mapTopicName) {
+        const mapTopic = new Topic<OccupancyGridMsg>({
+          ros,
+          name: mapTopicName,
+          messageType: OCCUPANCY_GRID_TYPE,
+        })
+        mapTopic.subscribe((msg) => {
+          const info = msg.info
+          const data = msg.data
+          if (
+            !info ||
+            typeof info.width !== 'number' ||
+            typeof info.height !== 'number' ||
+            typeof info.resolution !== 'number' ||
+            !Array.isArray(data) ||
+            info.width <= 0 ||
+            info.height <= 0
+          ) {
+            return
+          }
+          pendingMapRef.current = {
+            width: info.width,
+            height: info.height,
+            resolution: info.resolution,
+            data,
+          }
+          if (mapRafRef.current != null) return
+          mapRafRef.current = requestAnimationFrame(() => {
+            mapRafRef.current = null
+            if (pendingMapRef.current) setMapGrid(pendingMapRef.current)
+          })
+        })
+        mapRef.current = mapTopic
+      }
     }
     const onError = () => {
       setStatus('error')
       setError('Falha ao conectar no rosbridge')
+      clearTelemetry()
     }
     const onClose = () => {
-      // Socket already gone — clear local teleop state; zero may not land.
       keysRef.current.clear()
       hadKeysRef.current = false
+      clearTelemetry()
       setStatus('closed')
     }
 
@@ -308,12 +393,16 @@ export function useRos(
     }
   }, [
     enabled,
+    canSendGoal,
+    limits,
     profile?.id,
     profile?.rosbridgeUrl,
     profile?.topics.cmd_vel,
     profile?.topics.goal_pose,
     profile?.topics.battery,
     profile?.topics.scan,
+    profile?.topics.map,
+    clearTelemetry,
     disconnect,
   ])
 
@@ -342,6 +431,9 @@ export function useRos(
 
   const sendGoalPose = useCallback(
     (x: number, y: number, yaw: number, frameId = 'map') => {
+      if (goalRejectedRef.current) {
+        throw new Error('rosbridge recusou goal_pose (verifique messageType ROS 2)')
+      }
       if (!goalPoseRef.current) {
         throw new Error('Tópico goal_pose indisponível')
       }
@@ -356,7 +448,11 @@ export function useRos(
           orientation,
         },
       }
-      goalPoseRef.current.publish(msg)
+      try {
+        goalPoseRef.current.publish(msg)
+      } catch {
+        throw new Error('Falha ao publicar PoseStamped no rosbridge')
+      }
     },
     [],
   )
@@ -382,7 +478,6 @@ export function useRos(
       keysRef.current.add(key)
       hadKeysRef.current = true
     }
-    // Always honor keyup: the press may have started outside an input.
     const onKeyUp = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase()
       if (!TELEOP_KEYS.has(key) && key !== ' ') return
@@ -399,8 +494,6 @@ export function useRos(
     const onVisibility = () => {
       if (document.visibilityState === 'hidden') releaseKeys()
     }
-    // pagehide/beforeunload fire while the socket may still be open — unlike
-    // rosbridge `close`, where a late stop() cannot leave the robot.
     const onPageHide = () => releaseKeys()
 
     window.addEventListener('keydown', onKeyDown)
@@ -447,6 +540,6 @@ export function useRos(
     sendGoalPose,
     batteryPercent,
     scan,
+    mapGrid,
   }
 }
-

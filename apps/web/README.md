@@ -6,18 +6,19 @@ Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo h�
 2. `GET /me/session-config` → profile, permissions, limits
 3. Rosbridge (roslib) + teleop WASD respeitando `limits.teleop`
 4. Stream de câmera via `videoBaseUrl` (seletor `camera_user` / `camera_link`)
-5. Goal Nav2 (`goal_pose` PoseStamped) + audit `POST /audit/events` se `canSendGoal`
-6. Scan LiDAR (`sensor_msgs/LaserScan`) e chip de bateria (`BatteryState`)
+5. Goal Nav2: audit `goal_pose` (com `robotProfileId`) → então PoseStamped se `canSendGoal`
+6. Mapa OccupancyGrid (`topics.map`) + Scan LiDAR opcional + chip bateria
 7. Assistente via `POST /llm/ask` (admin/operator)
 
 ## Demo Etapa E (capabilities)
 
 Com sim + `bridgelaunch` + API + `npm run dev`:
 
-1. Login `admin` / `operator` → chip **bat** no header (atualiza se o tópico existir).
-2. Painel **Scan** → nuvem polar do LiDAR (`topics.scan`).
-3. Painel **Goal** → informe x/y/yaw → publica PoseStamped e registra audit `goal_pose`.
-4. Viewer: goal/teleop desabilitados; câmera e (se conectado) scan/bateria só com roles que abrem rosbridge.
+1. Login qualquer papel → rosbridge abre para telemetria; chip **bat** / painel **Mapa**.
+2. Painel **Mapa** → OccupancyGrid (`topics.map`, obrigatório no DoD de E).
+3. Painel **Scan** (recomendado) → polar LiDAR se o tópico publicar.
+4. Painel **Goal** (admin/operator) → x/y/yaw (vírgula OK; blank rejeitado) → audit 201 → publish.
+5. Viewer: sem teleop/goal; mapa/scan/bateria visíveis quando conectado.
 
 ## Pré-requisitos
 

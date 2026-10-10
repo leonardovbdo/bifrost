@@ -35,7 +35,13 @@ export function ConsolePage({
   const { user, activeProfile, allowedProfiles, permissions, limits } = session
   const teleopEnabled = permissions.canTeleop
   const batteryLabel =
-    batteryPercent == null ? 'bat —' : `bat ${batteryPercent.toFixed(0)}%`
+    batteryPercent != null
+      ? `bat ${batteryPercent.toFixed(0)}%`
+      : rosStatus === 'connected'
+        ? 'bat —'
+        : rosStatus === 'connecting'
+          ? 'bat …'
+          : 'bat off'
 
   return (
     <div className="console-shell">

@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react'
-import type { LaserScanSample } from '../hooks/useRos'
+import type { LaserScanSample, RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
 
 interface ScanPanelProps {
   session: SessionConfig
+  rosStatus: RosStatus
   scan: LaserScanSample | null
 }
 
-export function ScanPanel({ session, scan }: ScanPanelProps) {
+export function ScanPanel({ session, rosStatus, scan }: ScanPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const topic = session.activeProfile.topics.scan
 
@@ -57,6 +58,16 @@ export function ScanPanel({ session, scan }: ScanPanelProps) {
     )
   }
 
+  let empty: string
+  if (rosStatus !== 'connected') {
+    empty =
+      rosStatus === 'connecting'
+        ? 'Conectando ao rosbridge…'
+        : 'Rosbridge desconectado — scan indisponível.'
+  } else {
+    empty = 'Aguardando LaserScan…'
+  }
+
   return (
     <section className="panel">
       <h2>Scan (LiDAR)</h2>
@@ -70,7 +81,7 @@ export function ScanPanel({ session, scan }: ScanPanelProps) {
           aria-label="Visualização LaserScan"
         />
       ) : (
-        <p className="muted">Aguardando LaserScan…</p>
+        <p className="muted">{empty}</p>
       )}
     </section>
   )

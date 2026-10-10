@@ -412,7 +412,8 @@ button:disabled {
   margin-top: 0.5rem;
 }
 
-.scan-canvas {
+.scan-canvas,
+.map-canvas {
   display: block;
   width: 100%;
   max-width: 320px;
@@ -420,6 +421,7 @@ button:disabled {
   margin-top: 0.5rem;
   border-radius: 10px;
   border: 1px solid rgba(11, 61, 74, 0.25);
+  background: #0b1220;
 }
 
 .form-ok {

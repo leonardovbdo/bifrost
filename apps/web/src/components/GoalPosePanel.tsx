@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { postGoalAudit } from '../api/bifrost'
+import { parseGoalCoord } from '../lib/parseGoalCoord'
 import type { SessionConfig } from '../types/session'
 
 interface GoalPosePanelProps {
@@ -43,11 +44,11 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
     e.preventDefault()
     setError(null)
     setOk(null)
-    const nx = Number(x)
-    const ny = Number(y)
-    const nyaw = Number(yaw)
-    if (![nx, ny, nyaw].every((n) => Number.isFinite(n))) {
-      setError('x, y e yaw devem ser números finitos')
+    const nx = parseGoalCoord(x)
+    const ny = parseGoalCoord(y)
+    const nyaw = parseGoalCoord(yaw)
+    if (nx == null || ny == null || nyaw == null) {
+      setError('x, y e yaw são obrigatórios (números; use vírgula ou ponto)')
       return
     }
     if (!rosConnected) {
@@ -56,11 +57,22 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
     }
     setBusy(true)
     try {
-      onSendGoal(nx, ny, nyaw)
-      await postGoalAudit({ x: nx, y: ny, yaw: nyaw })
-      setOk(`Goal enviado (${frameId}): x=${nx} y=${ny} yaw=${nyaw}`)
+      await postGoalAudit(
+        { x: nx, y: ny, yaw: nyaw },
+        session.activeProfile.id,
+      )
+      try {
+        onSendGoal(nx, ny, nyaw)
+        setOk(`Goal enviado (${frameId}): x=${nx} y=${ny} yaw=${nyaw}`)
+      } catch (pubErr) {
+        setError(
+          pubErr instanceof Error
+            ? `Auditoria registrada, mas o rosbridge falhou: ${pubErr.message}`
+            : 'Auditoria registrada, mas o rosbridge falhou ao publicar',
+        )
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Falha ao enviar goal')
+      setError(err instanceof Error ? err.message : 'Falha ao auditar goal')
     } finally {
       setBusy(false)
     }
@@ -70,7 +82,7 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
     <section className="panel">
       <h2>Goal (Nav2)</h2>
       <p className="muted mono">{topic}</p>
-      <p className="hint">frame: {frameId} · PoseStamped + audit goal_pose</p>
+      <p className="hint">frame: {frameId} · audit 201 → PoseStamped</p>
       <form className="goal-form" onSubmit={(e) => void handleSubmit(e)}>
         <label className="field">
           x

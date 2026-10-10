@@ -79,11 +79,12 @@ Detalhes: [`docker-postgres-local.md`](docker-postgres-local.md).
 
 ### Console Etapa E (capabilities)
 
-Com login **admin** ou **operator** e rosbridge up:
+Com qualquer login autenticado e rosbridge up:
 
 - Header: chip de bateria (`topics.battery` / `sensor_msgs/BatteryState`)
-- Painel **Scan**: polar do LiDAR (`topics.scan` / `LaserScan`)
-- Painel **Goal**: x/y/yaw → `goal_pose` PoseStamped + `POST /api/v1/audit/events`
+- Painel **Mapa**: OccupancyGrid (`topics.map` / `nav_msgs/OccupancyGrid`)
+- Painel **Scan** (recomendado): polar LiDAR (`topics.scan` / `LaserScan`)
+- Painel **Goal** (admin/operator): x/y/yaw → audit `goal_pose` + `robotProfileId` → PoseStamped
 - Câmera: seletor POV `camera_user` / `camera_link`
 
 Detalhes: `apps/web/README.md`.
