@@ -90,7 +90,7 @@ public class RobotProfilesController {
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public RobotProfileResponse patch(
-      @PathVariable UUID id, @RequestBody RobotProfilePatchRequest request) {
+      @PathVariable UUID id, @Valid @RequestBody RobotProfilePatchRequest request) {
     ProfileEnvironment environment =
         request.environment() == null ? null : ProfileEnvironment.fromDb(request.environment());
     RobotProfile updated =

@@ -45,8 +45,8 @@ Checklist comum a toda etapa:
 | C — LLM + CI | `/llm/ask`, workflows Maven | **DONE** |
 | D — UI demo NARA | Console, teleop, câmera, LLM | **DONE** (+ POV câmera) |
 | E — Capabilities na console | goal_pose, mapa, bateria | **DONE** (`main`, PR #7) |
-| F — Admin + usuários | UI admin + CRUD users | **IN PROGRESS** (`feat/etapa-f-admin-users`, PR pendente) |
-| G — Hardening | Rate limit, validação, logs | **TODO** |
+| F — Admin + usuários | UI admin + CRUD users | **DONE** (`main`, PR #8) |
+| G — Hardening | Rate limit, validação, logs | **IN PROGRESS** (`feat/etapa-g-hardening`) |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / opcional |
 
 ---
@@ -153,7 +153,7 @@ main
 
 ```bash
 git checkout main && git pull
-git checkout feat/etapa-f-admin-users            # etapa atual; ou criar a partir de main
+git checkout feat/etapa-g-hardening              # etapa atual; ou criar a partir de main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)

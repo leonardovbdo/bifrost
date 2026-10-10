@@ -128,11 +128,26 @@ public class BifrostProperties {
   public static class Audit {
     private int retentionDays = 90;
     private String purgeCron = "0 30 3 * * *";
+    private final ClientEvents clientEvents = new ClientEvents();
 
     public int retentionDays() { return retentionDays; }
     public void setRetentionDays(int retentionDays) { this.retentionDays = retentionDays; }
     public String purgeCron() { return purgeCron; }
     public void setPurgeCron(String purgeCron) { this.purgeCron = purgeCron; }
+    public ClientEvents clientEvents() { return clientEvents; }
+    public ClientEvents getClientEvents() { return clientEvents; }
+
+    public static class ClientEvents {
+      private int maxGoalPosePerWindow = 120;
+      private Duration window = Duration.ofMinutes(1);
+
+      public int maxGoalPosePerWindow() { return maxGoalPosePerWindow; }
+      public void setMaxGoalPosePerWindow(int maxGoalPosePerWindow) {
+        this.maxGoalPosePerWindow = maxGoalPosePerWindow;
+      }
+      public Duration window() { return window; }
+      public void setWindow(Duration window) { this.window = window; }
+    }
   }
 
   public static class Llm {
@@ -142,6 +157,7 @@ public class BifrostProperties {
     private int maxPromptLength = 4000;
     private int timeoutMs = 30000;
     private boolean stubWhenMissingKey = true;
+    private final RateLimit rateLimit = new RateLimit();
 
     public String apiKey() { return apiKey; }
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
@@ -156,6 +172,18 @@ public class BifrostProperties {
     public boolean stubWhenMissingKey() { return stubWhenMissingKey; }
     public void setStubWhenMissingKey(boolean stubWhenMissingKey) {
       this.stubWhenMissingKey = stubWhenMissingKey;
+    }
+    public RateLimit rateLimit() { return rateLimit; }
+    public RateLimit getRateLimit() { return rateLimit; }
+
+    public static class RateLimit {
+      private int maxRequests = 30;
+      private Duration window = Duration.ofMinutes(1);
+
+      public int maxRequests() { return maxRequests; }
+      public void setMaxRequests(int maxRequests) { this.maxRequests = maxRequests; }
+      public Duration window() { return window; }
+      public void setWindow(Duration window) { this.window = window; }
     }
   }
 }

@@ -21,6 +21,28 @@ public final class RobotProfileValidator {
     if (profile.videoBaseUrl() == null || profile.videoBaseUrl().isBlank()) {
       throw new ValidationException("PROFILE_URL_REQUIRED", "videoBaseUrl is required");
     }
+    validateRosbridgeUrl(profile.rosbridgeUrl());
+    validateVideoBaseUrl(profile.videoBaseUrl());
+  }
+
+  public static void validateRosbridgeUrl(String url) {
+    if (url == null || url.isBlank()) {
+      return;
+    }
+    if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
+      throw new ValidationException(
+          "PROFILE_URL_INVALID", "rosbridgeUrl must use ws or wss scheme");
+    }
+  }
+
+  public static void validateVideoBaseUrl(String url) {
+    if (url == null || url.isBlank()) {
+      return;
+    }
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      throw new ValidationException(
+          "PROFILE_URL_INVALID", "videoBaseUrl must use http or https scheme");
+    }
   }
 
   public static void validateCapabilities(List<String> capabilities) {

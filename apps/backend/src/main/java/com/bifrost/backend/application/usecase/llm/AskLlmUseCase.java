@@ -2,10 +2,12 @@ package com.bifrost.backend.application.usecase.llm;
 
 import com.bifrost.backend.domain.exception.LlmException;
 import com.bifrost.backend.domain.exception.NotFoundException;
+import com.bifrost.backend.domain.exception.RateLimitExceededException;
 import com.bifrost.backend.domain.exception.ValidationException;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.port.output.AuditRecorder;
 import com.bifrost.backend.domain.port.output.LlmClient;
+import com.bifrost.backend.domain.port.output.RequestRateLimiter;
 import com.bifrost.backend.domain.repository.UserRepository;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,16 +22,19 @@ public class AskLlmUseCase {
   private final UserRepository userRepository;
   private final LlmClient llmClient;
   private final AuditRecorder auditRecorder;
+  private final RequestRateLimiter rateLimiter;
   private final int maxPromptLength;
 
   public AskLlmUseCase(
       UserRepository userRepository,
       LlmClient llmClient,
       AuditRecorder auditRecorder,
+      RequestRateLimiter rateLimiter,
       @Value("${bifrost.llm.max-prompt-length:4000}") int maxPromptLength) {
     this.userRepository = userRepository;
     this.llmClient = llmClient;
     this.auditRecorder = auditRecorder;
+    this.rateLimiter = rateLimiter;
     this.maxPromptLength = maxPromptLength;
   }
 
@@ -54,6 +59,22 @@ public class AskLlmUseCase {
       throw new ValidationException(
           "LLM_PROMPT_TOO_LONG",
           "prompt+context exceeds max length of " + maxPromptLength);
+    }
+
+    if (!rateLimiter.allowLlmAsk(userId)) {
+      if (rateLimiter.allowLlmRateLimitAudit(userId)) {
+        try {
+          auditRecorder.record(
+              "llm_rate_limited",
+              user.id(),
+              user.lastActiveProfileId(),
+              Map.of("promptLength", prompt.length()));
+        } catch (RuntimeException ignored) {
+          // rate limit response must not fail because audit is optional
+        }
+      }
+      throw new RateLimitExceededException(
+          "LLM_RATE_LIMIT", "Too many LLM requests; try again later");
     }
 
     LlmClient.LlmReply reply = llmClient.ask(prompt, safeContext);

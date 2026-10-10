@@ -11,6 +11,7 @@ import com.bifrost.backend.domain.port.output.PasswordHasher;
 import com.bifrost.backend.domain.port.output.TokenProvider;
 import com.bifrost.backend.domain.repository.RefreshTokenRepository;
 import com.bifrost.backend.domain.repository.UserRepository;
+import com.bifrost.backend.domain.service.AuditUsernameSanitizer;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,14 +40,15 @@ public class LoginUserUseCase {
   @Transactional
   public LoginResult execute(String username, String password) {
     var maybeUser = userRepository.findByUsername(username).filter(User::active);
+    String auditUsername = AuditUsernameSanitizer.forAudit(username);
     if (maybeUser.isEmpty()) {
-      auditRecorder.record("login_failure", null, null, Map.of("username", username));
+      auditRecorder.record("login_failure", null, null, Map.of("username", auditUsername));
       throw new AuthenticationFailedException();
     }
 
     User user = maybeUser.get();
     if (!passwordHasher.matches(password, user.passwordHash())) {
-      auditRecorder.record("login_failure", user.id(), null, Map.of("username", username));
+      auditRecorder.record("login_failure", user.id(), null, Map.of("username", auditUsername));
       throw new AuthenticationFailedException();
     }
 

@@ -9,6 +9,9 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Etapa G: hardening — rate limit `/llm/ask` e `POST /audit/events`
+  (goal_pose), validação PATCH profiles + login, log de exceções sem
+  stack no body (`feat/etapa-g-hardening`)
 - Etapa F: UI admin (profiles, parameters, users, audit) + API users
   admin (`feat/etapa-f-admin-users`)
 - Etapa E: console capabilities — goal_pose + audit, OccupancyGrid,

@@ -2,9 +2,11 @@ package com.bifrost.backend.application.usecase.audit;
 
 import com.bifrost.backend.domain.exception.ForbiddenException;
 import com.bifrost.backend.domain.exception.NotFoundException;
+import com.bifrost.backend.domain.exception.RateLimitExceededException;
 import com.bifrost.backend.domain.exception.ValidationException;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.port.output.AuditRecorder;
+import com.bifrost.backend.domain.port.output.RequestRateLimiter;
 import com.bifrost.backend.domain.repository.UserProfileAccessRepository;
 import com.bifrost.backend.domain.repository.UserRepository;
 import com.bifrost.backend.domain.service.SessionPermissionResolver;
@@ -24,14 +26,17 @@ public class RecordClientAuditEventUseCase {
   private final AuditRecorder auditRecorder;
   private final UserProfileAccessRepository accessRepository;
   private final UserRepository userRepository;
+  private final RequestRateLimiter rateLimiter;
 
   public RecordClientAuditEventUseCase(
       AuditRecorder auditRecorder,
       UserProfileAccessRepository accessRepository,
-      UserRepository userRepository) {
+      UserRepository userRepository,
+      RequestRateLimiter rateLimiter) {
     this.auditRecorder = auditRecorder;
     this.accessRepository = accessRepository;
     this.userRepository = userRepository;
+    this.rateLimiter = rateLimiter;
   }
 
   @Transactional
@@ -56,6 +61,12 @@ public class RecordClientAuditEventUseCase {
     }
 
     Map<String, Object> validated = validateGoalPosePayload(payload);
+
+    if (!rateLimiter.allowClientGoalPoseAudit(userId)) {
+      throw new RateLimitExceededException(
+          "AUDIT_RATE_LIMIT", "Too many goal_pose audit events; try again later");
+    }
+
     auditRecorder.record(type, userId, profileId, validated);
   }
 
