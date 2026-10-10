@@ -25,10 +25,14 @@ export default function App() {
 
   const route = useHashRoute()
 
+  const isAdminRoute = route.kind === 'admin'
   const teleopEnabled = Boolean(session?.permissions.canTeleop)
   const canSendGoal = Boolean(session?.permissions.canSendGoal)
   // Telemetry (map/scan/battery) for all authenticated roles; publish gated below.
   const rosEnabled = authState === 'authenticated'
+  const rosTeleopLimits =
+    isAdminRoute || !teleopEnabled ? null : (session?.limits.teleop ?? null)
+  const rosCanSendGoal = !isAdminRoute && canSendGoal
   const {
     status: rosStatus,
     error: rosError,
@@ -40,8 +44,8 @@ export default function App() {
   } = useRos(
     session?.activeProfile ?? null,
     rosEnabled,
-    teleopEnabled ? (session?.limits.teleop ?? null) : null,
-    canSendGoal,
+    rosTeleopLimits,
+    rosCanSendGoal,
   )
 
   if (authState === 'loading') {

@@ -75,7 +75,7 @@ export function AdminAuditPage() {
             <input
               type="number"
               min={1}
-              max={200}
+              max={100}
               value={limit}
               onChange={(e) => setLimit(Number(e.target.value) || 50)}
             />

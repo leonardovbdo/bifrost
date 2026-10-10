@@ -26,6 +26,16 @@ public class UpdateUserUseCase {
         userRepository
             .findById(userId)
             .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User not found"));
+    UserRole newRole = role != null ? role : existing.role();
+    boolean newActive = active != null ? active : existing.active();
+    boolean wasActiveAdmin = existing.role() == UserRole.ADMIN && existing.active();
+    boolean willBeActiveAdmin = newRole == UserRole.ADMIN && newActive;
+    if (wasActiveAdmin && !willBeActiveAdmin) {
+      if (userRepository.countActiveByRole(UserRole.ADMIN) <= 1) {
+        throw new ValidationException(
+            "USER_LAST_ADMIN", "Cannot demote or deactivate the last active admin");
+      }
+    }
     User patched = existing.applyAdminPatch(active, role);
     return userRepository.save(patched);
   }

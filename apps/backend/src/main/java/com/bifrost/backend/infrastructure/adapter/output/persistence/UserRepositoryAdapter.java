@@ -1,5 +1,6 @@
 package com.bifrost.backend.infrastructure.adapter.output.persistence;
 
+import com.bifrost.backend.domain.enums.UserRole;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.repository.UserRepository;
 import com.bifrost.backend.infrastructure.adapter.output.persistence.jpa.UserJpaRepository;
@@ -39,6 +40,11 @@ public class UserRepositoryAdapter implements UserRepository {
   @Override
   public boolean existsByEmail(String email) {
     return jpaRepository.existsByEmail(email);
+  }
+
+  @Override
+  public long countActiveByRole(UserRole role) {
+    return jpaRepository.countByRoleAndActiveTrue(role.dbValue());
   }
 
   @Override

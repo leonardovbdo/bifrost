@@ -16,14 +16,20 @@ import type { AdminUser, RobotProfileDetail } from '../../types/admin'
 
 const EMPTY_TOPICS = stringifyJson({
   cmd_vel: '/noblenara/alfa/cmd_vel',
-  goal_pose: '/noblenara/alfa/goal_pose',
+  camera_link: '/noblenara/alfa/camera_link/image',
+  camera_user: '/noblenara/alfa/camera_user',
+  scan: '/noblenara/alfa/scan_filtered',
   map: '/noblenara/alfa/map',
+  odom: '/noblenara/alfa/odom',
   battery: '/noblenara/alfa/battery_status',
+  goal_pose: '/noblenara/alfa/goal_pose',
 })
 
 const EMPTY_FRAMES = stringifyJson({
   map: 'map',
+  odom: 'odom',
   base: 'base_link',
+  camera: 'camera_link',
 })
 
 type Mode = 'create' | 'edit'

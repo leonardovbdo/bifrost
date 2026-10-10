@@ -123,6 +123,88 @@ class UsersAdminIntegrationTest {
         .andExpect(jsonPath("$.error.code").value("USER_PATCH_EMPTY"));
   }
 
+  @Test
+  void createUserTrimsUsernameAndRejectsDuplicateWithSpaces() throws Exception {
+    String admin = login("admin", "admin-pass");
+
+    mockMvc
+        .perform(
+            post("/api/v1/users")
+                .cookie(cookie("BIFROST_ACCESS", admin))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {
+                      "username":"  trim-user  ",
+                      "password":"trim-pass-123",
+                      "role":"viewer"
+                    }
+                    """))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.username").value("trim-user"));
+
+    mockMvc
+        .perform(
+            post("/api/v1/users")
+                .cookie(cookie("BIFROST_ACCESS", admin))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {
+                      "username":"trim-user",
+                      "password":"other-pass-123",
+                      "role":"viewer"
+                    }
+                    """))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.error.code").value("USER_USERNAME_EXISTS"));
+  }
+
+  @Test
+  void cannotDemoteOrDeactivateLastActiveAdmin() throws Exception {
+    String admin = login("admin", "admin-pass");
+
+    mockMvc
+        .perform(get("/api/v1/users").cookie(cookie("BIFROST_ACCESS", admin)))
+        .andExpect(status().isOk());
+
+    String adminId = null;
+    MvcResult list =
+        mockMvc
+            .perform(get("/api/v1/users").cookie(cookie("BIFROST_ACCESS", admin)))
+            .andReturn();
+    String body = list.getResponse().getContentAsString();
+    int count = com.jayway.jsonpath.JsonPath.read(body, "$.items.length()");
+    for (int i = 0; i < count; i++) {
+      String role = com.jayway.jsonpath.JsonPath.read(body, "$.items[" + i + "].role");
+      if ("admin".equals(role)) {
+        adminId = com.jayway.jsonpath.JsonPath.read(body, "$.items[" + i + "].id");
+        break;
+      }
+    }
+    if (adminId == null) {
+      throw new IllegalStateException("seed admin not found");
+    }
+
+    mockMvc
+        .perform(
+            patch("/api/v1/users/" + adminId)
+                .cookie(cookie("BIFROST_ACCESS", admin))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"active\":false}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error.code").value("USER_LAST_ADMIN"));
+
+    mockMvc
+        .perform(
+            patch("/api/v1/users/" + adminId)
+                .cookie(cookie("BIFROST_ACCESS", admin))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"role\":\"operator\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error.code").value("USER_LAST_ADMIN"));
+  }
+
   private String login(String username, String password) throws Exception {
     MvcResult login =
         mockMvc
