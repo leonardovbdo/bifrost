@@ -59,5 +59,7 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 | Fase | Situação |
 |------|----------|
 | Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** |
-| Skeleton + Etapas A–C (API) | **Em PRs** — ver [próximos passos](docs/docs/operations/proximos-passos.md) |
-| Etapa D (UI demo) | **Em andamento** — `apps/web` |
+| Etapas A–D (API + console NARA) | **Na `main`** |
+| Esteira pós-MVP (E–H) | **Planejada** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
+
+Retomar: [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md).

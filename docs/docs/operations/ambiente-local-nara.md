@@ -73,7 +73,9 @@ Detalhes: [`docker-postgres-local.md`](docker-postgres-local.md).
 1. PostgreSQL up + migrations Flyway  
 2. API em `:8081` + Actuator `/health` (ADR-013)  
 3. Protótipo UI: `cd apps/web && npm run dev` → `http://localhost:5173`  
-4. Rosbridge permanece `:9090` (híbrido); câmera via web_video_server `:8080`
+4. Rosbridge permanece `:9090` (híbrido); câmera via web_video_server `:8080`  
+   (tópico na query **sem** `%2F`; seletor Usuário/Frente na console)  
+5. Esteira do que falta (goal/mapa/admin/…): [`esteira-pos-mvp.md`](esteira-pos-mvp.md)
 
 ---
 

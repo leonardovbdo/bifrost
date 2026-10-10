@@ -49,10 +49,12 @@ Implementado em [`apps/web`](../../../apps/web/README.md) (Vite + React):
 
 - Login + exibição de role  
 - Lista/seleção de robot profiles permitidos  
-- Conexão rosbridge + teleop mínimo (WASD) + uma câmera  
+- Conexão rosbridge + teleop mínimo (WASD) + câmera (seletor `camera_user` / `camera_link`)  
 - Assistente via `/llm/ask` (admin/operator)  
 - Preset de teleop (`safety`/`normal`/`fast`) via parameters
 
 Não é objetivo reproduzir uma IHM completa de produto de terceiros.
+
+**Próximas entregas de UI:** goal_pose auditado, mapa/scan, bateria, admin — ver [`../operations/esteira-pos-mvp.md`](../operations/esteira-pos-mvp.md).
 
 Gap analysis genérico: [`../requirements/inventario-frontend-ihm.md`](../requirements/inventario-frontend-ihm.md).

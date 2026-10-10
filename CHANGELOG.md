@@ -9,6 +9,8 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Ops: esteira pós-MVP normativa (Etapas E–H) em
+  `docs/docs/operations/esteira-pos-mvp.md`
 - Etapa D: protótipo UI `apps/web` (login, session-config, teleop,
   câmera, LLM) + CI Node (`feat/etapa-d-ui-demo`)
 - Etapa C: proxy LLM `/llm/ask` (Gemini + stub), audit `llm_ask`,
