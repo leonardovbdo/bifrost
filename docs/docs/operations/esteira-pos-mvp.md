@@ -1,6 +1,6 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
-**Atualizado:** 2026-10-08  
+**Atualizado:** 2026-10-10  
 **Status:** Documento **normativo** da esteira de trabalho até a defesa / demo NARA completa.  
 **Pré-requisito:** `main` com Etapas A–D mergeadas (auth, parameters/audit, LLM/CI, console web + câmera POV).
 
@@ -14,15 +14,23 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 1. Branch a partir de `main` (ou da etapa anterior já mergeada): `feat/etapa-e-…`, `feat/etapa-f-…`, …
 2. Implementar **só** o escopo da etapa (sem misturar etapas no mesmo PR).
 3. Abrir PR → `main` (ou stack se necessário).
-4. Pedir `@cursoragent review`; corrigir achados coerentes; CI verde.
+4. Pedir `@cursoragent review`; corrigir achados coerentes com specs/ADRs/esteira; CI verde.
 5. Merge; atualizar status neste documento + `CHANGELOG.md` + `proximos-passos.md`.
-6. Só então abrir a branch da próxima etapa.
+6. Só então abrir a branch da próxima etapa (caminho padrão).
 
-**Definição de pronto (DoD) de cada etapa**
+**Definição de pronto (DoD) — por tipo de etapa**
 
-- [ ] Spec/tasks da feature tocada atualizadas (`DONE` / notas)
-- [ ] Testes (IT e/ou unit) cobrindo o caminho feliz + 1 negativo relevante
-- [ ] Docs ops / README alinhados se o fluxo de demo mudou
+| Tipo | Critério de pronto |
+|------|--------------------|
+| **E** (UI console) | `npm run lint` + `npm run build` em `apps/web`; demo manual no corpo do PR (goal + mapa + bateria; viewer com `canSendGoal=false` não publica/audita). Docs: `apps/web/README.md` + `ambiente-local-nara.md`. Teste de backend novo **só** se o contrato HTTP mudar (audit `goal_pose` já coberto na Etapa B). |
+| **F e G** (API + UI admin / hardening) | IT feliz + 1 negativo relevante (estilo A–C); docs/ops se o fluxo mudar; review + CI. |
+| **H** (telemetria) | Migration + teste de repositório/ingestão; H-03 não bloqueia. |
+| **Itens opcionais** (ex.: G-06, odom em E-03) | Fora do DoD. |
+
+Checklist comum a toda etapa:
+
+- [ ] Arquivos de spec/tasks/README da feature tocada atualizados (`DONE` / notas) — para E: READMEs acima
+- [ ] Critério de teste da tabela acima satisfeito
 - [ ] Review Cursor + CI (`backend` / `web` / `markdownlint` conforme paths)
 - [ ] Demo manual mínima descrita no corpo do PR
 
@@ -36,23 +44,24 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 | B — Parameters + audit | Presets, audit, purge | **DONE** |
 | C — LLM + CI | `/llm/ask`, workflows Maven | **DONE** |
 | D — UI demo NARA | Console, teleop, câmera, LLM | **DONE** (+ POV câmera) |
-| E — Capabilities na console | goal_pose, mapa/scan, bateria | **TODO** (próxima) |
+| E — Capabilities na console | goal_pose, mapa, bateria | **TODO** (próxima) |
 | F — Admin + usuários | UI admin + CRUD users | **TODO** |
 | G — Hardening | Rate limit, validação, logs | **TODO** |
-| H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / fase 2 |
+| H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / opcional |
 
 ---
 
 ## 3. Etapa E — Capabilities na console (prioridade 1)
 
-**Objetivo:** provar na UI o que o profile NARA já declara (`nav2`, `slam`/`scan`, `battery`), além de teleop/câmera.
+**Objetivo:** provar na UI o que o profile NARA já declara (`nav2`, `slam`, `battery`), além de teleop/câmera.  
+(ADR-010: `slam` exige tópico `map`; `scan` é recomendado, não capability.)
 
-| ID | Entrega | Notas |
-|----|---------|--------|
-| E-01 | UI **goal_pose** (clique no mapa ou input x/y/yaw) | Só se `permissions.canSendGoal`; publish ROS + `POST /audit/events` tipo `goal_pose` |
-| E-02 | Painel/overlay **mapa** e/ou **scan** | Subscribe rosbridge aos tópicos da session-config; viewer simples ( OccupancyGrid / LaserScan ) |
-| E-03 | Status **bateria** (e opcional odom) | Subscribe `battery` / `odom`; chip na console |
-| E-04 | Docs de demo | Atualizar `apps/web/README.md` + `ambiente-local-nara.md` com o fluxo E |
+| ID | Entrega (mínimo) | Notas |
+|----|------------------|-------|
+| E-01 | Input **x/y/yaw** → `goal_pose` | Obrigatório. Clique no mapa só se o viewer de `map` existir. Só com `permissions.canSendGoal`. Publish `geometry_msgs/msg/PoseStamped` no tópico da session-config + `POST /api/v1/audit/events` `{ type: "goal_pose", payload: { x, y, yaw } }` (com `robotProfileId` quando disponível). |
+| E-02 | Viewer **OccupancyGrid** (`map`) | Obrigatório (`slam`). LaserScan (`scan`) recomendado, não bloqueia o DoD. |
+| E-03 | Chip **bateria** | Obrigatório. `odom` opcional, fora do DoD. |
+| E-04 | Docs de demo | `apps/web/README.md` + `ambiente-local-nara.md` |
 
 **Fora de E:** CRUD admin, users API, rate limit.
 
@@ -67,14 +76,14 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 
 | ID | Entrega | Notas |
 |----|---------|--------|
-| F-01 | API **CRUD users** (admin) | Alinha functional spec §2 `users`; create/list/patch `active`/`role`; nunca expor hash |
-| F-02 | UI admin **profiles** | Listar/criar/editar profile + grant access (consome API já existente) |
+| F-01 | API **users** (admin) | Mínimo: `GET`/`POST /api/v1/users`, `PATCH /api/v1/users/{id}` com `active` e/ou `role`; nunca expor hash. (Functional spec §2 nomeia o módulo; §4 ainda não lista o HTTP — este item **é** o contrato.) |
+| F-02 | UI admin **profiles** | Listar/criar/editar profile + grant (`POST /api/v1/robot-profiles/{id}/access`). Listar/revogar ACL fica **fora de F** (API ainda não existe). Depende de F-01 para escolher usuário no grant. |
 | F-03 | UI admin **parameters** | Editar presets globais / ver merge |
 | F-04 | UI admin **users** | Consome F-01; viewer/operator sem acesso |
 | F-05 | UI **audit** (admin) | Lista `GET /audit/events` com filtros básicos |
 
 **Branch sugerida:** `feat/etapa-f-admin-users`  
-**Base:** `main` (após merge de E, se E ainda estiver aberto use stack E→F)
+**Base:** `main` após merge de E (F **não** depende de código de E; pode nascer de `main` em paralelo. Stack E→F só para adiantar.)
 
 ---
 
@@ -85,52 +94,58 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 | ID | Entrega | Notas |
 |----|---------|--------|
 | G-01 | Rate limit `/llm/ask` | Spec LLM recomenda; 429 + audit opcional |
-| G-02 | Rate limit / teto em `POST /audit/events` | Evitar flood de `goal_pose` |
+| G-02 | Rate limit / teto em `POST /audit/events` | Evitar flood de `goal_pose` (depende de E existir na demo) |
 | G-03 | `@Valid` + schema URLs em PATCH profiles | `ws`/`wss`, `http`/`https`; 400 em vez de 500 |
 | G-04 | `@Size` em `LoginRequest` | Mitigar bcrypt DoS + truncar username no audit |
 | G-05 | Log de `Exception` no `GlobalExceptionHandler` | Sem vazar stack no body |
-| G-06 | (Opcional) retry câmera após `onError` | Botão “tentar de novo” sem reload |
+| G-06 | (Opcional) retry câmera após `onError` | Botão “tentar de novo” sem reload; fora do DoD |
 
 **Branch sugerida:** `feat/etapa-g-hardening`  
-**Base:** `main` após F (ou em paralelo se não houver conflito)
+**Base:** `main` após F no caminho padrão (G-01/G-02 podem adiantar se a defesa apertar — ver §8).
 
 ---
 
-## 6. Etapa H — Telemetria persistida (fase 2 / se sobrar tempo)
+## 6. Etapa H — Telemetria persistida (opcional / se sobrar tempo)
 
 | ID | Entrega | Notas |
 |----|---------|--------|
 | H-01 | Draft migration `telemetry_samples` | Já em `features/telemetria/tasks.md` (`TEL-01`) |
 | H-02 | Ingestão amostrada (não cmd_vel por tick) | Spec telemetria |
-| H-03 | Query admin básica | Fora do caminho crítico da defesa |
+| H-03 | Query admin básica | Fora do caminho crítico da defesa; não bloqueia DoD de H |
 
-Não bloqueia demo NARA se E–G estiverem fechadas.
+Não bloqueia demo NARA se E–G (ou o corte de defesa) estiverem fechadas.  
+Não confundir com “FASE 2” do inventário de IHM — é evolução do módulo de telemetria.
 
 ---
 
-## 7. Explicitamente fora da esteira (não abrir PR “só por isso”)
+## 7. Explicitamente fora desta esteira (não abrir PR “só por isso”)
 
-- Autenticação do rosbridge / enforcement de `cmd_vel` no backend  
-- IHM completa tipo `noblenara-ihm`  
-- Histórico de chat LLM no Postgres  
-- Deploy produção / multi-robô físico  
-- STT/voz no browser  
-
-Esses itens permanecem como **FASE 2** no inventário de IHM e na functional spec §8.
+| Item | Onde está documentado |
+|------|------------------------|
+| Auth do rosbridge / enforcement de `cmd_vel` no backend | Functional spec §8 (fora do MVP de implementação) |
+| IHM completa tipo `noblenara-ihm` | Fora do escopo Bifrost console |
+| Histórico de chat LLM no Postgres | Spec LLM: fora do MVP |
+| Deploy produção / multi-robô físico | Fora do MVP local/demo |
+| STT/voz no browser | Inventário IHM: CLIENT (não é o “FASE 2” de biometria) |
+| Face / biometria | Inventário IHM: FASE 2 explícita |
 
 ---
 
 ## 8. Ordem de PRs (cadeia)
 
+**Caminho padrão:** merge de E → F → G → H (opcional).
+
 ```text
 main
   └─ feat/etapa-e-console-capabilities     → PR (merge)
-       └─ feat/etapa-f-admin-users         → PR (merge)   [ou a partir de main pós-E]
+       └─ feat/etapa-f-admin-users         → PR (merge)   [ou main em paralelo]
             └─ feat/etapa-g-hardening      → PR (merge)
                  └─ feat/etapa-h-telemetry (opcional)
 ```
 
-Preferência: **uma etapa = um PR**. Se a defesa estiver perto, cortar em E + G-01/G-05 e deixar F/H para depois — registrar o corte neste arquivo.
+- Preferência: **uma etapa = um PR**.
+- F pode nascer de `main` em paralelo; stack só para adiantar.
+- **Corte de defesa** (se o prazo apertar): **E + G-01 + G-02**. Fica fora: F, H, G-03/G-04/G-05/G-06 — registrar o corte neste arquivo quando aplicado.
 
 ---
 

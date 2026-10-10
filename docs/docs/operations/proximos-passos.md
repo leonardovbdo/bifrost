@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-08  
-**Estado:** Etapas A–D na `main`. Esteira seguinte em [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+**Atualizado:** 2026-10-10  
+**Estado:** Etapas A–D na `main`. Esteira normativa: [`esteira-pos-mvp.md`](esteira-pos-mvp.md). Próxima ação de código: Etapa E.
 
 ---
 
@@ -17,10 +17,7 @@
 | Etapas F–H | Ver [esteira pós-MVP](esteira-pos-mvp.md) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md)  
-(processo de PR/review, DoD, escopos E–H, o que fica fora).
-
-Branch de docs desta retomada (se aberta): `feat/esteira-pos-mvp-docs`.  
-Próxima branch de código: `feat/etapa-e-console-capabilities` a partir de `main`.
+(processo de PR/review, DoD por tipo de etapa, escopos E–H, o que fica fora).
 
 ---
 
@@ -28,6 +25,7 @@ Próxima branch de código: `feat/etapa-e-console-capabilities` a partir de `mai
 
 ```bash
 git checkout main && git pull
+git checkout -b feat/etapa-e-console-capabilities   # se ainda não existir
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET="$(openssl rand -base64 48)"
@@ -46,6 +44,6 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-1. Seguir **Etapa E** em [`esteira-pos-mvp.md`](esteira-pos-mvp.md) (§3).  
-2. Abrir `feat/etapa-e-console-capabilities` a partir de `main`.  
-3. Mesma esteira: implementar → PR → `@cursoragent review` → merge.
+1. Implementar **Etapa E** conforme [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §3 (mínimo: input goal + OccupancyGrid + chip bateria).  
+2. Branch `feat/etapa-e-console-capabilities` a partir de `main`.  
+3. Mesma esteira: implementar → PR → `@cursoragent review` → corrigir achados coerentes → merge.
