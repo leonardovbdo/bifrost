@@ -6,10 +6,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bifrost.backend.domain.enums.UserRole;
+import com.bifrost.backend.domain.exception.RateLimitExceededException;
 import com.bifrost.backend.domain.exception.ValidationException;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.port.output.AuditRecorder;
@@ -69,5 +71,27 @@ class AskLlmUseCaseTest {
 
     assertEquals("hello", reply.reply());
     verify(audit).record(eq("llm_ask"), eq(user.id()), any(), anyMap());
+  }
+
+  @Test
+  void recordsLlmRateLimitAuditAtMostOnceWhileLimited() {
+    UserRepository users = mock(UserRepository.class);
+    LlmClient llm = mock(LlmClient.class);
+    AuditRecorder audit = mock(AuditRecorder.class);
+    User user = User.create("op", null, "hash", UserRole.OPERATOR);
+    when(users.findById(user.id())).thenReturn(Optional.of(user));
+
+    RequestRateLimiter rateLimiter = mock(RequestRateLimiter.class);
+    when(rateLimiter.allowLlmAsk(user.id())).thenReturn(false);
+    when(rateLimiter.allowLlmRateLimitAudit(user.id())).thenReturn(true, false);
+
+    AskLlmUseCase useCase = new AskLlmUseCase(users, llm, audit, rateLimiter, 4000);
+    assertThrows(
+        RateLimitExceededException.class, () -> useCase.execute(user.id(), "hi", Map.of()));
+    assertThrows(
+        RateLimitExceededException.class, () -> useCase.execute(user.id(), "hi", Map.of()));
+
+    verify(audit, times(1))
+        .record(eq("llm_rate_limited"), eq(user.id()), any(), anyMap());
   }
 }

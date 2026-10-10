@@ -62,14 +62,16 @@ public class AskLlmUseCase {
     }
 
     if (!rateLimiter.allowLlmAsk(userId)) {
-      try {
-        auditRecorder.record(
-            "llm_rate_limited",
-            user.id(),
-            user.lastActiveProfileId(),
-            Map.of("promptLength", prompt.length()));
-      } catch (RuntimeException ignored) {
-        // rate limit response must not fail because audit is optional
+      if (rateLimiter.allowLlmRateLimitAudit(userId)) {
+        try {
+          auditRecorder.record(
+              "llm_rate_limited",
+              user.id(),
+              user.lastActiveProfileId(),
+              Map.of("promptLength", prompt.length()));
+        } catch (RuntimeException ignored) {
+          // rate limit response must not fail because audit is optional
+        }
       }
       throw new RateLimitExceededException(
           "LLM_RATE_LIMIT", "Too many LLM requests; try again later");

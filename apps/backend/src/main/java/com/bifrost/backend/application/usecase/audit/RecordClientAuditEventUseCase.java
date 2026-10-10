@@ -60,12 +60,13 @@ public class RecordClientAuditEventUseCase {
       throw new ForbiddenException("PROFILE_FORBIDDEN", "Robot profile is not allowed for this user");
     }
 
+    Map<String, Object> validated = validateGoalPosePayload(payload);
+
     if (!rateLimiter.allowClientGoalPoseAudit(userId)) {
       throw new RateLimitExceededException(
           "AUDIT_RATE_LIMIT", "Too many goal_pose audit events; try again later");
     }
 
-    Map<String, Object> validated = validateGoalPosePayload(payload);
     auditRecorder.record(type, userId, profileId, validated);
   }
 

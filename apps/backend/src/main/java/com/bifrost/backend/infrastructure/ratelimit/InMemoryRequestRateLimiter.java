@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InMemoryRequestRateLimiter implements RequestRateLimiter {
-  private record WindowKey(UUID userId, String scope, long bucket) {}
+  private record WindowKey(UUID userId, String scope, long bucket, long windowMillis) {}
 
   private final BifrostProperties properties;
   private final ConcurrentHashMap<WindowKey, AtomicInteger> counters = new ConcurrentHashMap<>();
@@ -32,13 +32,19 @@ public class InMemoryRequestRateLimiter implements RequestRateLimiter {
     return tryConsume(userId, "audit_goal_pose", limit.maxGoalPosePerWindow(), limit.window());
   }
 
+  @Override
+  public boolean allowLlmRateLimitAudit(UUID userId) {
+    var limit = properties.llm().rateLimit();
+    return tryConsume(userId, "llm_rate_limit_audit", 1, limit.window());
+  }
+
   boolean tryConsume(UUID userId, String scope, int maxRequests, Duration window) {
     if (maxRequests <= 0) {
       return true;
     }
     long windowMillis = Math.max(1L, window.toMillis());
     long bucket = System.currentTimeMillis() / windowMillis;
-    WindowKey key = new WindowKey(userId, scope, bucket);
+    WindowKey key = new WindowKey(userId, scope, bucket, windowMillis);
     AtomicInteger counter = counters.computeIfAbsent(key, ignored -> new AtomicInteger(0));
     int attempt = counter.incrementAndGet();
     if (attempt > maxRequests) {
@@ -53,11 +59,16 @@ public class InMemoryRequestRateLimiter implements RequestRateLimiter {
     if (counters.size() <= 10_000) {
       return;
     }
-    long oldestAllowedBucket = System.currentTimeMillis() / 60_000L - 2;
+    long now = System.currentTimeMillis();
     for (Map.Entry<WindowKey, AtomicInteger> entry : counters.entrySet()) {
-      if (entry.getKey().bucket() < oldestAllowedBucket) {
-        counters.remove(entry.getKey(), entry.getValue());
+      WindowKey key = entry.getKey();
+      if (isBucketExpired(key.bucket(), key.windowMillis(), now)) {
+        counters.remove(key, entry.getValue());
       }
     }
+  }
+
+  static boolean isBucketExpired(long bucket, long windowMillis, long nowMillis) {
+    return (bucket + 1L) * windowMillis <= nowMillis;
   }
 }
