@@ -49,9 +49,16 @@ export function askLlm(prompt: string, context?: Record<string, unknown>) {
   })
 }
 
-export function postGoalAudit(payload: Record<string, unknown>) {
+export function postGoalAudit(
+  payload: Record<string, unknown>,
+  robotProfileId?: string,
+) {
   return api<unknown>('/api/v1/audit/events', {
     method: 'POST',
-    body: JSON.stringify({ type: 'goal_pose', payload }),
+    body: JSON.stringify({
+      type: 'goal_pose',
+      robotProfileId: robotProfileId ?? null,
+      payload,
+    }),
   })
 }

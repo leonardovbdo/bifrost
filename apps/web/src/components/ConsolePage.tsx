@@ -9,6 +9,7 @@ interface ConsolePageProps {
   error: string | null
   rosStatus: RosStatus
   rosError: string | null
+  batteryPercent: number | null
   onLogout: () => Promise<void>
   onSelectProfile: (profileId: string) => Promise<void>
   onChangePreset: (preset: string) => Promise<void>
@@ -24,6 +25,7 @@ export function ConsolePage({
   error,
   rosStatus,
   rosError,
+  batteryPercent,
   onLogout,
   onSelectProfile,
   onChangePreset,
@@ -32,6 +34,14 @@ export function ConsolePage({
 }: ConsolePageProps) {
   const { user, activeProfile, allowedProfiles, permissions, limits } = session
   const teleopEnabled = permissions.canTeleop
+  const batteryLabel =
+    batteryPercent != null
+      ? `bat ${batteryPercent.toFixed(0)}%`
+      : rosStatus === 'connected'
+        ? 'bat —'
+        : rosStatus === 'connecting'
+          ? 'bat …'
+          : 'bat off'
 
   return (
     <div className="console-shell">
@@ -41,6 +51,9 @@ export function ConsolePage({
           <span className="console-sub">console NARA</span>
         </div>
         <div className="console-user">
+          <span className="chip" title={activeProfile.topics.battery ?? 'sem tópico battery'}>
+            {batteryLabel}
+          </span>
           <span className="chip">{user.username}</span>
           <span className="chip chip-role">{user.role}</span>
           <button type="button" className="btn-ghost" onClick={() => void onLogout()} disabled={busy}>

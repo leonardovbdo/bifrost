@@ -1,6 +1,9 @@
 import { LoginPage } from './components/LoginPage'
 import { ConsolePage } from './components/ConsolePage'
+import { GoalPosePanel } from './components/GoalPosePanel'
 import { LlmPanel } from './components/LlmPanel'
+import { MapPanel } from './components/MapPanel'
+import { ScanPanel } from './components/ScanPanel'
 import { useRos } from './hooks/useRos'
 import { useSession } from './hooks/useSession'
 import './styles.css'
@@ -18,10 +21,22 @@ export default function App() {
   } = useSession()
 
   const teleopEnabled = Boolean(session?.permissions.canTeleop)
-  const { status: rosStatus, error: rosError, stop } = useRos(
+  const canSendGoal = Boolean(session?.permissions.canSendGoal)
+  // Telemetry (map/scan/battery) for all authenticated roles; publish gated below.
+  const rosEnabled = authState === 'authenticated'
+  const {
+    status: rosStatus,
+    error: rosError,
+    stop,
+    sendGoalPose,
+    batteryPercent,
+    scan,
+    mapGrid,
+  } = useRos(
     session?.activeProfile ?? null,
-    authState === 'authenticated' && teleopEnabled,
-    session?.limits.teleop ?? null,
+    rosEnabled,
+    teleopEnabled ? (session?.limits.teleop ?? null) : null,
+    canSendGoal,
   )
 
   if (authState === 'loading') {
@@ -44,11 +59,21 @@ export default function App() {
       error={error}
       rosStatus={rosStatus}
       rosError={rosError}
+      batteryPercent={batteryPercent}
       onLogout={logout}
       onSelectProfile={selectProfile}
       onChangePreset={changeTeleopPreset}
       onStop={stop}
     >
+      <GoalPosePanel
+        session={session}
+        rosConnected={rosStatus === 'connected'}
+        onSendGoal={(x, y, yaw) =>
+          sendGoalPose(x, y, yaw, session.activeProfile.frames.map ?? 'map')
+        }
+      />
+      <MapPanel session={session} rosStatus={rosStatus} mapGrid={mapGrid} />
+      <ScanPanel session={session} rosStatus={rosStatus} scan={scan} />
       <LlmPanel session={session} />
     </ConsolePage>
   )

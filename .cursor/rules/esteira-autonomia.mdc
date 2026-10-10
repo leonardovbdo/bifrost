@@ -1,0 +1,29 @@
+---
+description: Autonomia da esteira pós-MVP (E–H) — o agent age sem esperar o usuário
+alwaysApply: true
+---
+
+# Esteira Bifrost — autonomia do agent
+
+Fonte normativa: `docs/docs/operations/esteira-pos-mvp.md` + `proximos-passos.md`.
+
+## Mandato
+
+Você **executa** a esteira. Não peça ao usuário para rebasear, resolver conflito, mergear, abrir a próxima branch ou “autorizar” o óbvio do processo. Bloqueio só quando faltar segredo/credencial humana, decisão de produto fora da esteira, ou risco destrutivo explícito.
+
+## Em todo tick / retomada
+
+1. `gh pr list --state open` + checks/reviews dos PRs ativos (#7+).
+2. Se `mergeable: CONFLICTING` ou branch atrás de `main`: **você** faz `fetch`, rebase/merge, resolve conflitos alinhados à esteira (código da etapa + docs de status), commit, push. Conflito de docs = integrar ambas as intenções (esteira em `main` + progresso da etapa).
+3. Review Cursor com achados alinhados a esteira/specs/ADRs → corrigir, commit, push, `@cursoragent review` de novo.
+4. Review ok (sem bloqueio) + CI verde (ou “no checks” se workflows não aplicam aos paths) + mergeável → squash merge + delete branch. Em seguida atualizar `esteira-pos-mvp.md`, `proximos-passos.md`, `CHANGELOG.md` (na `main` ou na próxima branch).
+5. Ordem: fechar E → F (`feat/etapa-f-admin-users`) → G (G-01..G-05; corte defesa E+G-01+G-02 se prazo) → H opcional. Uma etapa = um PR.
+6. Autor git só via env: `GIT_AUTHOR_NAME=Leonardo` `GIT_AUTHOR_EMAIL=leonardovbdo25@gmail.com` (+ committer igual). **Sem** `git config`.
+7. Idle real (ex.: waiting só por review Cursor ainda em andamento): status breve. Idle **não** inclui conflito, CI vermelha, branch desatualizada ou PR mergeável sem merge.
+8. Parar automação só quando E–G (ou corte registrado na esteira) estiverem DONE na `main`.
+
+## Anti-padrões
+
+- Reportar “há conflito” / “precisa rebase” e parar.
+- Esperar mensagem do usuário para o próximo passo mecânico da esteira.
+- Misturar duas etapas no mesmo PR.

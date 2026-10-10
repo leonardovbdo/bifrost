@@ -77,6 +77,18 @@ Detalhes: [`docker-postgres-local.md`](docker-postgres-local.md).
    (tópico na query **sem** `%2F`; seletor Usuário/Frente na console)  
 5. Esteira do que falta (goal/mapa/admin/…): [`esteira-pos-mvp.md`](esteira-pos-mvp.md)
 
+### Console Etapa E (capabilities)
+
+Com qualquer login autenticado e rosbridge up:
+
+- Header: chip de bateria (`topics.battery` / `sensor_msgs/BatteryState`)
+- Painel **Mapa**: OccupancyGrid (`topics.map` / `nav_msgs/OccupancyGrid`)
+- Painel **Scan** (recomendado): polar LiDAR (`topics.scan` / `LaserScan`)
+- Painel **Goal** (admin/operator): x/y/yaw → audit `goal_pose` + `robotProfileId` → PoseStamped
+- Câmera: seletor POV `camera_user` / `camera_link`
+
+Detalhes: `apps/web/README.md`.
+
 ---
 
 ## 6. Encerrar processos

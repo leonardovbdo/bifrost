@@ -9,6 +9,8 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Etapa E: console capabilities — goal_pose + audit, OccupancyGrid,
+  scan LiDAR, chip bateria (`feat/etapa-e-console-capabilities`)
 - Ops: esteira pós-MVP normativa (Etapas E–H) em
   `docs/docs/operations/esteira-pos-mvp.md`
 - Etapa D: protótipo UI `apps/web` (login, session-config, teleop,

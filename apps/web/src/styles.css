@@ -406,6 +406,30 @@ button:disabled {
     linear-gradient(135deg, rgba(11, 61, 74, 0.04), rgba(62, 207, 178, 0.06));
 }
 
+.goal-form {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.scan-canvas,
+.map-canvas {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin-top: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(11, 61, 74, 0.25);
+  background: #0b1220;
+}
+
+.form-ok {
+  margin: 0.55rem 0 0;
+  color: #0f766e;
+  font-size: 0.9rem;
+}
+
 .llm-form {
   display: grid;
   gap: 0.65rem;
