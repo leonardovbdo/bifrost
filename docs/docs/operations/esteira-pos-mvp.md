@@ -45,7 +45,7 @@ Checklist comum a toda etapa:
 | C — LLM + CI | `/llm/ask`, workflows Maven | **DONE** |
 | D — UI demo NARA | Console, teleop, câmera, LLM | **DONE** (+ POV câmera) |
 | E — Capabilities na console | goal_pose, mapa, bateria | **DONE** (`main`, PR #7) |
-| F — Admin + usuários | UI admin + CRUD users | **IN PROGRESS** (`feat/etapa-f-admin-users`) |
+| F — Admin + usuários | UI admin + CRUD users | **IN PROGRESS** (`feat/etapa-f-admin-users`, PR pendente) |
 | G — Hardening | Rate limit, validação, logs | **TODO** |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / opcional |
 

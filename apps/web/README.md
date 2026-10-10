@@ -9,6 +9,18 @@ Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo h�
 5. Goal Nav2: audit `goal_pose` (com `robotProfileId`) → então PoseStamped se `canSendGoal`
 6. Mapa OccupancyGrid (`topics.map`) + Scan LiDAR opcional + chip bateria
 7. Assistente via `POST /llm/ask` (admin/operator)
+8. **Admin** (`#/admin/…`, só papel `admin`): profiles, parameters, users, audit
+
+## Demo Etapa F (admin UI)
+
+Com API + `npm run dev`, login **admin**:
+
+1. Header **Admin** → `#/admin/profiles`: listar/criar/editar robot profile + **Grant** (`POST …/access`).
+2. **Parameters**: editar `teleop.presets` / default global; preview de merge (`limits.teleop` da session-config).
+3. **Users**: listar/criar; alterar `role` / `active` (`GET`/`POST`/`PATCH /api/v1/users`).
+4. **Audit**: `GET /api/v1/audit/events` com filtros type / user / limit.
+
+Viewer/operator: link Admin ausente; `#/admin` mostra acesso negado.
 
 ## Demo Etapa E (capabilities)
 

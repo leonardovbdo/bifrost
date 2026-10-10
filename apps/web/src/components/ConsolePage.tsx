@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { adminHash } from '../hooks/useHashRoute'
 import type { RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
 import { CameraStage } from './CameraFeed'
@@ -56,6 +57,11 @@ export function ConsolePage({
           </span>
           <span className="chip">{user.username}</span>
           <span className="chip chip-role">{user.role}</span>
+          {user.role === 'admin' ? (
+            <a className="btn-ghost admin-nav-link" href={adminHash('profiles')}>
+              Admin
+            </a>
+          ) : null}
           <button type="button" className="btn-ghost" onClick={() => void onLogout()} disabled={busy}>
             Sair
           </button>

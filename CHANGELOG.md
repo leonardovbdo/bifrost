@@ -9,6 +9,8 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Etapa F: UI admin (profiles, parameters, users, audit) + API users
+  admin (`feat/etapa-f-admin-users`)
 - Etapa E: console capabilities — goal_pose + audit, OccupancyGrid,
   scan LiDAR, chip bateria (`feat/etapa-e-console-capabilities`)
 - Ops: esteira pós-MVP normativa (Etapas E–H) em

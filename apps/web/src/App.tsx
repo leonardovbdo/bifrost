@@ -1,5 +1,8 @@
+import { AdminApp } from './components/admin/AdminApp'
+import { AdminForbidden } from './components/admin/AdminForbidden'
 import { LoginPage } from './components/LoginPage'
 import { ConsolePage } from './components/ConsolePage'
+import { useHashRoute } from './hooks/useHashRoute'
 import { GoalPosePanel } from './components/GoalPosePanel'
 import { LlmPanel } from './components/LlmPanel'
 import { MapPanel } from './components/MapPanel'
@@ -19,6 +22,8 @@ export default function App() {
     selectProfile,
     changeTeleopPreset,
   } = useSession()
+
+  const route = useHashRoute()
 
   const teleopEnabled = Boolean(session?.permissions.canTeleop)
   const canSendGoal = Boolean(session?.permissions.canSendGoal)
@@ -50,6 +55,20 @@ export default function App() {
 
   if (authState !== 'authenticated' || !session) {
     return <LoginPage onLogin={login} busy={busy} error={error} />
+  }
+
+  if (route.kind === 'admin') {
+    if (session.user.role !== 'admin') {
+      return <AdminForbidden />
+    }
+    return (
+      <AdminApp
+        session={session}
+        tab={route.tab}
+        busy={busy}
+        onLogout={logout}
+      />
+    )
   }
 
   return (
