@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-10  
-**Estado:** Etapas A–F na `main`. Trabalho atual: Etapa G (`feat/etapa-g-hardening`). Esteira normativa: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+**Estado:** Etapas A–G na `main`. Esteira normativa E–G **DONE**. H opcional: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
 ---
 
@@ -15,13 +15,12 @@
 | Etapa D — UI / demo NARA (+ POV câmera) | **DONE** |
 | Etapa E — capabilities console (goal/mapa/bateria) | **DONE** (`main`, PR #7) |
 | Etapa F — admin + users | **DONE** (`main`, PR #8) |
-| Etapa G — hardening | **IN PROGRESS** |
+| Etapa G — hardening | **DONE** (`main`, PR #9) |
 | Etapa H — telemetria samples | opcional — ver [esteira](esteira-pos-mvp.md) |
 
-**Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md)  
-(processo de PR/review, DoD por tipo de etapa, escopos E–H, o que fica fora).
+**Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch atual: `feat/etapa-g-hardening`
+Branch atual: `main`
 
 ---
 
@@ -29,7 +28,6 @@ Branch atual: `feat/etapa-g-hardening`
 
 ```bash
 git checkout main && git pull
-git checkout feat/etapa-g-hardening
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET="$(openssl rand -base64 48)"
@@ -47,4 +45,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-Implementar **Etapa G** (G-01..G-05) conforme [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §5 → PR → `@cursoragent review` → merge. H opcional depois.
+Esteira E–G fechada. Se sobrar tempo: **Etapa H** (telemetria persistida) conforme [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §6 — opcional, não bloqueia demo/defesa.

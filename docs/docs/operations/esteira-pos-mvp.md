@@ -46,8 +46,8 @@ Checklist comum a toda etapa:
 | D — UI demo NARA | Console, teleop, câmera, LLM | **DONE** (+ POV câmera) |
 | E — Capabilities na console | goal_pose, mapa, bateria | **DONE** (`main`, PR #7) |
 | F — Admin + usuários | UI admin + CRUD users | **DONE** (`main`, PR #8) |
-| G — Hardening | Rate limit, validação, logs | **IN PROGRESS** (`feat/etapa-g-hardening`) |
-| H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / opcional |
+| G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
+| H — Telemetria samples | `telemetry_samples` (evolução) | **TODO** / opcional (fora do corte E–G) |
 
 ---
 
@@ -153,7 +153,7 @@ main
 
 ```bash
 git checkout main && git pull
-git checkout feat/etapa-g-hardening              # etapa atual; ou criar a partir de main
+git checkout main                                # E–G DONE; H opcional: feat/etapa-h-telemetry
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)
