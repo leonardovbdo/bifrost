@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-10  
-**Estado:** Etapas A–D na `main`. Trabalho atual: Etapa E (`feat/etapa-e-console-capabilities`). Esteira normativa: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+**Estado:** Etapas A–E na `main`. Trabalho atual: Etapa F (`feat/etapa-f-admin-users`). Esteira normativa: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
 ---
 
@@ -13,13 +13,14 @@
 | Etapa B — parameters + audit | **DONE** |
 | Etapa C — LLM + CI Maven | **DONE** |
 | Etapa D — UI / demo NARA (+ POV câmera) | **DONE** |
-| Etapa E — capabilities console (goal/mapa/bateria) | **em progresso** (PR) |
-| Etapas F–H | Ver [esteira pós-MVP](esteira-pos-mvp.md) |
+| Etapa E — capabilities console (goal/mapa/bateria) | **DONE** (`main`, PR #7) |
+| Etapa F — admin + users | **IN PROGRESS** |
+| Etapas G–H | Ver [esteira pós-MVP](esteira-pos-mvp.md) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md)  
 (processo de PR/review, DoD por tipo de etapa, escopos E–H, o que fica fora).
 
-Branch atual: `feat/etapa-e-console-capabilities`
+Branch atual: `feat/etapa-f-admin-users`
 
 ---
 
@@ -27,7 +28,7 @@ Branch atual: `feat/etapa-e-console-capabilities`
 
 ```bash
 git checkout main && git pull
-git checkout feat/etapa-e-console-capabilities
+git checkout feat/etapa-f-admin-users
 docker compose up -d
 export BIFROST_ADMIN_USERNAME=admin BIFROST_ADMIN_PASSWORD=change-me
 export BIFROST_JWT_SECRET="$(openssl rand -base64 48)"
@@ -45,5 +46,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-1. Fechar **Etapa E** (PR + `@cursoragent review` + merge).  
-2. Abrir `feat/etapa-f-admin-users` e seguir [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+Implementar **Etapa F** (F-01..F-05) conforme [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §4 → PR → `@cursoragent review` → merge → G.

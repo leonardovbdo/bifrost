@@ -38,8 +38,27 @@ public class User {
   }
 
   public static User create(String username, String email, String passwordHash, UserRole role) {
+    return create(username, email, passwordHash, role, true);
+  }
+
+  public static User create(
+      String username, String email, String passwordHash, UserRole role, boolean active) {
     Instant now = Instant.now();
-    return new User(UUID.randomUUID(), username, email, passwordHash, role, true, null, now, now);
+    return new User(
+        UUID.randomUUID(), username, email, passwordHash, role, active, null, now, now);
+  }
+
+  public User applyAdminPatch(Boolean active, UserRole role) {
+    return new User(
+        id,
+        username,
+        email,
+        passwordHash,
+        role != null ? role : this.role,
+        active != null ? active : this.active,
+        lastActiveProfileId,
+        createdAt,
+        Instant.now());
   }
 
   public UUID id() {

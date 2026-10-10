@@ -1,8 +1,10 @@
 package com.bifrost.backend.infrastructure.adapter.output.persistence;
 
+import com.bifrost.backend.domain.enums.UserRole;
 import com.bifrost.backend.domain.model.User;
 import com.bifrost.backend.domain.repository.UserRepository;
 import com.bifrost.backend.infrastructure.adapter.output.persistence.jpa.UserJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -26,8 +28,23 @@ public class UserRepositoryAdapter implements UserRepository {
   }
 
   @Override
+  public List<User> findAllOrderByUsernameAsc() {
+    return jpaRepository.findAllByOrderByUsernameAsc().stream().map(UserMapper::toDomain).toList();
+  }
+
+  @Override
   public boolean existsByUsername(String username) {
     return jpaRepository.existsByUsername(username);
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return jpaRepository.existsByEmail(email);
+  }
+
+  @Override
+  public long countActiveByRole(UserRole role) {
+    return jpaRepository.countByRoleAndActiveTrue(role.dbValue());
   }
 
   @Override

@@ -1,5 +1,8 @@
+import { AdminApp } from './components/admin/AdminApp'
+import { AdminForbidden } from './components/admin/AdminForbidden'
 import { LoginPage } from './components/LoginPage'
 import { ConsolePage } from './components/ConsolePage'
+import { useHashRoute } from './hooks/useHashRoute'
 import { GoalPosePanel } from './components/GoalPosePanel'
 import { LlmPanel } from './components/LlmPanel'
 import { MapPanel } from './components/MapPanel'
@@ -20,10 +23,16 @@ export default function App() {
     changeTeleopPreset,
   } = useSession()
 
+  const route = useHashRoute()
+
+  const isAdminRoute = route.kind === 'admin'
   const teleopEnabled = Boolean(session?.permissions.canTeleop)
   const canSendGoal = Boolean(session?.permissions.canSendGoal)
   // Telemetry (map/scan/battery) for all authenticated roles; publish gated below.
   const rosEnabled = authState === 'authenticated'
+  const rosTeleopLimits =
+    isAdminRoute || !teleopEnabled ? null : (session?.limits.teleop ?? null)
+  const rosCanSendGoal = !isAdminRoute && canSendGoal
   const {
     status: rosStatus,
     error: rosError,
@@ -35,8 +44,8 @@ export default function App() {
   } = useRos(
     session?.activeProfile ?? null,
     rosEnabled,
-    teleopEnabled ? (session?.limits.teleop ?? null) : null,
-    canSendGoal,
+    rosTeleopLimits,
+    rosCanSendGoal,
   )
 
   if (authState === 'loading') {
@@ -50,6 +59,20 @@ export default function App() {
 
   if (authState !== 'authenticated' || !session) {
     return <LoginPage onLogin={login} busy={busy} error={error} />
+  }
+
+  if (route.kind === 'admin') {
+    if (session.user.role !== 'admin') {
+      return <AdminForbidden />
+    }
+    return (
+      <AdminApp
+        session={session}
+        tab={route.tab}
+        busy={busy}
+        onLogout={logout}
+      />
+    )
   }
 
   return (
