@@ -6,9 +6,12 @@ import com.bifrost.backend.domain.exception.DomainException;
 import com.bifrost.backend.domain.exception.ForbiddenException;
 import com.bifrost.backend.domain.exception.LlmException;
 import com.bifrost.backend.domain.exception.NotFoundException;
+import com.bifrost.backend.domain.exception.RateLimitExceededException;
 import com.bifrost.backend.domain.exception.ValidationException;
 import com.bifrost.backend.infrastructure.adapter.input.controller.v1.dto.ErrorResponse;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
   @ExceptionHandler(AuthenticationFailedException.class)
   public ResponseEntity<ErrorResponse> authFailed(AuthenticationFailedException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -71,6 +76,12 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(ErrorResponse.of(ex.code(), ex.getMessage()));
   }
 
+  @ExceptionHandler(RateLimitExceededException.class)
+  public ResponseEntity<ErrorResponse> rateLimit(RateLimitExceededException ex) {
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .body(ErrorResponse.of(ex.code(), ex.getMessage()));
+  }
+
   @ExceptionHandler(DomainException.class)
   public ResponseEntity<ErrorResponse> domain(DomainException ex) {
     return ResponseEntity.badRequest().body(ErrorResponse.of(ex.code(), ex.getMessage()));
@@ -88,6 +99,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> generic(Exception ex) {
+    log.error("Unhandled exception", ex);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ErrorResponse.of("INTERNAL_ERROR", "Unexpected error"));
   }

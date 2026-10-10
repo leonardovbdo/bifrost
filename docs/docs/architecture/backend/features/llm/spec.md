@@ -21,7 +21,7 @@
 2. Sem API key no response ou logs
 3. Prompt/resposta não persistidos como histórico; audit só metadados
 4. `context` opcional é string/objeto enviado ao provedor na mesma request (efêmero)
-5. Rate limit simples recomendado (config) para abuso em demos
+5. Rate limit simples (config) para abuso em demos → 429 `LLM_RATE_LIMIT`
 
 ## Contrato
 
@@ -40,3 +40,4 @@
 - [x] Falha Gemini não vaza key
 - [x] Evento `llm_ask` aparece na auditoria admin
 - [x] Sem key: stub responde (dev/CI) ou 503 se stub desligado
+- [x] Rate limit configurável (`bifrost.llm.rate-limit`) → 429
