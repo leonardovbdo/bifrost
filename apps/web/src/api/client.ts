@@ -47,9 +47,15 @@ export async function api<T>(
     throw await parseError(res)
   }
 
-  if (res.status === 204) {
+  // 201 Created / 204 No Content often have an empty body (e.g. POST /audit/events).
+  if (res.status === 204 || res.status === 205) {
     return undefined as T
   }
 
-  return (await res.json()) as T
+  const text = await res.text()
+  if (!text) {
+    return undefined as T
+  }
+
+  return JSON.parse(text) as T
 }
