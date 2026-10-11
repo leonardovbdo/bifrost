@@ -47,15 +47,20 @@ export async function api<T>(
     throw await parseError(res)
   }
 
-  // 201 Created / 204 No Content often have an empty body (e.g. POST /audit/events).
+  // 204/205 have no body. 201 may be empty (POST /audit/events) or JSON
+  // (users, profiles) — only skip parsing when the payload is actually empty.
   if (res.status === 204 || res.status === 205) {
     return undefined as T
   }
 
-  const text = await res.text()
+  const text = (await res.text()).trim()
   if (!text) {
     return undefined as T
   }
 
-  return JSON.parse(text) as T
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    throw new ApiError(res.status, 'Resposta não é JSON')
+  }
 }

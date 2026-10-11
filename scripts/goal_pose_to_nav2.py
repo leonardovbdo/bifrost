@@ -41,15 +41,25 @@ class GoalPoseRelay(Node):
         )
         self._client = ActionClient(self, NavigateToPose, action_name)
         self._sub = self.create_subscription(PoseStamped, goal_topic, self._on_goal, qos)
+        self._seq = 0
+        self._goal_handle = None
         self.get_logger().info(
             f"Relaying {goal_topic} → action {action_name} "
             f"(frame fallback={self.default_frame}, use_sim_time + stamp=now)"
         )
 
     def _on_goal(self, msg: PoseStamped) -> None:
-        if not self._client.wait_for_server(timeout_sec=5.0):
+        # Do not block the executor here. wait_for_server() inside a subscription
+        # callback stalls discovery and every other callback on the default spinner.
+        if not self._client.server_is_ready():
             self.get_logger().error("NavigateToPose action server not available")
             return
+
+        self._seq += 1
+        seq = self._seq
+        if self._goal_handle is not None:
+            self._goal_handle.cancel_goal_async()
+            self._goal_handle = None
 
         goal = NavigateToPose.Goal()
         goal.pose = msg
@@ -64,7 +74,38 @@ class GoalPoseRelay(Node):
             f"yaw={yaw:.2f} frame={goal.pose.header.frame_id} "
             f"t={goal.pose.header.stamp.sec}.{goal.pose.header.stamp.nanosec:09d}"
         )
-        self._client.send_goal_async(goal)
+        send_future = self._client.send_goal_async(goal)
+        send_future.add_done_callback(lambda future, seq=seq: self._on_send_done(future, seq))
+
+    def _on_send_done(self, future, seq: int) -> None:
+        try:
+            goal_handle = future.result()
+        except Exception as exc:
+            self.get_logger().error(f"NavigateToPose send failed: {exc}")
+            return
+        if seq != self._seq:
+            if goal_handle is not None and goal_handle.accepted:
+                goal_handle.cancel_goal_async()
+            return
+        if goal_handle is None or not goal_handle.accepted:
+            self.get_logger().error("NavigateToPose rejected goal")
+            return
+        self._goal_handle = goal_handle
+        self.get_logger().info("NavigateToPose accepted goal")
+        goal_handle.get_result_async().add_done_callback(
+            lambda result_future, seq=seq: self._on_result(result_future, seq)
+        )
+
+    def _on_result(self, future, seq: int) -> None:
+        if seq != self._seq:
+            return
+        self._goal_handle = None
+        try:
+            result = future.result()
+        except Exception as exc:
+            self.get_logger().error(f"NavigateToPose result failed: {exc}")
+            return
+        self.get_logger().info(f"NavigateToPose finished status={result.status}")
 
 
 def quat_to_yaw(q) -> float:
@@ -84,7 +125,6 @@ def main(argv: list[str] | None = None) -> int:
         node.destroy_node()
         rclpy.shutdown()
     return 0
-
 
 
 if __name__ == "__main__":
