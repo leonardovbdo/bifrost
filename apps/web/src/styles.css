@@ -1156,6 +1156,10 @@ button:disabled {
   font-size: 0.78rem;
 }
 
+.admin-ts {
+  white-space: nowrap;
+}
+
 .admin-payload {
   max-width: 28rem;
   overflow: hidden;
@@ -1169,7 +1173,9 @@ button:disabled {
 @media (max-width: 900px) {
   .console-shell {
     height: auto;
+    min-height: 100vh;
     overflow: visible;
+    grid-template-rows: auto minmax(70vh, auto);
   }
 
   .console-body,
@@ -1183,8 +1189,9 @@ button:disabled {
     max-height: none;
   }
 
-  .stage-pane.is-camera:not(.is-parked) {
-    min-height: 50vh;
+  .console-stage,
+  .stage-viewport {
+    min-height: 60vh;
   }
 
   .camera-feed,
