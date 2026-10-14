@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { adminHash, consoleHash } from '../../hooks/useHashRoute'
+import { adminHash, sessionHash } from '../../hooks/useHashRoute'
 import type { AdminTab } from '../../types/admin'
 import type { SessionConfig } from '../../types/session'
 
@@ -36,8 +36,8 @@ export function AdminShell({
         <div className="console-user">
           <span className="chip">{session.user.username}</span>
           <span className="chip chip-role">{session.user.role}</span>
-          <a className="btn-ghost admin-nav-link" href={consoleHash()}>
-            Console
+          <a className="btn-ghost admin-nav-link" href={sessionHash()}>
+            Sessão
           </a>
           <button
             type="button"

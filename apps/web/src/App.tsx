@@ -2,6 +2,7 @@ import { AdminApp } from './components/admin/AdminApp'
 import { AdminForbidden } from './components/admin/AdminForbidden'
 import { LoginPage } from './components/LoginPage'
 import { ConsolePage } from './components/ConsolePage'
+import { SessionHubPage } from './components/SessionHubPage'
 import { useHashRoute } from './hooks/useHashRoute'
 import { GoalPosePanel } from './components/GoalPosePanel'
 import { LlmPanel } from './components/LlmPanel'
@@ -26,13 +27,17 @@ export default function App() {
   const route = useHashRoute()
 
   const isAdminRoute = route.kind === 'admin'
+  const isConsoleRoute = route.kind === 'console'
   const teleopEnabled = Boolean(session?.permissions.canTeleop)
   const canSendGoal = Boolean(session?.permissions.canSendGoal)
-  // Telemetry (map/scan/battery) for all authenticated roles; publish gated below.
-  const rosEnabled = authState === 'authenticated'
+  const canAskLlm =
+    session?.user.role === 'admin' || session?.user.role === 'operator'
+
+  // ROS only while on the live console — governance hub stays disconnected.
+  const rosEnabled = authState === 'authenticated' && isConsoleRoute
   const rosTeleopLimits =
-    isAdminRoute || !teleopEnabled ? null : (session?.limits.teleop ?? null)
-  const rosCanSendGoal = !isAdminRoute && canSendGoal
+    !isConsoleRoute || !teleopEnabled ? null : (session?.limits.teleop ?? null)
+  const rosCanSendGoal = isConsoleRoute && canSendGoal
   const {
     status: rosStatus,
     error: rosError,
@@ -61,7 +66,7 @@ export default function App() {
     return <LoginPage onLogin={login} busy={busy} error={error} />
   }
 
-  if (route.kind === 'admin') {
+  if (isAdminRoute) {
     if (session.user.role !== 'admin') {
       return <AdminForbidden />
     }
@@ -75,29 +80,44 @@ export default function App() {
     )
   }
 
+  if (isConsoleRoute) {
+    return (
+      <ConsolePage
+        session={session}
+        busy={busy}
+        error={error}
+        rosStatus={rosStatus}
+        rosError={rosError}
+        batteryPercent={batteryPercent}
+        onLogout={logout}
+        onSelectProfile={selectProfile}
+        onChangePreset={changeTeleopPreset}
+        onStop={stop}
+      >
+        {canSendGoal ? (
+          <GoalPosePanel
+            session={session}
+            rosConnected={rosStatus === 'connected'}
+            onSendGoal={(x, y, yaw) =>
+              sendGoalPose(x, y, yaw, session.activeProfile.frames.map ?? 'map')
+            }
+          />
+        ) : null}
+        <MapPanel session={session} rosStatus={rosStatus} mapGrid={mapGrid} />
+        <ScanPanel session={session} rosStatus={rosStatus} scan={scan} />
+        {canAskLlm ? <LlmPanel session={session} /> : null}
+      </ConsolePage>
+    )
+  }
+
   return (
-    <ConsolePage
+    <SessionHubPage
       session={session}
       busy={busy}
       error={error}
-      rosStatus={rosStatus}
-      rosError={rosError}
-      batteryPercent={batteryPercent}
       onLogout={logout}
       onSelectProfile={selectProfile}
       onChangePreset={changeTeleopPreset}
-      onStop={stop}
-    >
-      <GoalPosePanel
-        session={session}
-        rosConnected={rosStatus === 'connected'}
-        onSendGoal={(x, y, yaw) =>
-          sendGoalPose(x, y, yaw, session.activeProfile.frames.map ?? 'map')
-        }
-      />
-      <MapPanel session={session} rosStatus={rosStatus} mapGrid={mapGrid} />
-      <ScanPanel session={session} rosStatus={rosStatus} scan={scan} />
-      <LlmPanel session={session} />
-    </ConsolePage>
+    />
   )
 }

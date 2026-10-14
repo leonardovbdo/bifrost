@@ -8,7 +8,17 @@ import {
   switchActiveProfile,
 } from '../api/bifrost'
 import { ApiError } from '../api/client'
+import { sessionHash } from './useHashRoute'
 import type { SessionConfig, User } from '../types/session'
+
+/** Login must land on the hub. A leftover `#/console` would open rosbridge with no gesture. */
+function returnToSessionHub() {
+  if (typeof window === 'undefined') return
+  const hub = sessionHash()
+  if (window.location.hash !== hub) {
+    window.location.hash = hub
+  }
+}
 
 type AuthState = 'loading' | 'anonymous' | 'authenticated'
 
@@ -90,6 +100,7 @@ export function useSession() {
       setError(null)
       try {
         await apiLogin(username, password)
+        returnToSessionHub()
         await loadSession()
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Falha no login')
@@ -108,6 +119,7 @@ export function useSession() {
       await apiLogout()
     } finally {
       clearSession()
+      returnToSessionHub()
       setBusy(false)
     }
   }, [clearSession])

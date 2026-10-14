@@ -9,6 +9,9 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Etapa I: Session Hub de governança antes do console ROS (`#/` →
+  `#/console`); ROS só após Conectar; ações proibidas ocultas
+  (`feat/ux-governance-shell`)
 - Etapa H: `telemetry_samples` + `POST/GET /api/v1/telemetry/samples`
   (battery/pose amostrados; rejeita cmd_vel; UI admin Telemetry)
   (PR #11)

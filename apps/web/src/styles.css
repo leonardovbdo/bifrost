@@ -322,6 +322,10 @@ button:disabled {
   vertical-align: middle;
 }
 
+.status-idle {
+  background: var(--line);
+}
+
 .status-connected {
   background: var(--accent);
   box-shadow: 0 0 0 0 rgba(62, 207, 178, 0.6);
@@ -335,6 +339,259 @@ button:disabled {
 .status-error,
 .status-closed {
   background: var(--danger);
+}
+
+/* —— Session hub (governança antes do ROS) —— */
+
+.hub-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1.25rem 2.5rem;
+  animation: fade-rise 480ms ease both;
+}
+
+.hub-atmosphere {
+  position: absolute;
+  inset: -15% -8% auto;
+  height: 55%;
+  background:
+    linear-gradient(120deg, rgba(11, 61, 74, 0.1), transparent 42%),
+    repeating-linear-gradient(
+      -16deg,
+      transparent,
+      transparent 22px,
+      rgba(15, 118, 110, 0.045) 22px,
+      rgba(15, 118, 110, 0.045) 23px
+    );
+  pointer-events: none;
+}
+
+.hub-layout {
+  position: relative;
+  width: min(720px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.hub-brand-block .brand-mark {
+  font-size: clamp(2.2rem, 5vw, 3.1rem);
+}
+
+.hub-title {
+  margin: 0.2rem 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3.5vw, 2.15rem);
+  letter-spacing: -0.03em;
+}
+
+.hub-lead {
+  margin: 0;
+  max-width: 38rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.hub-card {
+  animation: fade-rise 560ms ease both;
+}
+
+.hub-identity {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hub-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.hub-user {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.hub-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 118, 110, 0.35);
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--teal-deep);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.hub-role-viewer {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.hub-meta {
+  margin-bottom: 0.75rem;
+}
+
+.profile-cap-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.9rem;
+  padding: 0;
+}
+
+.profile-cap {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+}
+
+.profile-cap-on {
+  border-color: rgba(15, 118, 110, 0.35);
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--teal-deep);
+  font-weight: 600;
+}
+
+.profile-cap-off {
+  color: var(--muted);
+}
+
+.console-ros-error {
+  margin: 0.65rem 0 0;
+}
+
+.hub-preset-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}
+
+.cap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cap-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.cap-allowed {
+  border-color: rgba(15, 118, 110, 0.28);
+}
+
+.cap-denied {
+  opacity: 0.78;
+}
+
+.cap-mark {
+  color: var(--teal);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.cap-denied .cap-mark {
+  color: var(--muted);
+}
+
+.cap-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cap-detail {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.cap-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+.cap-denied .cap-badge {
+  color: var(--muted);
+}
+
+.hub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.hub-connect {
+  min-width: min(100%, 240px);
+}
+
+.hub-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0.7rem 1rem;
+}
+
+.console-status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: min(360px, 42vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.console-sep {
+  margin: 0 0.2rem;
+  opacity: 0.6;
+}
+
+.console-profile-name {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.console-ros-url {
+  margin: 0;
+  font-size: 0.78rem;
 }
 
 .hint {

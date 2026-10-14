@@ -9,10 +9,16 @@ const ADMIN_TABS: AdminTab[] = [
   'telemetry',
 ]
 
-export type AppView = { kind: 'console' } | { kind: 'admin'; tab: AdminTab }
+export type AppView =
+  | { kind: 'session' }
+  | { kind: 'console' }
+  | { kind: 'admin'; tab: AdminTab }
 
 function parseHash(hash: string): AppView {
-  if (!hash || hash === '#' || hash === '#/') {
+  if (!hash || hash === '#' || hash === '#/' || hash === '#/session') {
+    return { kind: 'session' }
+  }
+  if (hash === '#/console' || hash === '#/console/') {
     return { kind: 'console' }
   }
   if (hash === '#/admin' || hash === '#/admin/') {
@@ -23,7 +29,8 @@ function parseHash(hash: string): AppView {
     if (hash.startsWith('#/admin')) {
       return { kind: 'admin', tab: 'profiles' }
     }
-    return { kind: 'console' }
+    // Unknown hashes stay on the hub so a typo never opens rosbridge.
+    return { kind: 'session' }
   }
   const tab = match[1] as AdminTab
   if (!ADMIN_TABS.includes(tab)) {
@@ -36,8 +43,12 @@ export function adminHash(tab: AdminTab): string {
   return `#/admin/${tab}`
 }
 
-export function consoleHash(): string {
+export function sessionHash(): string {
   return '#/'
+}
+
+export function consoleHash(): string {
+  return '#/console'
 }
 
 export function useHashRoute(): AppView {

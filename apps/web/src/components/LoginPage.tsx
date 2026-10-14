@@ -29,9 +29,10 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
       <div className="login-atmosphere" aria-hidden="true" />
       <section className="login-panel">
         <p className="brand-mark">Bifrost</p>
-        <h1 className="login-title">Console NARA</h1>
+        <h1 className="login-title">Sessão Bifrost</h1>
         <p className="login-lead">
-          Ponte governada entre operadores e a simulação — sessão via API, teleop no browser.
+          Identidade e permissões primeiro. Depois você decide quando conectar ao
+          console NARA.
         </p>
 
         <form className="login-form" onSubmit={handleSubmit}>

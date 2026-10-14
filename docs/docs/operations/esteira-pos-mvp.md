@@ -1,8 +1,8 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
 **Atualizado:** 2026-10-14  
-**Status:** Documento **normativo** da esteira. Etapas E–H **DONE** na `main`.  
-**Pré-requisito:** `main` com Etapas A–G (auth, parameters/audit, LLM/CI, console, admin, hardening) + ops NARA bringup (PR #10).
+**Status:** Documento **normativo** da esteira. Etapas E–H **DONE** na `main`. UX governança **IN PROGRESS** (`feat/ux-governance-shell`).  
+**Pré-requisito:** `main` com Etapas A–H + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
 Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
@@ -25,6 +25,7 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 | **E** (UI console) | `npm run lint` + `npm run build` em `apps/web`; demo manual no corpo do PR (goal + mapa + bateria; viewer com `canSendGoal=false` não publica/audita). Docs: `apps/web/README.md` + `ambiente-local-nara.md`. Teste de backend novo **só** se o contrato HTTP mudar (audit `goal_pose` já coberto na Etapa B). |
 | **F e G** (API + UI admin / hardening) | IT feliz + 1 negativo relevante (estilo A–C); docs/ops se o fluxo mudar; review + CI. |
 | **H** (telemetria) | Migration + teste de repositório/ingestão; H-03 não bloqueia. |
+| **I** (UX hub) | `npm run lint` + `npm run build`; demo hub → conectar → desconectar; viewer sem ações proibidas. |
 | **Itens opcionais** (ex.: G-06, odom em E-03) | Fora do DoD. |
 
 Checklist comum a toda etapa:
@@ -48,6 +49,7 @@ Checklist comum a toda etapa:
 | F — Admin + usuários | UI admin + CRUD users | **DONE** (`main`, PR #8) |
 | G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **DONE** (`main`, PR #11) |
+| I — UX hub de governança | Session hub antes do console ROS | **IN PROGRESS** (`feat/ux-governance-shell`) |
 
 ---
 
@@ -119,6 +121,21 @@ Não confundir com “FASE 2” do inventário de IHM — é evolução do módu
 
 ---
 
+## 6b. Etapa I — UX hub de governança
+
+**Objetivo:** após login, mostrar sessão/papel/permissões **antes** de conectar rosbridge/câmera.
+
+| ID | Entrega | Notas |
+|----|---------|--------|
+| I-01 | Session Hub (`#/`) | Profile, capabilities (ADR-010) e matriz de permissões, sem ROS |
+| I-02 | Console sob demanda (`#/console`) | ROS só após “Conectar”; Desconectar → hub |
+| I-03 | Ocultar ações proibidas no console | Viewer sem Teleop/Goal/LLM |
+
+**Branch:** `feat/ux-governance-shell`  
+**DoD:** `npm run lint` + `npm run build`; demo login → hub → conectar → desconectar.
+
+---
+
 ## 7. Explicitamente fora desta esteira (não abrir PR “só por isso”)
 
 | Item | Onde está documentado |
@@ -153,7 +170,7 @@ main
 ## 9. Checklist de retomada (ambiente)
 
 ```bash
-git checkout main && git pull                         # E–H DONE na main
+git checkout feat/ux-governance-shell                 # I IN PROGRESS; E–H DONE na main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)
