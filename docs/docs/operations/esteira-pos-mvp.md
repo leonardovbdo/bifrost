@@ -1,7 +1,7 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
 **Atualizado:** 2026-10-14  
-**Status:** Documento **normativo** da esteira. Etapas E–H **DONE** na `main`. UX governança **IN PROGRESS** (`feat/ux-governance-shell`).  
+**Status:** Documento **normativo** da esteira. Etapas E–I **DONE** na `main`.  
 **Pré-requisito:** `main` com Etapas A–H + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
@@ -49,7 +49,7 @@ Checklist comum a toda etapa:
 | F — Admin + usuários | UI admin + CRUD users | **DONE** (`main`, PR #8) |
 | G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **DONE** (`main`, PR #11) |
-| I — UX hub de governança | Session hub antes do console ROS | **IN PROGRESS** (`feat/ux-governance-shell`) |
+| I — UX hub de governança | Session hub antes do console ROS | **DONE** (`main`, PR #12) |
 
 ---
 
@@ -131,7 +131,7 @@ Não confundir com “FASE 2” do inventário de IHM — é evolução do módu
 | I-02 | Console sob demanda (`#/console`) | ROS só após “Conectar”; Desconectar → hub |
 | I-03 | Ocultar ações proibidas no console | Viewer sem Teleop/Goal/LLM |
 
-**Branch:** `feat/ux-governance-shell`  
+**Branch:** `feat/ux-governance-shell` — mergeada (PR #12).  
 **DoD:** `npm run lint` + `npm run build`; demo login → hub → conectar → desconectar.
 
 ---
@@ -170,7 +170,7 @@ main
 ## 9. Checklist de retomada (ambiente)
 
 ```bash
-git checkout feat/ux-governance-shell                 # I IN PROGRESS; E–H DONE na main
+git checkout main && git pull                         # E–I DONE na main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)

@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-14  
-**Estado:** Etapas A–H **DONE** na `main`. Etapa I (UX hub de governança) **IN PROGRESS** (`feat/ux-governance-shell`).
+**Estado:** Etapas A–I **DONE** na `main` (I no PR #12). Esteira E–I fechada.
 
 ---
 
@@ -17,11 +17,11 @@
 | Etapa F — admin + users | **DONE** (`main`, PR #8) |
 | Etapa G — hardening | **DONE** (`main`, PR #9) |
 | Etapa H — telemetria samples | **DONE** (`main`, PR #11) |
-| Etapa I — UX hub de governança | **IN PROGRESS** (`feat/ux-governance-shell`) |
+| Etapa I — UX hub de governança | **DONE** (`main`, PR #12) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch de trabalho: `feat/ux-governance-shell`
+Branch de trabalho: `main`
 
 ---
 
@@ -46,4 +46,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-**Etapa I** — hub de sessão (governança) antes de conectar ao console ROS; ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+Nenhuma etapa E–I aberta. Session Hub está na `main` (PR #12): login → `#/` → **Conectar** `#/console`. Fora da esteira: ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §7.

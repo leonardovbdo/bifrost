@@ -59,8 +59,7 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 | Fase | Situação |
 |------|----------|
 | Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** |
-| Etapas A–H (API + console NARA + admin + hardening + telemetria) | **Na `main`** |
-| Etapa I (UX hub de governança) | **IN PROGRESS** (`feat/ux-governance-shell`) |
-| Esteira pós-MVP E–H | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
+| Etapas A–I (API + console NARA + admin + hardening + telemetria + hub) | **Na `main`** |
+| Esteira pós-MVP E–I | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
 
 Retomar: [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md).
