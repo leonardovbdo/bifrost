@@ -9,6 +9,9 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Etapa H: `telemetry_samples` + `POST/GET /api/v1/telemetry/samples`
+  (battery/pose amostrados; rejeita cmd_vel; UI admin Telemetry)
+  (`feat/etapa-h-telemetry`)
 - Ops: `scripts/bringup-nara-nav.sh` + `scripts/goal_pose_to_nav2.py`
   (ordem world→robot→bridge→slam→nav2→relay) e guia em
   `ambiente-local-nara.md` (PR #10)

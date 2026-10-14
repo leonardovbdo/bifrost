@@ -70,6 +70,8 @@ bifrost:
     client-events:
       max-goal-pose-per-window: ${BIFROST_AUDIT_MAX_GOAL_POSE_PER_WINDOW:120}
       window: ${BIFROST_AUDIT_CLIENT_EVENTS_WINDOW:1m}
+  telemetry:
+    min-sample-interval: ${BIFROST_TELEMETRY_MIN_SAMPLE_INTERVAL:5s}
   llm:
     api-key: ${BIFROST_LLM_API_KEY:}
     model: ${BIFROST_LLM_MODEL:gemini-3.6-flash}

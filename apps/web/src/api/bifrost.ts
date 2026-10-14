@@ -4,6 +4,7 @@ import type {
   AuditEventRow,
   ParameterRow,
   RobotProfileDetail,
+  TelemetrySampleRow,
 } from '../types/admin'
 import type { LlmAskResponse, SessionConfig, User, UserRole } from '../types/session'
 
@@ -179,4 +180,32 @@ export function listAuditEvents(filters: {
   return api<{ items: AuditEventRow[] }>(
     `/api/v1/audit/events${qs ? `?${qs}` : ''}`,
   )
+}
+
+export function listTelemetrySamples(filters: {
+  metric?: string
+  robotProfileId?: string
+  limit?: number
+}) {
+  const params = new URLSearchParams()
+  if (filters.metric?.trim()) params.set('metric', filters.metric.trim())
+  if (filters.robotProfileId?.trim()) {
+    params.set('robotProfileId', filters.robotProfileId.trim())
+  }
+  if (filters.limit != null) params.set('limit', String(filters.limit))
+  const qs = params.toString()
+  return api<{ items: TelemetrySampleRow[] }>(
+    `/api/v1/telemetry/samples${qs ? `?${qs}` : ''}`,
+  )
+}
+
+export function ingestTelemetrySample(body: {
+  robotProfileId: string
+  metric: string
+  value: Record<string, unknown>
+}) {
+  return api<TelemetrySampleRow>('/api/v1/telemetry/samples', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
 }

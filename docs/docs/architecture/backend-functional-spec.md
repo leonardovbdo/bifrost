@@ -25,7 +25,7 @@ Prefixo sugerido: `/api/v1`.
 | `params` | Parâmetros e preferências |
 | `session` | Agregação `/me/session-config` |
 | `audit` | Eventos de auditoria |
-| `telemetry` | (evolução) amostras persistidas |
+| `telemetry` | amostras persistidas (`telemetry_samples`) |
 | `llm` | Proxy de assistente |
 | `health` | Liveness/readiness |
 
@@ -94,6 +94,16 @@ Prefixo sugerido: `/api/v1`.
 | payload_json | resumido |
 | created_at | |
 
+### 3.6 `telemetry_samples`
+
+| Campo | Notas |
+|-------|-------|
+| id | PK |
+| robot_profile_id | FK obrigatória |
+| metric | ex.: `battery`, `pose` (não `cmd_vel`) |
+| value_json | resumido |
+| captured_at | |
+
 ---
 
 ## 4. Endpoints (contrato inicial)
@@ -131,6 +141,11 @@ Prefixo sugerido: `/api/v1`.
 
 - `POST /api/v1/audit/events` (client autenticado; tipos permitidos)
 - `GET /api/v1/audit/events` (`admin`, com filtros)
+
+### Telemetry
+
+- `POST /api/v1/telemetry/samples` `{ robotProfileId, metric, value }` → amostra (`admin`/`operator`; métricas `battery`/`pose`; intervalo mínimo)
+- `GET /api/v1/telemetry/samples` (`admin`, filtros `metric` / `robotProfileId`)
 
 ### LLM
 

@@ -1,6 +1,6 @@
 # Feature: Telemetria e Auditoria
 
-**Status:** `PLANEJAMENTO`  
+**Status:** `DONE` (auditoria MVP + samples Etapa H)  
 **Owner:** Backend TCC  
 **Criado em:** 2026-09-29  
 
@@ -8,7 +8,7 @@
 
 ## Visão Geral
 
-Persistir eventos de alto nível (auditoria) e preparar evolução para telemetria amostrada. Não registrar cada mensagem de teleop no MVP.
+Persistir eventos de alto nível (auditoria) e amostras de telemetria (battery/pose) com intervalo mínimo. Não registrar cada mensagem de teleop.
 
 ## Objetivos
 
@@ -16,7 +16,7 @@ Persistir eventos de alto nível (auditoria) e preparar evolução para telemetr
 2. Consulta admin com filtros
 3. Tipos MVP: login_success/failure, logout, profile_switch, goal_pose, parameter_change, llm_ask
 4. Retenção 90 dias + purge automático
-5. Desenhar tabela futura de samples de telemetria (sem ingestão contínua no MVP)
+5. Tabela `telemetry_samples` + ingestão amostrada + listagem admin (Etapa H)
 
 ## Documentos
 
