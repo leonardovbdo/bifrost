@@ -61,7 +61,7 @@ export function LlmPanel({ session }: LlmPanelProps) {
       {reply ? (
         <div className="llm-reply">
           <p>{reply}</p>
-          {model ? <span className="chip">{model}</span> : null}
+          {model ? <span className="muted hint">{model}</span> : null}
         </div>
       ) : null}
     </section>

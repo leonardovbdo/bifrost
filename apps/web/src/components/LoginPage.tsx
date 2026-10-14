@@ -29,10 +29,10 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
       <div className="login-atmosphere" aria-hidden="true" />
       <section className="login-panel">
         <p className="brand-mark">Bifrost</p>
-        <h1 className="login-title">Sessão Bifrost</h1>
+        <h1 className="login-title">Entrar</h1>
         <p className="login-lead">
-          Identidade e permissões primeiro. Depois você decide quando conectar ao
-          console NARA.
+          Ponte governada entre operadores e o robô. A sessão define o que você
+          pode fazer antes de qualquer conexão ROS.
         </p>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -57,7 +57,7 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
           </label>
           {message ? <p className="form-error" role="alert">{message}</p> : null}
           <button type="submit" className="btn-primary" disabled={busy}>
-            {busy ? 'Entrando…' : 'Entrar'}
+            {busy ? 'Entrando…' : 'Continuar'}
           </button>
         </form>
       </section>

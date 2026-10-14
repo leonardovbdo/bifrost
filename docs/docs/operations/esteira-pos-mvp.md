@@ -1,8 +1,8 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
 **Atualizado:** 2026-10-14  
-**Status:** Documento **normativo** da esteira. Etapas E–I **DONE** na `main`.  
-**Pré-requisito:** `main` com Etapas A–H + ops NARA bringup (PR #10).
+**Status:** Documento **normativo** da esteira. Etapas E–I **DONE** na `main`. Etapa J **IN PROGRESS** (`feat/ux-dual-surface`).  
+**Pré-requisito:** `main` com Etapas A–I + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
 Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
@@ -26,6 +26,7 @@ Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
 | **F e G** (API + UI admin / hardening) | IT feliz + 1 negativo relevante (estilo A–C); docs/ops se o fluxo mudar; review + CI. |
 | **H** (telemetria) | Migration + teste de repositório/ingestão; H-03 não bloqueia. |
 | **I** (UX hub) | `npm run lint` + `npm run build`; demo hub → conectar → desconectar; viewer sem ações proibidas. |
+| **J** (UX dual surface) | `npm run lint` + `npm run build`; hub claro + console escuro; admin shell alinhado. |
 | **Itens opcionais** (ex.: G-06, odom em E-03) | Fora do DoD. |
 
 Checklist comum a toda etapa:
@@ -50,6 +51,7 @@ Checklist comum a toda etapa:
 | G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **DONE** (`main`, PR #11) |
 | I — UX hub de governança | Session hub antes do console ROS | **DONE** (`main`, PR #12) |
+| J — UX dual surface | Governança clara + console ops escuro | **IN PROGRESS** (`feat/ux-dual-surface`) |
 
 ---
 
@@ -136,6 +138,22 @@ Não confundir com “FASE 2” do inventário de IHM — é evolução do módu
 
 ---
 
+## 6c. Etapa J — UX dual surface (governança + ops)
+
+**Objetivo:** visual profissional em duas superfícies — hub/admin claros; console ao vivo escuro.
+
+| ID | Entrega | Notas |
+|----|---------|--------|
+| J-01 | Tokens + CSS dual | paper/ink/bridge + runtime surface |
+| J-02 | Login + Session Hub | hierarquia limpa; detalhes recolhidos |
+| J-03 | Console ops | câmera full-bleed; rail; top bar |
+| J-04 | Admin shell | alinhado à superfície de governança |
+
+**Branch:** `feat/ux-dual-surface`  
+**DoD:** `npm run lint` + `npm run build`; demo hub claro → console escuro → admin coerente.
+
+---
+
 ## 7. Explicitamente fora desta esteira (não abrir PR “só por isso”)
 
 | Item | Onde está documentado |
@@ -170,7 +188,7 @@ main
 ## 9. Checklist de retomada (ambiente)
 
 ```bash
-git checkout main && git pull                         # E–I DONE na main
+git checkout feat/ux-dual-surface                     # J IN PROGRESS; E–I DONE na main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)
