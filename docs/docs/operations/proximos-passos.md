@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-14  
-**Estado:** Etapas A–I **DONE** na `main` (I no PR #12). Esteira E–I fechada.
+**Atualizado:** 2026-10-13  
+**Estado:** Etapas A–I **DONE** na `main`. Etapa J (UX dual surface) **IN PROGRESS** (`feat/ux-dual-surface`).
 
 ---
 
@@ -18,10 +18,11 @@
 | Etapa G — hardening | **DONE** (`main`, PR #9) |
 | Etapa H — telemetria samples | **DONE** (`main`, PR #11) |
 | Etapa I — UX hub de governança | **DONE** (`main`, PR #12) |
+| Etapa J — UX dual surface | **IN PROGRESS** (`feat/ux-dual-surface`) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch de trabalho: `main`
+Branch de trabalho: `feat/ux-dual-surface`
 
 ---
 
@@ -39,11 +40,11 @@ cd apps/web && npm install && npm run dev
 
 UI: `http://localhost:5173` (proxy `/api` → `:8081`)
 
-UI: login → **Session Hub** (`#/`) → **Conectar** (`#/console`). Com NARA: `./scripts/bringup-nara-nav.sh`. No console: teleop WASD + câmera, goal_pose + audit, mapa/scan/bateria. Admin: `#/admin/*`.  
+UI: login → hub claro (`#/`) → **Entrar no console** escuro (`#/console`). Com NARA: `./scripts/bringup-nara-nav.sh`. Admin: `#/admin/*`.  
 Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ---
 
 ## Próxima ação imediata
 
-Nenhuma etapa E–I aberta. Session Hub está na `main` (PR #12): login → `#/` → **Conectar** `#/console`. Fora da esteira: ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §7.
+**Etapa J** — dual surface (hub/admin claros + console ops escuro) em `feat/ux-dual-surface`.

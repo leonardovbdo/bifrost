@@ -33,7 +33,6 @@ export default function App() {
   const canAskLlm =
     session?.user.role === 'admin' || session?.user.role === 'operator'
 
-  // ROS only while on the live console — governance hub stays disconnected.
   const rosEnabled = authState === 'authenticated' && isConsoleRoute
   const rosTeleopLimits =
     !isConsoleRoute || !teleopEnabled ? null : (session?.limits.teleop ?? null)
@@ -90,23 +89,32 @@ export default function App() {
         rosError={rosError}
         batteryPercent={batteryPercent}
         onLogout={logout}
-        onSelectProfile={selectProfile}
         onChangePreset={changeTeleopPreset}
         onStop={stop}
-      >
-        {canSendGoal ? (
-          <GoalPosePanel
-            session={session}
-            rosConnected={rosStatus === 'connected'}
-            onSendGoal={(x, y, yaw) =>
-              sendGoalPose(x, y, yaw, session.activeProfile.frames.map ?? 'map')
-            }
-          />
-        ) : null}
-        <MapPanel session={session} rosStatus={rosStatus} mapGrid={mapGrid} />
-        <ScanPanel session={session} rosStatus={rosStatus} scan={scan} />
-        {canAskLlm ? <LlmPanel session={session} /> : null}
-      </ConsolePage>
+        goalSlot={
+          canSendGoal ? (
+            <GoalPosePanel
+              session={session}
+              rosConnected={rosStatus === 'connected'}
+              onSendGoal={(x, y, yaw) =>
+                sendGoalPose(
+                  x,
+                  y,
+                  yaw,
+                  session.activeProfile.frames.map ?? 'map',
+                )
+              }
+            />
+          ) : null
+        }
+        mapSlot={
+          <MapPanel session={session} rosStatus={rosStatus} mapGrid={mapGrid} />
+        }
+        scanSlot={
+          <ScanPanel session={session} rosStatus={rosStatus} scan={scan} />
+        }
+        llmSlot={canAskLlm ? <LlmPanel session={session} /> : null}
+      />
     )
   }
 

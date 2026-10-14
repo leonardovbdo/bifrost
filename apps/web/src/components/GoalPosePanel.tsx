@@ -28,10 +28,10 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
 
   if (!topic) {
     return (
-      <section className="panel">
-        <h2>Goal (Nav2)</h2>
+      <>
+        <h2>Goal</h2>
         <p className="muted">Profile sem tópico goal_pose.</p>
-      </section>
+      </>
     )
   }
 
@@ -74,10 +74,9 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
   }
 
   return (
-    <section className="panel">
-      <h2>Goal (Nav2)</h2>
-      <p className="muted mono">{topic}</p>
-      <p className="hint">frame: {frameId} · audit 201 → PoseStamped</p>
+    <>
+      <h2>Goal</h2>
+      <p className="hint">frame {frameId}</p>
       <form className="goal-form" onSubmit={(e) => void handleSubmit(e)}>
         <label className="field">
           x
@@ -98,7 +97,7 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
           />
         </label>
         <label className="field">
-          yaw (rad)
+          yaw
           <input
             value={yaw}
             onChange={(e) => setYaw(e.target.value)}
@@ -106,12 +105,16 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
             disabled={busy}
           />
         </label>
-        <button type="submit" className="btn-secondary" disabled={busy || !rosConnected}>
-          {busy ? 'Enviando…' : 'Enviar goal'}
+        <button
+          type="submit"
+          className="btn-secondary"
+          disabled={busy || !rosConnected}
+        >
+          {busy ? 'Enviando…' : 'Enviar'}
         </button>
       </form>
       {error ? <p className="form-error">{error}</p> : null}
       {ok ? <p className="form-ok">{ok}</p> : null}
-    </section>
+    </>
   )
 }

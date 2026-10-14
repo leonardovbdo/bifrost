@@ -4,19 +4,24 @@ Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo h�
 
 1. Login com cookies JWT (`credentials: include`)
 2. `GET /me/session-config` → **Session Hub** (`#/`): role, profile, capabilities (ADR-010) e matriz de permissões — **sem ROS**
-3. **Conectar ao console** (`#/console`) → rosbridge + câmera / teleop / goal / mapa
+3. **Entrar no console** (`#/console`) — superfície **ops escura**: câmera full-bleed, rail teleop/goal, tabs mapa/scan/LLM
 4. Stream de câmera via `videoBaseUrl` (seletor `camera_user` / `camera_link`)
-5. Goal Nav2: audit `goal_pose` → PoseStamped se `canSendGoal` (painel só se permitido)
-6. Mapa OccupancyGrid + Scan LiDAR + bateria
-7. Assistente via `POST /llm/ask` (só admin/operator; painel oculto para viewer)
-8. **Admin** (`#/admin/…`, só `admin`): profiles, parameters, users, audit, telemetry
-9. **Desconectar** volta ao hub e encerra ROS
+5. Goal Nav2: audit `goal_pose` → PoseStamped se `canSendGoal` (rail)
+6. Mapa / Scan / Assistente em tabs do viewport
+7. **Admin** (`#/admin/…`) — mesma superfície clara de governança
+8. **Desconectar** volta ao hub e encerra ROS
+
+## Demo Etapa J (dual surface)
+
+1. Login / hub: tipografia forte, matriz sim/não, detalhes recolhidos (claro).
+2. **Entrar no console**: shell escuro; câmera dominante; Desconectar → hub.
+3. Admin: top bar + tabs alinhados ao hub.
 
 ## Demo Etapa I (hub de governança)
 
-1. Login → hub (`#/`): capabilities do profile + matriz permitido/bloqueado; ROS **idle**. Sair no console e entrar de novo também abre o hub.
-2. **Conectar ao console NARA** → `#/console` (rosbridge + câmera).
-3. Viewer: sem Teleop / Goal / LLM no console; só observação.
+1. Login → hub (`#/`): capabilities do profile + matriz; ROS **idle**.
+2. **Entrar no console** → `#/console`.
+3. Viewer: sem Teleop / Goal / LLM; só observação.
 4. **Desconectar** → hub de novo.
 
 ## Demo Etapa F (admin UI)

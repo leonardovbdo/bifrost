@@ -1,8 +1,10 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { adminHash, sessionHash } from '../hooks/useHashRoute'
 import type { RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
 import { CameraStage } from './CameraFeed'
+
+type StageTab = 'camera' | 'map' | 'scan' | 'llm'
 
 interface ConsolePageProps {
   session: SessionConfig
@@ -12,10 +14,12 @@ interface ConsolePageProps {
   rosError: string | null
   batteryPercent: number | null
   onLogout: () => Promise<void>
-  onSelectProfile: (profileId: string) => Promise<void>
   onChangePreset: (preset: string) => Promise<void>
   onStop: () => void
-  children?: ReactNode
+  goalSlot?: ReactNode
+  mapSlot?: ReactNode
+  scanSlot?: ReactNode
+  llmSlot?: ReactNode
 }
 
 const PRESETS = ['safety', 'normal', 'fast'] as const
@@ -28,13 +32,17 @@ export function ConsolePage({
   rosError,
   batteryPercent,
   onLogout,
-  onSelectProfile,
   onChangePreset,
   onStop,
-  children,
+  goalSlot,
+  mapSlot,
+  scanSlot,
+  llmSlot,
 }: ConsolePageProps) {
-  const { user, activeProfile, allowedProfiles, permissions, limits } = session
+  const { user, activeProfile, permissions, limits } = session
   const teleopEnabled = permissions.canTeleop
+  const [tab, setTab] = useState<StageTab>('camera')
+
   const batteryLabel =
     batteryPercent != null
       ? `${batteryPercent.toFixed(0)}%`
@@ -48,29 +56,44 @@ export function ConsolePage({
     window.location.hash = sessionHash()
   }
 
+  const tabs: { id: StageTab; label: string; show: boolean }[] = [
+    { id: 'camera', label: 'Câmera', show: true },
+    { id: 'map', label: 'Mapa', show: Boolean(mapSlot) },
+    { id: 'scan', label: 'Scan', show: Boolean(scanSlot) },
+    { id: 'llm', label: 'Assistente', show: Boolean(llmSlot) },
+  ]
+
   return (
     <div className="console-shell">
       <header className="console-top">
         <div className="console-brand">
           <span className="brand-mark">Bifrost</span>
-          <span className="console-sub">console ao vivo</span>
+          <span className="console-sub">{activeProfile.displayName}</span>
         </div>
-        <div className="console-user">
+        <div className="console-top-meta">
           <span
-            className="console-status-line"
-            title={rosError ?? activeProfile.topics.battery ?? rosStatus}
+            className="console-stat"
+            title={rosError ?? rosStatus}
           >
             <span className={`status-dot status-${rosStatus}`} />
+            <strong>ROS</strong>
             {rosStatus}
-            <span className="console-sep">·</span>
-            bat {batteryLabel}
           </span>
-          <span className="chip chip-role">{user.role}</span>
+          <span className="console-stat">
+            <strong>Bat</strong>
+            {batteryLabel}
+          </span>
+          <span className="console-stat">
+            <strong>{user.role}</strong>
+          </span>
           {user.role === 'admin' ? (
             <a className="btn-ghost admin-nav-link" href={adminHash('profiles')}>
               Admin
             </a>
           ) : null}
+          <a className="btn-ghost" href={sessionHash()}>
+            Sessão
+          </a>
           <button type="button" className="btn-secondary" onClick={disconnect}>
             Desconectar
           </button>
@@ -85,35 +108,10 @@ export function ConsolePage({
         </div>
       </header>
 
-      <div className="console-grid">
-        <aside className="console-side">
-          <section className="panel">
-            <h2>Sessão</h2>
-            <p className="console-profile-name">{activeProfile.displayName}</p>
-            <label className="field">
-              Profile
-              <select
-                value={activeProfile.id}
-                disabled={busy || allowedProfiles.length < 2}
-                onChange={(e) => void onSelectProfile(e.target.value)}
-              >
-                {allowedProfiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.displayName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <p className="muted mono console-ros-url">{activeProfile.rosbridgeUrl}</p>
-            {rosError ? (
-              <p className="form-error console-ros-error" role="alert">
-                {rosError}
-              </p>
-            ) : null}
-          </section>
-
+      <div className="console-body">
+        <aside className="console-rail">
           {teleopEnabled ? (
-            <section className="panel">
+            <section className="rail-block">
               <h2>Teleop</h2>
               <label className="field">
                 Preset
@@ -129,8 +127,8 @@ export function ConsolePage({
                   ))}
                 </select>
               </label>
-              <p className="muted">
-                lim linear {limits.teleop.linearMax.toFixed(2)} · angular{' '}
+              <p className="hint">
+                lin {limits.teleop.linearMax.toFixed(2)} · ang{' '}
                 {limits.teleop.angularMax.toFixed(2)}
               </p>
               <p className="hint">WASD / setas · espaço = stop</p>
@@ -140,12 +138,48 @@ export function ConsolePage({
             </section>
           ) : null}
 
-          {children}
+          {goalSlot ? <div className="rail-block">{goalSlot}</div> : null}
+
+          {rosError ? (
+            <p className="form-error console-ros-error" role="alert">
+              {rosError}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </aside>
 
-        <section className="console-stage panel stage-panel">
-          <CameraStage profile={activeProfile} />
-          {error ? <p className="form-error">{error}</p> : null}
+        <section className="console-stage">
+          <div className="stage-toolbar">
+            <div className="stage-tabs" role="tablist" aria-label="Viewport">
+              {tabs
+                .filter((t) => t.show)
+                .map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t.id}
+                    className={`stage-tab${tab === t.id ? ' stage-tab-active' : ''}`}
+                    onClick={() => setTab(t.id)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+            </div>
+          </div>
+
+          <div
+            className={`stage-viewport${tab === 'camera' ? ' is-camera' : ' is-panel'}`}
+          >
+            {tab === 'camera' ? <CameraStage profile={activeProfile} /> : null}
+            {tab === 'map' ? mapSlot : null}
+            {tab === 'scan' ? scanSlot : null}
+            {tab === 'llm' ? llmSlot : null}
+          </div>
         </section>
       </div>
     </div>

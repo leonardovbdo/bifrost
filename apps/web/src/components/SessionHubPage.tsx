@@ -12,7 +12,6 @@ interface SessionHubPageProps {
 
 const PRESETS = ['safety', 'normal', 'fast'] as const
 
-/** ADR-010 closed enum. Order is the governance matrix, not the profile JSON order. */
 const PROFILE_CAPABILITIES = [
   'teleop',
   'cameras',
@@ -25,10 +24,12 @@ const PROFILE_CAPABILITIES = [
 function profileCapabilityChips(declared: string[]) {
   const present = new Set(declared)
   const known = new Set<string>(PROFILE_CAPABILITIES)
-  const rows: { id: string; present: boolean }[] = PROFILE_CAPABILITIES.map((id) => ({
-    id,
-    present: present.has(id),
-  }))
+  const rows: { id: string; present: boolean }[] = PROFILE_CAPABILITIES.map(
+    (id) => ({
+      id,
+      present: present.has(id),
+    }),
+  )
   for (const extra of declared) {
     if (!known.has(extra)) {
       rows.push({ id: extra, present: true })
@@ -37,52 +38,20 @@ function profileCapabilityChips(declared: string[]) {
   return rows
 }
 
-type CapRow = {
-  id: string
-  label: string
-  allowed: boolean
-  detail: string
-}
+type AuthRow = { id: string; label: string; allowed: boolean }
 
-function capabilityRows(session: SessionConfig): CapRow[] {
+function authRows(session: SessionConfig): AuthRow[] {
   const { permissions, user } = session
   const canLlm = user.role === 'admin' || user.role === 'operator'
   return [
-    {
-      id: 'observe',
-      label: 'Observação',
-      allowed: true,
-      detail: 'Câmera, mapa, scan e bateria após conectar',
-    },
-    {
-      id: 'teleop',
-      label: 'Teleop',
-      allowed: permissions.canTeleop,
-      detail: permissions.canTeleop
-        ? 'WASD / setas com limits do preset'
-        : 'Papel viewer — só observação',
-    },
-    {
-      id: 'goal',
-      label: 'Goal Nav2',
-      allowed: permissions.canSendGoal,
-      detail: permissions.canSendGoal
-        ? 'Publica goal_pose + audit'
-        : 'Sem permissão canSendGoal',
-    },
-    {
-      id: 'llm',
-      label: 'Assistente LLM',
-      allowed: canLlm,
-      detail: canLlm ? 'Proxy /llm/ask' : 'Só admin e operator',
-    },
+    { id: 'observe', label: 'Observação (câmera, mapa, bateria)', allowed: true },
+    { id: 'teleop', label: 'Teleop', allowed: permissions.canTeleop },
+    { id: 'goal', label: 'Goal Nav2', allowed: permissions.canSendGoal },
+    { id: 'llm', label: 'Assistente LLM', allowed: canLlm },
     {
       id: 'admin',
-      label: 'Admin / profiles',
+      label: 'Admin',
       allowed: permissions.canManageProfiles,
-      detail: permissions.canManageProfiles
-        ? 'Governança de profiles, users, audit'
-        : 'Reservado ao admin',
     },
   ]
 }
@@ -96,7 +65,7 @@ export function SessionHubPage({
   onChangePreset,
 }: SessionHubPageProps) {
   const { user, activeProfile, allowedProfiles, permissions, limits } = session
-  const caps = capabilityRows(session)
+  const rows = authRows(session)
   const profileCaps = profileCapabilityChips(activeProfile.capabilities ?? [])
 
   function goConsole() {
@@ -105,19 +74,28 @@ export function SessionHubPage({
 
   return (
     <main className="hub-shell">
-      <div className="hub-atmosphere" aria-hidden="true" />
       <div className="hub-layout">
-        <header className="hub-brand-block">
-          <p className="brand-mark">Bifrost</p>
-          <h1 className="hub-title">Sessão</h1>
-          <p className="hub-lead">
-            Governança primeiro: confira papel, profile e o que você pode fazer.
-            A simulação NARA só entra depois de conectar.
-          </p>
+        <header className="hub-top">
+          <div>
+            <p className="brand-mark">Bifrost</p>
+            <h1 className="hub-title">Sessão</h1>
+            <p className="hub-lead">
+              Confira papel e autorizações. O console NARA só sobe quando você
+              conectar.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={() => void onLogout()}
+            disabled={busy}
+          >
+            Sair
+          </button>
         </header>
 
-        <section className="hub-card panel">
-          <div className="hub-identity">
+        <section className="hub-paper">
+          <div className="hub-identity-row">
             <div>
               <p className="hub-kicker">Operador</p>
               <p className="hub-user">{user.username}</p>
@@ -140,93 +118,93 @@ export function SessionHubPage({
             </select>
           </label>
 
-          <dl className="meta-list hub-meta">
-            <div>
-              <dt>Slug</dt>
-              <dd>{activeProfile.slug}</dd>
-            </div>
-            <div>
-              <dt>Ambiente</dt>
-              <dd>
-                {activeProfile.environment} · {activeProfile.project}
-              </dd>
-            </div>
-            <div>
-              <dt>Rosbridge</dt>
-              <dd className="mono">{activeProfile.rosbridgeUrl}</dd>
-            </div>
-            <div>
-              <dt>Runtime</dt>
-              <dd>
-                <span className="status-dot status-idle" />
-                desconectado — ainda não conectou
-              </dd>
-            </div>
-          </dl>
+          <div>
+            <p className="hub-kicker">Esta sessão autoriza</p>
+            <ul className="hub-auth-list">
+              {rows.map((row) => (
+                <li
+                  key={row.id}
+                  className={`hub-auth-row${row.allowed ? '' : ' is-denied'}`}
+                >
+                  <p className="hub-auth-label">{row.label}</p>
+                  <span className="hub-auth-state">
+                    {row.allowed ? 'sim' : 'não'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          <p className="hub-kicker">Capabilities do profile</p>
-          <ul className="profile-cap-list" aria-label="Capabilities do profile">
-            {profileCaps.map((cap) => (
-              <li
-                key={cap.id}
-                className={`profile-cap${cap.present ? ' profile-cap-on' : ' profile-cap-off'}`}
-              >
-                {cap.id}
-                <span className="sr-only">
-                  {cap.present ? ', declarada' : ', ausente'}
-                </span>
-              </li>
-            ))}
-          </ul>
-
-          {permissions.canTeleop ? (
-            <label className="field">
-              Preset teleop (aplica na session-config)
-              <select
-                value={limits.teleop.profile}
-                disabled={busy}
-                onChange={(e) => void onChangePreset(e.target.value)}
-              >
-                {PRESETS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-              <p className="muted hub-preset-note">
-                Efetivo agora: linear {limits.teleop.linearMax.toFixed(2)} ·
-                angular {limits.teleop.angularMax.toFixed(2)}
-              </p>
-            </label>
-          ) : (
-            <p className="muted hub-preset-note">
-              Limits teleop na config: {limits.teleop.profile} (sem efeito —
-              teleop bloqueado).
-            </p>
-          )}
-        </section>
-
-        <section className="hub-card panel">
-          <h2>O que esta sessão autoriza</h2>
-          <ul className="cap-list">
-            {caps.map((row) => (
-              <li
-                key={row.id}
-                className={`cap-row${row.allowed ? ' cap-allowed' : ' cap-denied'}`}
-              >
-                <span className="cap-mark" aria-hidden="true">
-                  {row.allowed ? '●' : '○'}
-                </span>
+          <details className="hub-details">
+            <summary>Detalhes do profile e conexão</summary>
+            <div className="hub-details-body">
+              <dl className="hub-meta-grid">
                 <div>
-                  <p className="cap-label">{row.label}</p>
-                  <p className="cap-detail">{row.detail}</p>
+                  <dt>Slug</dt>
+                  <dd>{activeProfile.slug}</dd>
                 </div>
-                <span className="cap-badge">
-                  {row.allowed ? 'permitido' : 'bloqueado'}
-                </span>
-              </li>
-            ))}
-          </ul>
+                <div>
+                  <dt>Ambiente</dt>
+                  <dd>
+                    {activeProfile.environment} · {activeProfile.project}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Rosbridge</dt>
+                  <dd className="mono">{activeProfile.rosbridgeUrl}</dd>
+                </div>
+                <div>
+                  <dt>Runtime</dt>
+                  <dd>
+                    <span className="status-dot status-idle" />
+                    desconectado
+                  </dd>
+                </div>
+              </dl>
+
+              <div>
+                <p className="hub-kicker">Capabilities (profile)</p>
+                <ul className="profile-cap-list" aria-label="Capabilities do profile">
+                  {profileCaps.map((cap) => (
+                    <li
+                      key={cap.id}
+                      className={`profile-cap${cap.present ? ' profile-cap-on' : ''}`}
+                    >
+                      {cap.id}
+                      <span className="sr-only">
+                        {cap.present ? ', declarada' : ', ausente'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {permissions.canTeleop ? (
+                <label className="field">
+                  Preset teleop
+                  <select
+                    value={limits.teleop.profile}
+                    disabled={busy}
+                    onChange={(e) => void onChangePreset(e.target.value)}
+                  >
+                    {PRESETS.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="muted hint">
+                    Efetivo: linear {limits.teleop.linearMax.toFixed(2)} · angular{' '}
+                    {limits.teleop.angularMax.toFixed(2)}
+                  </p>
+                </label>
+              ) : (
+                <p className="muted hint">
+                  Preset na config: {limits.teleop.profile} (teleop bloqueado).
+                </p>
+              )}
+            </div>
+          </details>
         </section>
 
         <section className="hub-actions">
@@ -236,21 +214,13 @@ export function SessionHubPage({
             onClick={goConsole}
             disabled={busy}
           >
-            Conectar ao console NARA
+            Entrar no console
           </button>
           {user.role === 'admin' ? (
             <a className="btn-secondary hub-admin-link" href={adminHash('profiles')}>
-              Abrir Admin
+              Admin
             </a>
           ) : null}
-          <button
-            type="button"
-            className="btn-ghost"
-            onClick={() => void onLogout()}
-            disabled={busy}
-          >
-            Sair
-          </button>
           {error ? (
             <p className="form-error" role="alert">
               {error}
