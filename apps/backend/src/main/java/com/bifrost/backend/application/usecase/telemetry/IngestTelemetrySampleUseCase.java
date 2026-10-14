@@ -56,7 +56,7 @@ public class IngestTelemetrySampleUseCase {
             .filter(User::active)
             .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User not found"));
 
-    if (user.role() == UserRole.VIEWER) {
+    if (user.role() != UserRole.ADMIN && user.role() != UserRole.OPERATOR) {
       throw new ForbiddenException("TELEMETRY_FORBIDDEN", "Role cannot ingest telemetry samples");
     }
 
@@ -77,6 +77,7 @@ public class IngestTelemetrySampleUseCase {
 
     Duration minInterval = properties.telemetry().minSampleInterval();
     if (!minInterval.isZero() && !minInterval.isNegative()) {
+      telemetrySampleRepository.lockProfileMetric(robotProfileId, normalizedMetric);
       telemetrySampleRepository
           .findLatest(robotProfileId, normalizedMetric)
           .ifPresent(

@@ -8,6 +8,9 @@ import java.util.UUID;
 public interface TelemetrySampleRepository {
   TelemetrySample save(TelemetrySample sample);
 
+  /** Serializes ingest for one profile+metric until the surrounding transaction ends. */
+  void lockProfileMetric(UUID robotProfileId, String metric);
+
   Optional<TelemetrySample> findLatest(UUID robotProfileId, String metric);
 
   List<TelemetrySample> findRecent(String metric, UUID robotProfileId, int limit);

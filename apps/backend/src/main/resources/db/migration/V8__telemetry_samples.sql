@@ -1,7 +1,7 @@
 CREATE TABLE telemetry_samples (
     id                 UUID PRIMARY KEY,
     robot_profile_id   UUID         NOT NULL REFERENCES robot_profiles (id) ON DELETE CASCADE,
-    metric             VARCHAR(64)  NOT NULL,
+    metric             VARCHAR(64)  NOT NULL CHECK (metric IN ('battery', 'pose')),
     value_json         JSONB        NOT NULL DEFAULT '{}'::jsonb,
     captured_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );

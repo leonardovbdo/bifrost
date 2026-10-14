@@ -1,11 +1,19 @@
 package com.bifrost.backend;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -142,6 +150,55 @@ class TelemetrySamplesIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.items.length()").value(1))
         .andExpect(jsonPath("$.items[0].metric").value("battery"));
+
+    Set<Integer> poseStatuses = postPoseConcurrently(operator, profileId);
+    assertEquals(Set.of(201, 429), poseStatuses);
+
+    mockMvc
+        .perform(
+            get("/api/v1/telemetry/samples?metric=POSE")
+                .cookie(cookie("BIFROST_ACCESS", admin)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.items.length()").value(1))
+        .andExpect(jsonPath("$.items[0].metric").value("pose"));
+  }
+
+  private Set<Integer> postPoseConcurrently(String operator, String profileId) throws Exception {
+    ExecutorService pool = Executors.newFixedThreadPool(2);
+    CountDownLatch start = new CountDownLatch(1);
+    try {
+      Future<Integer> first = pool.submit(() -> postPose(operator, profileId, start));
+      Future<Integer> second = pool.submit(() -> postPose(operator, profileId, start));
+      start.countDown();
+      int left = first.get(30, TimeUnit.SECONDS);
+      int right = second.get(30, TimeUnit.SECONDS);
+      assertTrue(left == 201 || left == 429, "unexpected status " + left);
+      assertTrue(right == 201 || right == 429, "unexpected status " + right);
+      return Set.of(left, right);
+    } finally {
+      pool.shutdownNow();
+    }
+  }
+
+  private int postPose(String operator, String profileId, CountDownLatch start) throws Exception {
+    start.await(10, TimeUnit.SECONDS);
+    return mockMvc
+        .perform(
+            post("/api/v1/telemetry/samples")
+                .cookie(cookie("BIFROST_ACCESS", operator))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                    {
+                      "robotProfileId":"%s",
+                      "metric":"pose",
+                      "value":{"x":1.0,"y":2.0,"yaw":0.3}
+                    }
+                    """
+                        .formatted(profileId)))
+        .andReturn()
+        .getResponse()
+        .getStatus();
   }
 
   private String login(String username, String password) throws Exception {

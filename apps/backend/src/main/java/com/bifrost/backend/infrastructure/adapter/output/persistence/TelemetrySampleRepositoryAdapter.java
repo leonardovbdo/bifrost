@@ -4,18 +4,45 @@ import com.bifrost.backend.domain.model.TelemetrySample;
 import com.bifrost.backend.domain.repository.TelemetrySampleRepository;
 import com.bifrost.backend.infrastructure.adapter.output.persistence.entity.TelemetrySampleJpaEntity;
 import com.bifrost.backend.infrastructure.adapter.output.persistence.jpa.TelemetrySampleJpaRepository;
+import jakarta.persistence.EntityManager;
+import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.hibernate.Session;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class TelemetrySampleRepositoryAdapter implements TelemetrySampleRepository {
   private final TelemetrySampleJpaRepository jpaRepository;
+  private final EntityManager entityManager;
 
-  public TelemetrySampleRepositoryAdapter(TelemetrySampleJpaRepository jpaRepository) {
+  public TelemetrySampleRepositoryAdapter(
+      TelemetrySampleJpaRepository jpaRepository, EntityManager entityManager) {
     this.jpaRepository = jpaRepository;
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public void lockProfileMetric(UUID robotProfileId, String metric) {
+    long key = advisoryKey(robotProfileId, metric);
+    entityManager.unwrap(Session.class).doWork(connection -> {
+      try (PreparedStatement ps =
+          connection.prepareStatement("SELECT pg_advisory_xact_lock(?)")) {
+        ps.setLong(1, key);
+        try (ResultSet rs = ps.executeQuery()) {
+          rs.next();
+        }
+      }
+    });
+  }
+
+  private static long advisoryKey(UUID robotProfileId, String metric) {
+    String token = robotProfileId + "\0" + metric;
+    return UUID.nameUUIDFromBytes(token.getBytes(StandardCharsets.UTF_8)).getMostSignificantBits();
   }
 
   @Override
