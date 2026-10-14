@@ -28,18 +28,21 @@ O client **é** responsável por:
 1. `POST /api/v1/auth/login` → JWT  
 2. `GET /api/v1/me/session-config`  
 3. Hidratar estado local com topics, urls, limits, permissions  
-4. `connect(session.rosbridgeUrl)`  
-5. Montar URLs de vídeo a partir de `videoBaseUrl` + tópicos autorizados  
+4. **UI de governança (Session Hub)** — mostrar papel/permissões; **ainda sem** rosbridge  
+5. Sob gesto explícito do operador: `connect(session.rosbridgeUrl)`  
+6. Montar URLs de vídeo a partir de `videoBaseUrl` + tópicos autorizados  
+7. Desconectar / sair do console → fechar ROS e voltar ao hub  
 
 ---
 
 ## 3. Contratos que o client deve respeitar
 
 - Não publicar fora dos tópicos/permissions da session-config  
-- Ocultar teleop se `canTeleop === false`  
+- Ocultar teleop (e demais ações) se a permission/role não permitir — não só desabilitar com texto  
 - Não expor inspeção rosapi se `canInspectRosapi === false`  
 - Tratar 401/403 com logout / mensagem clara  
 - Nunca embutir chaves de LLM ou segredos de infraestrutura  
+- Não conectar rosbridge só porque o login autenticou  
 
 ---
 
@@ -47,14 +50,14 @@ O client **é** responsável por:
 
 Implementado em [`apps/web`](../../../apps/web/README.md) (Vite + React):
 
-- Login + exibição de role  
-- Lista/seleção de robot profiles permitidos  
-- Conexão rosbridge + teleop mínimo (WASD) + câmera (seletor `camera_user` / `camera_link`)  
-- Assistente via `/llm/ask` (admin/operator)  
-- Preset de teleop (`safety`/`normal`/`fast`) via parameters
+- Login → **Session Hub** (role, profile, matriz de capabilities)  
+- Conectar sob demanda ao console (`#/console`) + teleop WASD + câmera  
+- Assistente via `/llm/ask` (admin/operator; oculto para viewer)  
+- Preset de teleop (`safety`/`normal`/`fast`) via parameters  
+- Admin (`#/admin/…`)  
 
 Não é objetivo reproduzir uma IHM completa de produto de terceiros.
 
-**Próximas entregas de UI:** goal_pose auditado, mapa/scan, bateria, admin — ver [`../operations/esteira-pos-mvp.md`](../operations/esteira-pos-mvp.md).
+Esteira / status: [`../operations/esteira-pos-mvp.md`](../operations/esteira-pos-mvp.md).
 
 Gap analysis genérico: [`../requirements/inventario-frontend-ihm.md`](../requirements/inventario-frontend-ihm.md).

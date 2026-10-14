@@ -23,12 +23,7 @@ export function GoalPosePanel({ session, rosConnected, onSendGoal }: GoalPosePan
   const [ok, setOk] = useState<string | null>(null)
 
   if (!canSend) {
-    return (
-      <section className="panel">
-        <h2>Goal (Nav2)</h2>
-        <p className="muted">Seu papel não pode enviar goal_pose.</p>
-      </section>
-    )
+    return null
   }
 
   if (!topic) {

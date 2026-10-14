@@ -17,12 +17,7 @@ export function LlmPanel({ session }: LlmPanelProps) {
   const [busy, setBusy] = useState(false)
 
   if (!canAsk) {
-    return (
-      <section className="panel">
-        <h2>Assistente</h2>
-        <p className="muted">Disponível para admin e operator.</p>
-      </section>
-    )
+    return null
   }
 
   async function handleSubmit(e: FormEvent) {

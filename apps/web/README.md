@@ -3,13 +3,21 @@
 Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo híbrido:
 
 1. Login com cookies JWT (`credentials: include`)
-2. `GET /me/session-config` → profile, permissions, limits
-3. Rosbridge (roslib) + teleop WASD respeitando `limits.teleop`
+2. `GET /me/session-config` → **Session Hub** (`#/`): role, profile, matriz de permissões — **sem ROS**
+3. **Conectar ao console** (`#/console`) → rosbridge + câmera / teleop / goal / mapa
 4. Stream de câmera via `videoBaseUrl` (seletor `camera_user` / `camera_link`)
-5. Goal Nav2: audit `goal_pose` (com `robotProfileId`) → então PoseStamped se `canSendGoal`
-6. Mapa OccupancyGrid (`topics.map`) + Scan LiDAR opcional + chip bateria
-7. Assistente via `POST /llm/ask` (admin/operator)
-8. **Admin** (`#/admin/…`, só papel `admin`): profiles, parameters, users, audit, telemetry
+5. Goal Nav2: audit `goal_pose` → PoseStamped se `canSendGoal` (painel só se permitido)
+6. Mapa OccupancyGrid + Scan LiDAR + bateria
+7. Assistente via `POST /llm/ask` (só admin/operator; painel oculto para viewer)
+8. **Admin** (`#/admin/…`, só `admin`): profiles, parameters, users, audit, telemetry
+9. **Desconectar** volta ao hub e encerra ROS
+
+## Demo Etapa I (hub de governança)
+
+1. Login → hub (`#/`): matriz permitido/bloqueado; ROS **idle**.
+2. **Conectar ao console NARA** → `#/console` (rosbridge + câmera).
+3. Viewer: sem Teleop / Goal / LLM no console; só observação.
+4. **Desconectar** → hub de novo.
 
 ## Demo Etapa F (admin UI)
 
@@ -27,11 +35,11 @@ Viewer/operator: link Admin ausente; `#/admin` mostra acesso negado.
 
 Com sim via `./scripts/bringup-nara-nav.sh` na raiz do repo (SLAM, Nav2 e relay `goal_pose`; ver `docs/docs/operations/ambiente-local-nara.md`) + API + `npm run dev`:
 
-1. Login qualquer papel → rosbridge abre para telemetria; chip **bat** / painel **Mapa**.
+1. Login → hub → **Conectar** → rosbridge; status **bat** / painel **Mapa**.
 2. Painel **Mapa** → OccupancyGrid (`topics.map`, obrigatório no DoD de E).
 3. Painel **Scan** (recomendado) → polar LiDAR se o tópico publicar.
-4. Painel **Goal** (admin/operator) → x/y/yaw (vírgula OK; blank rejeitado) → audit 201 → publish.
-5. Viewer: sem teleop/goal; mapa/scan/bateria visíveis quando conectado.
+4. Painel **Goal** (admin/operator) → x/y/yaw → audit 201 → publish.
+5. Viewer: sem teleop/goal/LLM; mapa/scan/bateria quando conectado.
 
 ## Pré-requisitos
 

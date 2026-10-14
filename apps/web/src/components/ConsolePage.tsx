@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { adminHash } from '../hooks/useHashRoute'
+import { adminHash, sessionHash } from '../hooks/useHashRoute'
 import type { RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
 import { CameraStage } from './CameraFeed'
@@ -37,32 +37,47 @@ export function ConsolePage({
   const teleopEnabled = permissions.canTeleop
   const batteryLabel =
     batteryPercent != null
-      ? `bat ${batteryPercent.toFixed(0)}%`
+      ? `${batteryPercent.toFixed(0)}%`
       : rosStatus === 'connected'
-        ? 'bat —'
+        ? '—'
         : rosStatus === 'connecting'
-          ? 'bat …'
-          : 'bat off'
+          ? '…'
+          : 'off'
+
+  function disconnect() {
+    window.location.hash = sessionHash()
+  }
 
   return (
     <div className="console-shell">
       <header className="console-top">
         <div className="console-brand">
           <span className="brand-mark">Bifrost</span>
-          <span className="console-sub">console NARA</span>
+          <span className="console-sub">console ao vivo</span>
         </div>
         <div className="console-user">
-          <span className="chip" title={activeProfile.topics.battery ?? 'sem tópico battery'}>
-            {batteryLabel}
+          <span className="console-status-line" title={activeProfile.topics.battery}>
+            <span className={`status-dot status-${rosStatus}`} />
+            {rosStatus}
+            {rosError ? ` · ${rosError}` : ''}
+            <span className="console-sep">·</span>
+            bat {batteryLabel}
           </span>
-          <span className="chip">{user.username}</span>
           <span className="chip chip-role">{user.role}</span>
           {user.role === 'admin' ? (
             <a className="btn-ghost admin-nav-link" href={adminHash('profiles')}>
               Admin
             </a>
           ) : null}
-          <button type="button" className="btn-ghost" onClick={() => void onLogout()} disabled={busy}>
+          <button type="button" className="btn-secondary" onClick={disconnect}>
+            Desconectar
+          </button>
+          <button
+            type="button"
+            className="btn-ghost"
+            onClick={() => void onLogout()}
+            disabled={busy}
+          >
             Sair
           </button>
         </div>
@@ -71,9 +86,10 @@ export function ConsolePage({
       <div className="console-grid">
         <aside className="console-side">
           <section className="panel">
-            <h2>Profile</h2>
+            <h2>Sessão</h2>
+            <p className="console-profile-name">{activeProfile.displayName}</p>
             <label className="field">
-              Ativo
+              Profile
               <select
                 value={activeProfile.id}
                 disabled={busy || allowedProfiles.length < 2}
@@ -86,57 +102,36 @@ export function ConsolePage({
                 ))}
               </select>
             </label>
-            <dl className="meta-list">
-              <div>
-                <dt>Slug</dt>
-                <dd>{activeProfile.slug}</dd>
-              </div>
-              <div>
-                <dt>Rosbridge</dt>
-                <dd className="mono">{activeProfile.rosbridgeUrl}</dd>
-              </div>
-              <div>
-                <dt>ROS</dt>
-                <dd>
-                  <span className={`status-dot status-${rosStatus}`} />
-                  {rosStatus}
-                  {rosError ? ` — ${rosError}` : ''}
-                </dd>
-              </div>
-            </dl>
+            <p className="muted mono console-ros-url">{activeProfile.rosbridgeUrl}</p>
           </section>
 
-          <section className="panel">
-            <h2>Teleop</h2>
-            {!teleopEnabled ? (
-              <p className="muted">Seu papel não permite teleop.</p>
-            ) : (
-              <>
-                <label className="field">
-                  Preset
-                  <select
-                    value={limits.teleop.profile}
-                    disabled={busy}
-                    onChange={(e) => void onChangePreset(e.target.value)}
-                  >
-                    {PRESETS.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <p className="muted">
-                  lim linear {limits.teleop.linearMax.toFixed(2)} · angular{' '}
-                  {limits.teleop.angularMax.toFixed(2)}
-                </p>
-                <p className="hint">WASD / setas · espaço = stop</p>
-                <button type="button" className="btn-secondary" onClick={onStop}>
-                  Stop
-                </button>
-              </>
-            )}
-          </section>
+          {teleopEnabled ? (
+            <section className="panel">
+              <h2>Teleop</h2>
+              <label className="field">
+                Preset
+                <select
+                  value={limits.teleop.profile}
+                  disabled={busy}
+                  onChange={(e) => void onChangePreset(e.target.value)}
+                >
+                  {PRESETS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className="muted">
+                lim linear {limits.teleop.linearMax.toFixed(2)} · angular{' '}
+                {limits.teleop.angularMax.toFixed(2)}
+              </p>
+              <p className="hint">WASD / setas · espaço = stop</p>
+              <button type="button" className="btn-secondary" onClick={onStop}>
+                Stop
+              </button>
+            </section>
+          ) : null}
 
           {children}
         </aside>
