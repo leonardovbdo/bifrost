@@ -7,10 +7,10 @@
 
 ## 1. Repositórios no Desktop
 
-| Pasta | Uso |
-|-------|-----|
+| Pasta                 | Uso                                             |
+| --------------------- | ----------------------------------------------- |
 | `~/Desktop/noblenara` | ROS 2 / simulação (`nara-sim`) — estudo de caso |
-| `~/Desktop/TCC` | Docs + `apps/backend` + protótipo UI `apps/web` |
+| `~/Desktop/TCC`       | Docs + `apps/backend` + protótipo UI `apps/web` |
 
 ---
 
@@ -57,6 +57,23 @@ Expõe:
 
 - rosbridge WebSocket `:9090`
 - web_video_server `:8080`
+
+### Goal (SLAM + Nav2)
+
+O painel Goal publica `PoseStamped` em `goal_pose` com stamp zero e `frame_id` do profile (seed: `map`). Nav2 não consome esse tópico direto. Para a demo local, na raiz do repo:
+
+```bash
+./scripts/bringup-nara-nav.sh
+```
+
+O script:
+
+1. Encerra stacks locais anteriores (Gazebo, Nav2, rosbridge, relay) para ficar com um único publisher de `/clock`.
+2. Sobe, nesta ordem: `worldmuseum` → `noblenara` → `bridgelaunch` → `slam` → `nav2` → `scripts/goal_pose_to_nav2.py`.
+3. Para se `/clock` não tiver exatamente 1 publisher, ou se odom, SLAM, TF `noblenara/alfa/map`→`robot_footprint` ou `navigate_to_pose` não aparecerem. Logs em `.data/logs/nara/`.
+4. O relay reescreve `frame_id` `map` para `noblenara/alfa/map`, carimba com o relógio de simulação e chama a action `navigate_to_pose` que estiver no ar.
+
+Ctrl+C nesse terminal encerra a stack. API e UI continuam na seção 5. Pré-requisito: ROS 2 Jazzy e `~/Desktop/noblenara/nara-sim` compilado (seções 1–2).
 
 ---
 
@@ -105,7 +122,7 @@ Verificar portas livres conforme o que estiver em uso (`9090`, `8080`, porta da 
 
 ## 7. Problemas conhecidos
 
-| Sintoma | Nota |
-|---------|------|
+| Sintoma                | Nota                                       |
+| ---------------------- | ------------------------------------------ |
 | SSL `packages.ros.org` | Apt do ROS pode precisar do espelho OSUOSL |
-| Streams / namespaces | Profile seed usa `/noblenara/alfa/...` |
+| Streams / namespaces   | Profile seed usa `/noblenara/alfa/...`     |

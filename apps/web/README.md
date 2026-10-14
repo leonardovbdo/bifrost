@@ -24,7 +24,7 @@ Viewer/operator: link Admin ausente; `#/admin` mostra acesso negado.
 
 ## Demo Etapa E (capabilities)
 
-Com sim + `bridgelaunch` + API + `npm run dev`:
+Com sim via `./scripts/bringup-nara-nav.sh` na raiz do repo (SLAM, Nav2 e relay `goal_pose`; ver `docs/docs/operations/ambiente-local-nara.md`) + API + `npm run dev`:
 
 1. Login qualquer papel → rosbridge abre para telemetria; chip **bat** / painel **Mapa**.
 2. Painel **Mapa** → OccupancyGrid (`topics.map`, obrigatório no DoD de E).
