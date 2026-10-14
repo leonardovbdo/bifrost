@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-13  
-**Estado:** Etapas A–G na `main`. Etapa H **IN PROGRESS** (`feat/etapa-h-telemetry`). Ops NARA (PR #10) na `main`.
+**Atualizado:** 2026-10-14  
+**Estado:** Etapas A–H **DONE** na `main` (H no PR #11). Ops NARA (PR #10) na `main`. Esteira E–H fechada.
 
 ---
 
@@ -16,11 +16,11 @@
 | Etapa E — capabilities console (goal/mapa/bateria) | **DONE** (`main`, PR #7) |
 | Etapa F — admin + users | **DONE** (`main`, PR #8) |
 | Etapa G — hardening | **DONE** (`main`, PR #9) |
-| Etapa H — telemetria samples | **IN PROGRESS** (`feat/etapa-h-telemetry`) |
+| Etapa H — telemetria samples | **DONE** (`main`, PR #11) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch atual: `feat/etapa-h-telemetry`
+Branch de trabalho: `main`
 
 ---
 
@@ -45,4 +45,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-**Etapa H** (H-01 migration `telemetry_samples`, H-02 ingestão amostrada, H-03 query admin) em `feat/etapa-h-telemetry` — ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §6.
+Nenhuma etapa E–H aberta. Telemetria amostrada está na `main` (PR #11): `POST/GET /api/v1/telemetry/samples` e `#/admin/telemetry`. Fora da esteira: ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §7.

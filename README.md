@@ -59,8 +59,7 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 | Fase | Situação |
 |------|----------|
 | Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** |
-| Etapas A–G (API + console NARA + admin + hardening) | **Na `main`** |
-| Esteira pós-MVP E–G | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
-| Etapa H (telemetria samples) | **IN PROGRESS** (`feat/etapa-h-telemetry`) |
+| Etapas A–H (API + console NARA + admin + hardening + telemetria) | **Na `main`** |
+| Esteira pós-MVP E–H | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
 
 Retomar: [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md).

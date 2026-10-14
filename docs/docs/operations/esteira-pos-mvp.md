@@ -1,7 +1,7 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
-**Atualizado:** 2026-10-13  
-**Status:** Documento **normativo** da esteira. Etapas E–G **DONE** na `main`. H **IN PROGRESS** (`feat/etapa-h-telemetry`).  
+**Atualizado:** 2026-10-14  
+**Status:** Documento **normativo** da esteira. Etapas E–H **DONE** na `main`.  
 **Pré-requisito:** `main` com Etapas A–G (auth, parameters/audit, LLM/CI, console, admin, hardening) + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
@@ -47,7 +47,7 @@ Checklist comum a toda etapa:
 | E — Capabilities na console | goal_pose, mapa, bateria | **DONE** (`main`, PR #7) |
 | F — Admin + usuários | UI admin + CRUD users | **DONE** (`main`, PR #8) |
 | G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
-| H — Telemetria samples | `telemetry_samples` (evolução) | **IN PROGRESS** (`feat/etapa-h-telemetry`) |
+| H — Telemetria samples | `telemetry_samples` (evolução) | **DONE** (`main`, PR #11) |
 
 ---
 
@@ -113,7 +113,7 @@ Checklist comum a toda etapa:
 | H-02 | Ingestão amostrada (não cmd_vel por tick) | `POST /api/v1/telemetry/samples` — métricas `battery`/`pose`; intervalo mínimo |
 | H-03 | Query admin básica | `GET` + UI `#/admin/telemetry` — não bloqueia DoD de H |
 
-**Branch:** `feat/etapa-h-telemetry`  
+**Branch:** `feat/etapa-h-telemetry` — mergeada (PR #11).  
 Não bloqueia demo NARA se E–G estiverem fechadas.  
 Não confundir com “FASE 2” do inventário de IHM — é evolução do módulo de telemetria.
 
@@ -153,8 +153,7 @@ main
 ## 9. Checklist de retomada (ambiente)
 
 ```bash
-git checkout main && git pull
-git checkout feat/etapa-h-telemetry              # H IN PROGRESS; E–G DONE na main
+git checkout main && git pull                         # E–H DONE na main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)
