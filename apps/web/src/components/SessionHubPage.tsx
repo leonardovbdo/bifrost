@@ -80,8 +80,8 @@ export function SessionHubPage({
             <p className="brand-mark">Bifrost</p>
             <h1 className="hub-title">Sessão</h1>
             <p className="hub-lead">
-              Confira papel e autorizações. O console NARA só sobe quando você
-              conectar.
+              Confira papel e autorizações. O console NARA só abre quando você
+              entrar.
             </p>
           </div>
           <button

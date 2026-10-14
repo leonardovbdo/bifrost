@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { adminHash, sessionHash } from '../hooks/useHashRoute'
 import type { RosStatus } from '../hooks/useRos'
 import type { SessionConfig } from '../types/session'
@@ -62,6 +62,33 @@ export function ConsolePage({
     { id: 'scan', label: 'Scan', show: Boolean(scanSlot) },
     { id: 'llm', label: 'Assistente', show: Boolean(llmSlot) },
   ]
+  const visibleTabs = tabs.filter((t) => t.show)
+  const activeTab = visibleTabs.some((t) => t.id === tab) ? tab : 'camera'
+  const showRail = teleopEnabled || Boolean(goalSlot) || Boolean(rosError) || Boolean(error)
+
+  function onTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    if (
+      event.key !== 'ArrowRight' &&
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'Home' &&
+      event.key !== 'End'
+    ) {
+      return
+    }
+    event.preventDefault()
+    const last = visibleTabs.length - 1
+    const nextIndex =
+      event.key === 'ArrowRight'
+        ? (index + 1) % visibleTabs.length
+        : event.key === 'ArrowLeft'
+          ? (index - 1 + visibleTabs.length) % visibleTabs.length
+          : event.key === 'Home'
+            ? 0
+            : last
+    const next = visibleTabs[nextIndex]
+    setTab(next.id)
+    document.getElementById(`stage-tab-${next.id}`)?.focus()
+  }
 
   return (
     <div className="console-shell">
@@ -108,77 +135,117 @@ export function ConsolePage({
         </div>
       </header>
 
-      <div className="console-body">
-        <aside className="console-rail">
-          {teleopEnabled ? (
-            <section className="rail-block">
-              <h2>Teleop</h2>
-              <label className="field">
-                Preset
-                <select
-                  value={limits.teleop.profile}
-                  disabled={busy}
-                  onChange={(e) => void onChangePreset(e.target.value)}
-                >
-                  {PRESETS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <p className="hint">
-                lin {limits.teleop.linearMax.toFixed(2)} · ang{' '}
-                {limits.teleop.angularMax.toFixed(2)}
+      <div className={`console-body${showRail ? '' : ' is-stage-only'}`}>
+        {showRail ? (
+          <aside className="console-rail">
+            {teleopEnabled ? (
+              <section className="rail-block">
+                <h2>Teleop</h2>
+                <label className="field">
+                  Preset
+                  <select
+                    value={limits.teleop.profile}
+                    disabled={busy}
+                    onChange={(e) => void onChangePreset(e.target.value)}
+                  >
+                    {PRESETS.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className="hint">
+                  lin {limits.teleop.linearMax.toFixed(2)} · ang{' '}
+                  {limits.teleop.angularMax.toFixed(2)}
+                </p>
+                <p className="hint">WASD / setas · espaço = stop</p>
+                <button type="button" className="btn-secondary" onClick={onStop}>
+                  Stop
+                </button>
+              </section>
+            ) : null}
+
+            {goalSlot ? <div className="rail-block">{goalSlot}</div> : null}
+
+            {rosError ? (
+              <p className="form-error console-ros-error" role="alert">
+                {rosError}
               </p>
-              <p className="hint">WASD / setas · espaço = stop</p>
-              <button type="button" className="btn-secondary" onClick={onStop}>
-                Stop
-              </button>
-            </section>
-          ) : null}
-
-          {goalSlot ? <div className="rail-block">{goalSlot}</div> : null}
-
-          {rosError ? (
-            <p className="form-error console-ros-error" role="alert">
-              {rosError}
-            </p>
-          ) : null}
-          {error ? (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          ) : null}
-        </aside>
+            ) : null}
+            {error ? (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+          </aside>
+        ) : null}
 
         <section className="console-stage">
           <div className="stage-toolbar">
             <div className="stage-tabs" role="tablist" aria-label="Viewport">
-              {tabs
-                .filter((t) => t.show)
-                .map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === t.id}
-                    className={`stage-tab${tab === t.id ? ' stage-tab-active' : ''}`}
-                    onClick={() => setTab(t.id)}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+              {visibleTabs.map((t, index) => (
+                <button
+                  key={t.id}
+                  id={`stage-tab-${t.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === t.id}
+                  aria-controls={`stage-panel-${t.id}`}
+                  tabIndex={activeTab === t.id ? 0 : -1}
+                  className={`stage-tab${activeTab === t.id ? ' stage-tab-active' : ''}`}
+                  onClick={() => setTab(t.id)}
+                  onKeyDown={(event) => onTabKey(event, index)}
+                >
+                  {t.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div
-            className={`stage-viewport${tab === 'camera' ? ' is-camera' : ' is-panel'}`}
-          >
-            {tab === 'camera' ? <CameraStage profile={activeProfile} /> : null}
-            {tab === 'map' ? mapSlot : null}
-            {tab === 'scan' ? scanSlot : null}
-            {tab === 'llm' ? llmSlot : null}
+          <div className="stage-viewport">
+            <div
+              id="stage-panel-camera"
+              role="tabpanel"
+              aria-labelledby="stage-tab-camera"
+              inert={activeTab !== 'camera' ? true : undefined}
+              className={`stage-pane is-camera${activeTab === 'camera' ? '' : ' is-parked'}`}
+            >
+              <CameraStage profile={activeProfile} />
+            </div>
+            {mapSlot ? (
+              <div
+                id="stage-panel-map"
+                role="tabpanel"
+                aria-labelledby="stage-tab-map"
+                hidden={activeTab !== 'map'}
+                className="stage-pane is-panel"
+              >
+                {mapSlot}
+              </div>
+            ) : null}
+            {scanSlot ? (
+              <div
+                id="stage-panel-scan"
+                role="tabpanel"
+                aria-labelledby="stage-tab-scan"
+                hidden={activeTab !== 'scan'}
+                className="stage-pane is-panel"
+              >
+                {scanSlot}
+              </div>
+            ) : null}
+            {llmSlot ? (
+              <div
+                id="stage-panel-llm"
+                role="tabpanel"
+                aria-labelledby="stage-tab-llm"
+                hidden={activeTab !== 'llm'}
+                className="stage-pane is-panel"
+              >
+                {llmSlot}
+              </div>
+            ) : null}
           </div>
         </section>
       </div>

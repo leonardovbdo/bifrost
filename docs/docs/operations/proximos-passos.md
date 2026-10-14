@@ -1,6 +1,6 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-13  
+**Atualizado:** 2026-10-14  
 **Estado:** Etapas A–I **DONE** na `main`. Etapa J (UX dual surface) **IN PROGRESS** (`feat/ux-dual-surface`).
 
 ---

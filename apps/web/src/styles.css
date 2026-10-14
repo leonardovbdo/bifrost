@@ -571,11 +571,13 @@ button:disabled {
 /* —— Console ops (runtime) —— */
 
 .console-shell {
+  height: 100vh;
   min-height: 100vh;
+  overflow: hidden;
   background: var(--runtime);
   color: var(--runtime-text);
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   animation: surface-in 320ms ease both;
 }
 
@@ -682,16 +684,14 @@ button:disabled {
   margin-right: 0.35rem;
 }
 
-.console-sep {
-  opacity: 0.4;
-  margin: 0 0.15rem;
-}
-
 .console-body {
   display: grid;
-  grid-template-columns: minmax(240px, 280px) 1fr;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
   min-height: 0;
-  height: calc(100vh - 3.1rem);
+}
+
+.console-body.is-stage-only {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .console-rail {
@@ -767,19 +767,41 @@ button:disabled {
 }
 
 .stage-viewport {
+  position: relative;
   min-height: 0;
-  overflow: auto;
-  padding: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+
+.stage-pane {
+  grid-area: 1 / 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.stage-pane.is-camera {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-.stage-viewport.is-camera {
-  padding: 0;
-}
-
-.stage-viewport.is-panel {
+.stage-pane.is-panel {
+  overflow: auto;
   padding: var(--space-4);
+}
+
+.stage-pane.is-parked {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage-pane[hidden] {
+  display: none !important;
 }
 
 .stage-header {
@@ -787,6 +809,7 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   gap: var(--space-3);
+  flex-shrink: 0;
   padding: 0.55rem 0.75rem;
   border-bottom: 1px solid var(--runtime-line);
 }
@@ -813,7 +836,7 @@ button:disabled {
 .camera-feed {
   width: 100%;
   flex: 1;
-  min-height: min(70vh, 640px);
+  min-height: 0;
   object-fit: contain;
   background: #050708;
   border: 0;
@@ -822,7 +845,7 @@ button:disabled {
 
 .camera-placeholder {
   flex: 1;
-  min-height: min(50vh, 420px);
+  min-height: 0;
   display: grid;
   place-content: center;
   text-align: center;
@@ -968,7 +991,100 @@ button:disabled {
 }
 
 .admin-main {
+  max-width: 1100px;
   animation: fade-rise 360ms ease both;
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.admin-row h2 {
+  margin: 0;
+}
+
+.admin-form {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 640px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.admin-textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  resize: vertical;
+  font: inherit;
+}
+
+.admin-textarea:focus {
+  outline: 2px solid rgba(31, 111, 139, 0.35);
+  outline-offset: 1px;
+  border-color: var(--bridge);
+}
+
+.admin-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-direction: row;
+}
+
+.admin-check input {
+  width: auto;
+}
+
+.admin-grant {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--line);
+}
+
+.admin-grant h3 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+}
+
+.admin-grant-select {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+.meta-list {
+  margin: 0 0 var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.meta-list > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.meta-list dt {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.meta-list dd {
+  margin: 0;
 }
 
 .admin-stack {
@@ -1051,9 +1167,14 @@ button:disabled {
 }
 
 @media (max-width: 900px) {
-  .console-body {
-    grid-template-columns: 1fr;
+  .console-shell {
     height: auto;
+    overflow: visible;
+  }
+
+  .console-body,
+  .console-body.is-stage-only {
+    grid-template-columns: 1fr;
   }
 
   .console-rail {
@@ -1062,7 +1183,12 @@ button:disabled {
     max-height: none;
   }
 
-  .camera-feed {
+  .stage-pane.is-camera:not(.is-parked) {
+    min-height: 50vh;
+  }
+
+  .camera-feed,
+  .camera-placeholder {
     min-height: 40vh;
   }
 }

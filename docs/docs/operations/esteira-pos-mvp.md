@@ -1,6 +1,6 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
-**Atualizado:** 2026-10-13  
+**Atualizado:** 2026-10-14  
 **Status:** Documento **normativo** da esteira. Etapas E–I **DONE** na `main`. Etapa J **IN PROGRESS** (`feat/ux-dual-surface`).  
 **Pré-requisito:** `main` com Etapas A–I + ops NARA bringup (PR #10).
 
