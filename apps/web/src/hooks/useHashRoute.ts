@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { AdminTab } from '../types/admin'
 
-const ADMIN_TABS: AdminTab[] = ['profiles', 'parameters', 'users', 'audit']
+const ADMIN_TABS: AdminTab[] = [
+  'profiles',
+  'parameters',
+  'users',
+  'audit',
+  'telemetry',
+]
 
 export type AppView = { kind: 'console' } | { kind: 'admin'; tab: AdminTab }
 

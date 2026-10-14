@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-13  
-**Estado:** Etapas A–G na `main`. Esteira normativa E–G **DONE**. Ops NARA (bringup Nav2 + fix body vazio audit) na `main` (PR #10). H opcional: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+**Estado:** Etapas A–G na `main`. Etapa H **IN PROGRESS** (`feat/etapa-h-telemetry`). Ops NARA (PR #10) na `main`.
 
 ---
 
@@ -16,11 +16,11 @@
 | Etapa E — capabilities console (goal/mapa/bateria) | **DONE** (`main`, PR #7) |
 | Etapa F — admin + users | **DONE** (`main`, PR #8) |
 | Etapa G — hardening | **DONE** (`main`, PR #9) |
-| Etapa H — telemetria samples | opcional — ver [esteira](esteira-pos-mvp.md) |
+| Etapa H — telemetria samples | **IN PROGRESS** (`feat/etapa-h-telemetry`) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch atual: `main`
+Branch atual: `feat/etapa-h-telemetry`
 
 ---
 
@@ -45,4 +45,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-Esteira E–G fechada. Se sobrar tempo: **Etapa H** (telemetria persistida) conforme [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §6 — opcional, não bloqueia demo/defesa.
+**Etapa H** (H-01 migration `telemetry_samples`, H-02 ingestão amostrada, H-03 query admin) em `feat/etapa-h-telemetry` — ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §6.

@@ -16,6 +16,7 @@ public class BifrostProperties {
   private final Teleop teleop = new Teleop();
   private final Audit audit = new Audit();
   private final Llm llm = new Llm();
+  private final Telemetry telemetry = new Telemetry();
 
   public Jwt getJwt() { return jwt; }
   public Cookie getCookie() { return cookie; }
@@ -26,6 +27,7 @@ public class BifrostProperties {
   public Teleop getTeleop() { return teleop; }
   public Audit getAudit() { return audit; }
   public Llm getLlm() { return llm; }
+  public Telemetry getTelemetry() { return telemetry; }
 
   public Jwt jwt() { return jwt; }
   public Cookie cookie() { return cookie; }
@@ -36,6 +38,7 @@ public class BifrostProperties {
   public Teleop teleop() { return teleop; }
   public Audit audit() { return audit; }
   public Llm llm() { return llm; }
+  public Telemetry telemetry() { return telemetry; }
 
   public static class Jwt {
     private String secret = "";
@@ -147,6 +150,19 @@ public class BifrostProperties {
       }
       public Duration window() { return window; }
       public void setWindow(Duration window) { this.window = window; }
+    }
+  }
+
+  public static class Telemetry {
+    /** Minimum gap between samples of the same profile+metric (sampled ingest, not teleop ticks). */
+    private Duration minSampleInterval = Duration.ofSeconds(5);
+
+    public Duration minSampleInterval() {
+      return minSampleInterval;
+    }
+
+    public void setMinSampleInterval(Duration minSampleInterval) {
+      this.minSampleInterval = minSampleInterval;
     }
   }
 

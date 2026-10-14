@@ -8,4 +8,6 @@
 | AUD-04 | `GET /audit/events` admin + filtros | `DONE` |
 | AUD-05 | Job purge + config retenção 90 dias | `DONE` |
 | AUD-06 | Ops: `operations/auditoria-retencao.md` | `DONE` |
-| TEL-01 | (Evolução) draft migration `telemetry_samples` | `TODO` — esteira Etapa H ([esteira-pos-mvp](../../../../operations/esteira-pos-mvp.md)) |
+| TEL-01 | Migration `telemetry_samples` | `DONE` — Etapa H (`feat/etapa-h-telemetry`) |
+| TEL-02 | Ingestão amostrada `POST /telemetry/samples` | `DONE` — métricas `battery`/`pose`; rejeita `cmd_vel`; intervalo mínimo |
+| TEL-03 | Query admin `GET /telemetry/samples` + UI admin | `DONE` — H-03 |

@@ -4,6 +4,7 @@ import { AdminAuditPage } from './AdminAuditPage'
 import { AdminParametersPage } from './AdminParametersPage'
 import { AdminProfilesPage } from './AdminProfilesPage'
 import { AdminShell } from './AdminShell'
+import { AdminTelemetryPage } from './AdminTelemetryPage'
 import { AdminUsersPage } from './AdminUsersPage'
 
 interface AdminAppProps {
@@ -18,6 +19,7 @@ export function AdminApp({ session, tab, busy, onLogout }: AdminAppProps) {
   if (tab === 'parameters') page = <AdminParametersPage />
   if (tab === 'users') page = <AdminUsersPage />
   if (tab === 'audit') page = <AdminAuditPage />
+  if (tab === 'telemetry') page = <AdminTelemetryPage />
 
   return (
     <AdminShell session={session} tab={tab} busy={busy} onLogout={onLogout}>

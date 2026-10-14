@@ -41,10 +41,19 @@ Tabela `audit_events` conforme functional-spec.
 4. Sem PII desnecessária no payload; nunca senha/token
 5. Listagem global: só `admin`
 
-## Telemetria amostrada (evolução)
+## Telemetria amostrada (Etapa H)
 
-Tabela futura `telemetry_samples` (`profile_id`, `metric`, `value_json`, `captured_at`).  
-Ingestão via job/bridge — **não** no caminho crítico do teleop.
+Tabela `telemetry_samples` (`robot_profile_id`, `metric`, `value_json`, `captured_at`).
+
+| Item | Decisão |
+|------|---------|
+| Métricas allowlist | `battery`, `pose` |
+| Proibido | `cmd_vel` / teleop contínuo |
+| Intervalo mínimo | `bifrost.telemetry.min-sample-interval` (default 5s) por profile+metric |
+| Quem ingere | `admin` / `operator` com ACL no profile (`POST /api/v1/telemetry/samples`) |
+| Listagem | só `admin` (`GET /api/v1/telemetry/samples`) |
+
+Ingestão pelo client/bridge amostrado — **não** no caminho crítico do teleop.
 
 ## Critérios de aceite (MVP auditoria)
 

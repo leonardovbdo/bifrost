@@ -29,4 +29,12 @@ export interface AuditEventRow {
   createdAt: string
 }
 
-export type AdminTab = 'profiles' | 'parameters' | 'users' | 'audit'
+export interface TelemetrySampleRow {
+  id: string
+  robotProfileId: string
+  metric: string
+  value: Record<string, unknown>
+  capturedAt: string
+}
+
+export type AdminTab = 'profiles' | 'parameters' | 'users' | 'audit' | 'telemetry'

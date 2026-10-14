@@ -8,6 +8,7 @@ const TABS: { id: AdminTab; label: string }[] = [
   { id: 'parameters', label: 'Parameters' },
   { id: 'users', label: 'Users' },
   { id: 'audit', label: 'Audit' },
+  { id: 'telemetry', label: 'Telemetry' },
 ]
 
 interface AdminShellProps {
