@@ -444,6 +444,40 @@ button:disabled {
   margin-bottom: 0.75rem;
 }
 
+.profile-cap-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.9rem;
+  padding: 0;
+}
+
+.profile-cap {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.78rem;
+}
+
+.profile-cap-on {
+  border-color: rgba(15, 118, 110, 0.35);
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--teal-deep);
+  font-weight: 600;
+}
+
+.profile-cap-off {
+  color: var(--muted);
+}
+
+.console-ros-error {
+  margin: 0.65rem 0 0;
+}
+
 .hub-preset-note {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;

@@ -56,10 +56,12 @@ export function ConsolePage({
           <span className="console-sub">console ao vivo</span>
         </div>
         <div className="console-user">
-          <span className="console-status-line" title={activeProfile.topics.battery}>
+          <span
+            className="console-status-line"
+            title={rosError ?? activeProfile.topics.battery ?? rosStatus}
+          >
             <span className={`status-dot status-${rosStatus}`} />
             {rosStatus}
-            {rosError ? ` · ${rosError}` : ''}
             <span className="console-sep">·</span>
             bat {batteryLabel}
           </span>
@@ -103,6 +105,11 @@ export function ConsolePage({
               </select>
             </label>
             <p className="muted mono console-ros-url">{activeProfile.rosbridgeUrl}</p>
+            {rosError ? (
+              <p className="form-error console-ros-error" role="alert">
+                {rosError}
+              </p>
+            ) : null}
           </section>
 
           {teleopEnabled ? (

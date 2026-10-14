@@ -3,7 +3,7 @@
 Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo híbrido:
 
 1. Login com cookies JWT (`credentials: include`)
-2. `GET /me/session-config` → **Session Hub** (`#/`): role, profile, matriz de permissões — **sem ROS**
+2. `GET /me/session-config` → **Session Hub** (`#/`): role, profile, capabilities (ADR-010) e matriz de permissões — **sem ROS**
 3. **Conectar ao console** (`#/console`) → rosbridge + câmera / teleop / goal / mapa
 4. Stream de câmera via `videoBaseUrl` (seletor `camera_user` / `camera_link`)
 5. Goal Nav2: audit `goal_pose` → PoseStamped se `canSendGoal` (painel só se permitido)
@@ -14,7 +14,7 @@ Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo h�
 
 ## Demo Etapa I (hub de governança)
 
-1. Login → hub (`#/`): matriz permitido/bloqueado; ROS **idle**.
+1. Login → hub (`#/`): capabilities do profile + matriz permitido/bloqueado; ROS **idle**. Sair no console e entrar de novo também abre o hub.
 2. **Conectar ao console NARA** → `#/console` (rosbridge + câmera).
 3. Viewer: sem Teleop / Goal / LLM no console; só observação.
 4. **Desconectar** → hub de novo.

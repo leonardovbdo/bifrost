@@ -1,6 +1,6 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
-**Atualizado:** 2026-10-13  
+**Atualizado:** 2026-10-14  
 **Status:** Documento **normativo** da esteira. Etapas E–H **DONE** na `main`. UX governança **IN PROGRESS** (`feat/ux-governance-shell`).  
 **Pré-requisito:** `main` com Etapas A–H + ops NARA bringup (PR #10).
 
@@ -127,7 +127,7 @@ Não confundir com “FASE 2” do inventário de IHM — é evolução do módu
 
 | ID | Entrega | Notas |
 |----|---------|--------|
-| I-01 | Session Hub (`#/`) | Profile, matriz de capabilities, sem ROS |
+| I-01 | Session Hub (`#/`) | Profile, capabilities (ADR-010) e matriz de permissões, sem ROS |
 | I-02 | Console sob demanda (`#/console`) | ROS só após “Conectar”; Desconectar → hub |
 | I-03 | Ocultar ações proibidas no console | Viewer sem Teleop/Goal/LLM |
 

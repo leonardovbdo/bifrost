@@ -29,7 +29,7 @@ function parseHash(hash: string): AppView {
     if (hash.startsWith('#/admin')) {
       return { kind: 'admin', tab: 'profiles' }
     }
-    // Legacy `#/` console bookmarks → session hub (governance first)
+    // Unknown hashes stay on the hub so a typo never opens rosbridge.
     return { kind: 'session' }
   }
   const tab = match[1] as AdminTab

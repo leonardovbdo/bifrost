@@ -1,6 +1,6 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-13  
+**Atualizado:** 2026-10-14  
 **Estado:** Etapas A–H **DONE** na `main`. Etapa I (UX hub de governança) **IN PROGRESS** (`feat/ux-governance-shell`).
 
 ---

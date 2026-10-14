@@ -12,6 +12,31 @@ interface SessionHubPageProps {
 
 const PRESETS = ['safety', 'normal', 'fast'] as const
 
+/** ADR-010 closed enum. Order is the governance matrix, not the profile JSON order. */
+const PROFILE_CAPABILITIES = [
+  'teleop',
+  'cameras',
+  'slam',
+  'nav2',
+  'battery',
+  'rosapi',
+] as const
+
+function profileCapabilityChips(declared: string[]) {
+  const present = new Set(declared)
+  const known = new Set<string>(PROFILE_CAPABILITIES)
+  const rows: { id: string; present: boolean }[] = PROFILE_CAPABILITIES.map((id) => ({
+    id,
+    present: present.has(id),
+  }))
+  for (const extra of declared) {
+    if (!known.has(extra)) {
+      rows.push({ id: extra, present: true })
+    }
+  }
+  return rows
+}
+
 type CapRow = {
   id: string
   label: string
@@ -72,6 +97,7 @@ export function SessionHubPage({
 }: SessionHubPageProps) {
   const { user, activeProfile, allowedProfiles, permissions, limits } = session
   const caps = capabilityRows(session)
+  const profileCaps = profileCapabilityChips(activeProfile.capabilities ?? [])
 
   function goConsole() {
     window.location.hash = consoleHash()
@@ -137,6 +163,21 @@ export function SessionHubPage({
               </dd>
             </div>
           </dl>
+
+          <p className="hub-kicker">Capabilities do profile</p>
+          <ul className="profile-cap-list" aria-label="Capabilities do profile">
+            {profileCaps.map((cap) => (
+              <li
+                key={cap.id}
+                className={`profile-cap${cap.present ? ' profile-cap-on' : ' profile-cap-off'}`}
+              >
+                {cap.id}
+                <span className="sr-only">
+                  {cap.present ? ', declarada' : ', ausente'}
+                </span>
+              </li>
+            ))}
+          </ul>
 
           {permissions.canTeleop ? (
             <label className="field">

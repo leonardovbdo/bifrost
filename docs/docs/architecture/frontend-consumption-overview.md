@@ -50,7 +50,7 @@ O client **é** responsável por:
 
 Implementado em [`apps/web`](../../../apps/web/README.md) (Vite + React):
 
-- Login → **Session Hub** (role, profile, matriz de capabilities)  
+- Login → **Session Hub** (role, profile, capabilities ADR-010, matriz de permissões)  
 - Conectar sob demanda ao console (`#/console`) + teleop WASD + câmera  
 - Assistente via `/llm/ask` (admin/operator; oculto para viewer)  
 - Preset de teleop (`safety`/`normal`/`fast`) via parameters  
