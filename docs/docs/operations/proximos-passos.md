@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
-**Atualizado:** 2026-10-10  
-**Estado:** Etapas A–G na `main`. Esteira normativa E–G **DONE**. H opcional: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
+**Atualizado:** 2026-10-13  
+**Estado:** Etapas A–G na `main`. Esteira normativa E–G **DONE**. Ops NARA (bringup Nav2 + fix body vazio audit) na `main` (PR #10). H opcional: [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
 ---
 
@@ -38,7 +38,7 @@ cd apps/web && npm install && npm run dev
 
 UI: `http://localhost:5173` (proxy `/api` → `:8081`)
 
-Com NARA + `bridgelaunch`: teleop WASD + câmera (seletor usuário/frente) via session-config, goal_pose + audit, OccupancyGrid, scan LiDAR, chip bateria. Admin: `#/admin/*` (só role admin).  
+Com NARA: preferir `./scripts/bringup-nara-nav.sh` (world → robot → bridge → slam → nav2 → relay `goal_pose`→Nav2). UI: teleop WASD + câmera (usuário/frente), goal_pose + audit, OccupancyGrid, scan LiDAR, chip bateria. Admin: `#/admin/*` (só role admin).  
 Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ---

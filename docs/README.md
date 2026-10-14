@@ -3,7 +3,7 @@
 > **Bifrost** — ponte governada entre pessoas e sistemas autônomos. Documentação do backend (docs-first) + skeleton em `apps/backend`. Protótipo de frontend próprio apenas para validar a API, se necessário.
 
 **Retomar implementação:** [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md).  
-**Esteira pós-MVP (E–H):** [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md).
+**Esteira pós-MVP:** E–G **DONE** na `main`; H opcional — [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md).
 
 Metáfora do nome: [`docs/architecture/bifrost-nome-e-metafora.md`](docs/architecture/bifrost-nome-e-metafora.md).
 
@@ -41,7 +41,7 @@ ADRs com status `PROPOSTA` precisam de decisão antes da implementação. ADRs `
 ## Leitura sugerida (ordem)
 
 1. [`docs/operations/proximos-passos.md`](docs/operations/proximos-passos.md) — **onde paramos**
-2. [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md) — **fila normativa E–H**
+2. [`docs/operations/esteira-pos-mvp.md`](docs/operations/esteira-pos-mvp.md) — **fila normativa** (E–G DONE; H opcional)
 3. [`docs/architecture/bifrost-nome-e-metafora.md`](docs/architecture/bifrost-nome-e-metafora.md)
 4. [`docs/architecture/system-overview.md`](docs/architecture/system-overview.md)
 5. [`docs/requirements/inventario-frontend-ihm.md`](docs/requirements/inventario-frontend-ihm.md)

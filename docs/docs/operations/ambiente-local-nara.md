@@ -1,7 +1,7 @@
 # Operação — Ambiente local NARA + (futuro) Backend TCC
 
-**Versão:** 0.2  
-**Status:** Baseado na validação da simulação NARA em 2026-09-29
+**Versão:** 0.3  
+**Status:** Bringup Nav2 + relay `goal_pose` documentados (PR #10); validação simulação NARA 2026-09-29 / ops 2026-10-13
 
 ---
 

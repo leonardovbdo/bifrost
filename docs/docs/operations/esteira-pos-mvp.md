@@ -1,8 +1,8 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
-**Atualizado:** 2026-10-10  
-**Status:** Documento **normativo** da esteira de trabalho até a defesa / demo NARA completa.  
-**Pré-requisito:** `main` com Etapas A–D mergeadas (auth, parameters/audit, LLM/CI, console web + câmera POV).
+**Atualizado:** 2026-10-13  
+**Status:** Documento **normativo** da esteira. Etapas E–G **DONE** na `main`. H opcional.  
+**Pré-requisito:** `main` com Etapas A–G (auth, parameters/audit, LLM/CI, console, admin, hardening) + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
 Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
@@ -164,10 +164,9 @@ cd apps/backend && ./mvnw spring-boot:run
 
 cd apps/web && npm install && npm run dev        # :5173
 
-# NARA (outro terminal / Desktop/noblenara):
-# ros2 launch smartwheelchair worldmuseum.launch.py
-# ros2 launch smartwheelchair noblenara.launch.py
-# ros2 launch smartwheelchair bridgelaunch.xml   # :9090 + :8080
+# NARA (na raiz do Bifrost; requer ~/Desktop/noblenara já built):
+# ./scripts/bringup-nara-nav.sh
+# (manual: worldmuseum → noblenara → bridgelaunch → slam → nav2 → goal_pose_to_nav2.py)
 ```
 
 Login demo: `admin` / `change-me`. Câmera: seletor Usuário / Frente (tópico **sem** `%2F` na query).

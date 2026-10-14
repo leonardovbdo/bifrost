@@ -9,6 +9,9 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- Ops: `scripts/bringup-nara-nav.sh` + `scripts/goal_pose_to_nav2.py`
+  (ordem world→robot→bridge→slam→nav2→relay) e guia em
+  `ambiente-local-nara.md` (PR #10)
 - Etapa G: hardening — rate limit `/llm/ask` e `POST /audit/events`
   (goal_pose), validação PATCH profiles + login, log de exceções sem
   stack no body (`feat/etapa-g-hardening`)
@@ -41,6 +44,8 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Fixed
 
+- Web: `apiPost` com 201 e body vazio (audit `goal_pose`) não quebra
+  mais o `JSON.parse` (PR #10)
 - Etapa D: envelope de erro da API, teleop sem capturar inputs,
   Twist ROS 2, deadman/blur e bootstrap de sessão (StrictMode)
 - Etapa D: soltar teleop ao focar inputs e status de advertise
