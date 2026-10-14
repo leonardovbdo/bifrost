@@ -9,6 +9,8 @@ Versionamento: [SemVer](https://semver.org/)
 
 ### Added
 
+- UiHint + Playwright E2E (`npm run test:e2e`): hints por tela
+  (login/hub/console/admin) e fluxo governança admin/viewer
 - Etapa J: dual surface — hub/admin claros + console ops escuro
   (câmera full-bleed, rail, tabs) (PR #13)
 - Etapa I: Session Hub de governança antes do console ROS (`#/` →

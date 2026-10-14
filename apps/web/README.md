@@ -11,6 +11,18 @@ Cliente leve (Vite + React + TypeScript) para validar a API Bifrost no modelo h�
 7. **Admin** (`#/admin/…`) — mesma superfície clara de governança
 8. **Desconectar** volta ao hub e encerra ROS
 
+## Hints + Playwright E2E
+
+Cada tela principal tem um `UiHint` (`data-testid="hint-…"`) explicando o papel da superfície (login, hub, console, admin).
+
+Com API + `npm run dev` já rodando:
+
+```bash
+npm run test:e2e
+```
+
+Cobre login → hub → console → desconectar; admin hint; viewer sem teleop/LLM.
+
 ## Demo Etapa J (dual surface)
 
 1. Login / hub: tipografia forte, matriz sim/não, detalhes recolhidos (claro).

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { adminHash, sessionHash } from '../../hooks/useHashRoute'
 import type { AdminTab } from '../../types/admin'
 import type { SessionConfig } from '../../types/session'
+import { UiHint } from '../UiHint'
 
 const TABS: { id: AdminTab; label: string }[] = [
   { id: 'profiles', label: 'Profiles' },
@@ -27,7 +28,7 @@ export function AdminShell({
   children,
 }: AdminShellProps) {
   return (
-    <div className="admin-shell">
+    <div className="admin-shell" data-testid="admin-shell">
       <header className="console-top">
         <div className="console-brand">
           <span className="brand-mark">Bifrost</span>
@@ -61,6 +62,11 @@ export function AdminShell({
           </a>
         ))}
       </nav>
+
+      <UiHint id="admin">
+        Área de governança (só admin): profiles, parameters, users, audit e
+        telemetry samples. Não abre rosbridge — isso fica no console.
+      </UiHint>
 
       <main className="admin-main">{children}</main>
     </div>

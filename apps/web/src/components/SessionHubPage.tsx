@@ -1,5 +1,6 @@
 import { adminHash, consoleHash } from '../hooks/useHashRoute'
 import type { SessionConfig } from '../types/session'
+import { UiHint } from './UiHint'
 
 interface SessionHubPageProps {
   session: SessionConfig
@@ -73,7 +74,7 @@ export function SessionHubPage({
   }
 
   return (
-    <main className="hub-shell">
+    <main className="hub-shell" data-testid="session-hub">
       <div className="hub-layout">
         <header className="hub-top">
           <div>
@@ -83,6 +84,10 @@ export function SessionHubPage({
               Confira papel e autorizações. O console NARA só abre quando você
               entrar.
             </p>
+            <UiHint id="hub">
+              Hub de governança: mostra role, profile e o que a session-config
+              autoriza. ROS permanece desconectado até Entrar no console.
+            </UiHint>
           </div>
           <button
             type="button"
@@ -120,11 +125,13 @@ export function SessionHubPage({
 
           <div>
             <p className="hub-kicker">Esta sessão autoriza</p>
-            <ul className="hub-auth-list">
+            <ul className="hub-auth-list" data-testid="auth-matrix">
               {rows.map((row) => (
                 <li
                   key={row.id}
                   className={`hub-auth-row${row.allowed ? '' : ' is-denied'}`}
+                  data-testid={`auth-${row.id}`}
+                  data-allowed={row.allowed ? 'true' : 'false'}
                 >
                   <p className="hub-auth-label">{row.label}</p>
                   <span className="hub-auth-state">
@@ -213,6 +220,7 @@ export function SessionHubPage({
             className="btn-primary hub-connect"
             onClick={goConsole}
             disabled={busy}
+            data-testid="enter-console"
           >
             Entrar no console
           </button>

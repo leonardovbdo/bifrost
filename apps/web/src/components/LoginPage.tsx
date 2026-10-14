@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { UiHint } from './UiHint'
 
 interface LoginPageProps {
   onLogin: (username: string, password: string) => Promise<void>
@@ -34,12 +35,18 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
           Ponte governada entre operadores e o robô. A sessão define o que você
           pode fazer antes de qualquer conexão ROS.
         </p>
+        <UiHint id="login">
+          Tela de identidade: autentica na API Bifrost (JWT em cookie). Depois
+          disso você cai no hub de sessão — ainda sem rosbridge/câmera.
+        </UiHint>
 
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="login-form" onSubmit={handleSubmit} data-testid="login-form">
           <label>
             Usuário
             <input
               autoComplete="username"
+              name="username"
+              data-testid="login-username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -49,6 +56,8 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
             Senha
             <input
               type="password"
+              name="password"
+              data-testid="login-password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -56,7 +65,12 @@ export function LoginPage({ onLogin, busy, error }: LoginPageProps) {
             />
           </label>
           {message ? <p className="form-error" role="alert">{message}</p> : null}
-          <button type="submit" className="btn-primary" disabled={busy}>
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={busy}
+            data-testid="login-submit"
+          >
             {busy ? 'Entrando…' : 'Continuar'}
           </button>
         </form>
