@@ -38,6 +38,11 @@ public class InMemoryRequestRateLimiter implements RequestRateLimiter {
     return tryConsume(userId, "llm_rate_limit_audit", 1, limit.window());
   }
 
+  /** Clears counters (integration tests that share a Spring context). */
+  public void reset() {
+    counters.clear();
+  }
+
   boolean tryConsume(UUID userId, String scope, int maxRequests, Duration window) {
     if (maxRequests <= 0) {
       return true;
