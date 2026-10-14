@@ -1,8 +1,8 @@
 # Esteira pós-MVP — Bifrost (após Etapas A–D)
 
 **Atualizado:** 2026-10-14  
-**Status:** Documento **normativo** da esteira. Etapas E–I **DONE** na `main`. Etapa J **IN PROGRESS** (`feat/ux-dual-surface`).  
-**Pré-requisito:** `main` com Etapas A–I + ops NARA bringup (PR #10).
+**Status:** Documento **normativo** da esteira. Etapas E–J **DONE** na `main`.  
+**Pré-requisito:** `main` com Etapas A–J + ops NARA bringup (PR #10).
 
 Este arquivo é a **fonte da verdade** do que falta e da ordem de entrega.  
 Retomada rápida do ambiente: [`proximos-passos.md`](proximos-passos.md).
@@ -51,7 +51,7 @@ Checklist comum a toda etapa:
 | G — Hardening | Rate limit, validação, logs | **DONE** (`main`, PR #9) |
 | H — Telemetria samples | `telemetry_samples` (evolução) | **DONE** (`main`, PR #11) |
 | I — UX hub de governança | Session hub antes do console ROS | **DONE** (`main`, PR #12) |
-| J — UX dual surface | Governança clara + console ops escuro | **IN PROGRESS** (`feat/ux-dual-surface`) |
+| J — UX dual surface | Governança clara + console ops escuro | **DONE** (`main`, PR #13) |
 
 ---
 
@@ -149,7 +149,7 @@ Não confundir com “FASE 2” do inventário de IHM — é evolução do módu
 | J-03 | Console ops | câmera full-bleed; rail; top bar |
 | J-04 | Admin shell | alinhado à superfície de governança |
 
-**Branch:** `feat/ux-dual-surface`  
+**Branch:** `feat/ux-dual-surface` — mergeada (PR #13).  
 **DoD:** `npm run lint` + `npm run build`; demo hub claro → console escuro → admin coerente.
 
 ---
@@ -188,7 +188,7 @@ main
 ## 9. Checklist de retomada (ambiente)
 
 ```bash
-git checkout feat/ux-dual-surface                     # J IN PROGRESS; E–I DONE na main
+git checkout main && git pull                         # E–J DONE na main
 
 docker compose up -d                             # Postgres
 # se sem Docker: Postgres local documentado em .data / micromamba (não versionar .data/)

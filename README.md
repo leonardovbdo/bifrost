@@ -59,8 +59,7 @@ Documentos acadêmicos de origem (súmula, slides, fundamentação): índice em 
 | Fase | Situação |
 |------|----------|
 | Definição (ADRs, specs, convenções, ops, diagramas) | **Concluída** |
-| Etapas A–I (API + console NARA + admin + hardening + telemetria + hub) | **Na `main`** |
-| Etapa J (UX dual surface) | **IN PROGRESS** (`feat/ux-dual-surface`) |
-| Esteira pós-MVP E–I | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
+| Etapas A–J (API + console NARA + admin + hardening + telemetria + hub + dual surface) | **Na `main`** |
+| Esteira pós-MVP E–J | **DONE** — [esteira-pos-mvp](docs/docs/operations/esteira-pos-mvp.md) |
 
 Retomar: [`docs/docs/operations/proximos-passos.md`](docs/docs/operations/proximos-passos.md).

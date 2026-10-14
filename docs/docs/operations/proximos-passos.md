@@ -1,7 +1,7 @@
 # Próximos passos — retomada do Bifrost
 
 **Atualizado:** 2026-10-14  
-**Estado:** Etapas A–I **DONE** na `main`. Etapa J (UX dual surface) **IN PROGRESS** (`feat/ux-dual-surface`).
+**Estado:** Etapas A–J **DONE** na `main` (J no PR #13). Esteira E–J fechada.
 
 ---
 
@@ -18,11 +18,11 @@
 | Etapa G — hardening | **DONE** (`main`, PR #9) |
 | Etapa H — telemetria samples | **DONE** (`main`, PR #11) |
 | Etapa I — UX hub de governança | **DONE** (`main`, PR #12) |
-| Etapa J — UX dual surface | **IN PROGRESS** (`feat/ux-dual-surface`) |
+| Etapa J — UX dual surface | **DONE** (`main`, PR #13) |
 
 **Documento normativo da fila:** [`esteira-pos-mvp.md`](esteira-pos-mvp.md).
 
-Branch de trabalho: `feat/ux-dual-surface`
+Branch de trabalho: `main`
 
 ---
 
@@ -47,4 +47,4 @@ Detalhes ROS: [`ambiente-local-nara.md`](ambiente-local-nara.md).
 
 ## Próxima ação imediata
 
-**Etapa J** — dual surface (hub/admin claros + console ops escuro) em `feat/ux-dual-surface`.
+Nenhuma etapa E–J aberta. Dual surface está na `main` (PR #13): login → hub claro (`#/`) → **Entrar no console** (`#/console`). Fora da esteira: ver [`esteira-pos-mvp.md`](esteira-pos-mvp.md) §7.

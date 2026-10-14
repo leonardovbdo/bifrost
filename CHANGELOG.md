@@ -10,7 +10,7 @@ Versionamento: [SemVer](https://semver.org/)
 ### Added
 
 - Etapa J: dual surface — hub/admin claros + console ops escuro
-  (câmera full-bleed, rail, tabs) (`feat/ux-dual-surface`)
+  (câmera full-bleed, rail, tabs) (PR #13)
 - Etapa I: Session Hub de governança antes do console ROS (`#/` →
   `#/console`); ROS só após Conectar; ações proibidas ocultas
   (PR #12)
