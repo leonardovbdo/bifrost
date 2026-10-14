@@ -65,6 +65,9 @@ export function ConsolePage({
   ]
   const visibleTabs = tabs.filter((t) => t.show)
   const activeTab = visibleTabs.some((t) => t.id === tab) ? tab : 'camera'
+  const showRail =
+    teleopEnabled || Boolean(goalSlot) || Boolean(rosError) || Boolean(error)
+
   function onTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     if (
       event.key !== 'ArrowRight' &&
@@ -139,53 +142,56 @@ export function ConsolePage({
         </div>
       </header>
 
-      <div className="console-body">
-        <aside className="console-rail" data-testid="console-rail">
-          <UiHint id="console">
-            Console ops: rosbridge sobe aqui. Rail = teleop/goal; tabs = câmera,
-            mapa, scan e assistente. Desconectar volta ao hub e fecha o ROS.
-          </UiHint>
-          {teleopEnabled ? (
-            <section className="rail-block" data-testid="teleop-block">
-              <h2>Teleop</h2>
-              <label className="field">
-                Preset
-                <select
-                  value={limits.teleop.profile}
-                  disabled={busy}
-                  onChange={(e) => void onChangePreset(e.target.value)}
-                >
-                  {PRESETS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <p className="hint">
-                lin {limits.teleop.linearMax.toFixed(2)} · ang{' '}
-                {limits.teleop.angularMax.toFixed(2)}
+      <UiHint id="console">
+        Console ops: rosbridge sobe aqui. Rail = teleop/goal; tabs = câmera,
+        mapa, scan e assistente. Desconectar volta ao hub e fecha o ROS.
+      </UiHint>
+
+      <div className={`console-body${showRail ? '' : ' is-stage-only'}`}>
+        {showRail ? (
+          <aside className="console-rail" data-testid="console-rail">
+            {teleopEnabled ? (
+              <section className="rail-block" data-testid="teleop-block">
+                <h2>Teleop</h2>
+                <label className="field">
+                  Preset
+                  <select
+                    value={limits.teleop.profile}
+                    disabled={busy}
+                    onChange={(e) => void onChangePreset(e.target.value)}
+                  >
+                    {PRESETS.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className="hint">
+                  lin {limits.teleop.linearMax.toFixed(2)} · ang{' '}
+                  {limits.teleop.angularMax.toFixed(2)}
+                </p>
+                <p className="hint">WASD / setas · espaço = stop</p>
+                <button type="button" className="btn-secondary" onClick={onStop}>
+                  Stop
+                </button>
+              </section>
+            ) : null}
+
+            {goalSlot ? <div className="rail-block">{goalSlot}</div> : null}
+
+            {rosError ? (
+              <p className="form-error console-ros-error" role="alert">
+                {rosError}
               </p>
-              <p className="hint">WASD / setas · espaço = stop</p>
-              <button type="button" className="btn-secondary" onClick={onStop}>
-                Stop
-              </button>
-            </section>
-          ) : null}
-
-          {goalSlot ? <div className="rail-block">{goalSlot}</div> : null}
-
-          {rosError ? (
-            <p className="form-error console-ros-error" role="alert">
-              {rosError}
-            </p>
-          ) : null}
-          {error ? (
-            <p className="form-error" role="alert">
-              {error}
-            </p>
-          ) : null}
-        </aside>
+            ) : null}
+            {error ? (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+          </aside>
+        ) : null}
 
         <section className="console-stage">
           <div className="stage-toolbar">

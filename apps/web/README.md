@@ -21,7 +21,8 @@ Com API + `npm run dev` já rodando:
 npm run test:e2e
 ```
 
-Cobre login → hub → console → desconectar; admin hint; viewer sem teleop/LLM.  
+Cobre login → hub → console → desconectar; admin hint; viewer sem teleop/LLM.
+O caso viewer precisa de `BIFROST_VIEWER_SEED_ENABLED=true` (ver `.env.example`).
 Vídeos (`.webm`) e pastas por teste ficam em `apps/web/test-results/` (gitignored).
 
 ## Demo Etapa J (dual surface)
